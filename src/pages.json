@@ -1,0 +1,63 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom",
+        "app-plus": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/result/result",
+      "style": {
+        "navigationStyle": "custom",
+        "app-plus": {
+          "animationType": "slide-in-right",
+          "animationDuration": 300
+        }
+      }
+    },
+    {
+      "path": "pages/setting/setting",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/about/about",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarBackgroundColor": "#8B4513",
+    "backgroundColor": "#F8F4EF",
+    "app-plus": {
+      "background": "#F8F4EF"
+    }
+  },
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#8B4513",
+    "borderStyle": "white",
+    "backgroundColor": "#fff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "取穴",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/setting/setting",
+        "text": "设置",
+        "iconPath": "static/tabbar/setting.png",
+        "selectedIconPath": "static/tabbar/setting-active.png"
+      }
+    ]
+  }
+}

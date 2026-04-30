@@ -1,0 +1,171 @@
+/* ============================================
+   子午流注取穴 - 全局样式
+   ============================================ */
+
+/* === 基础重置 === */
+page {
+  background-color: $tcm-bg;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  font-size: $font-size-base;
+  color: $tcm-text;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  word-break: break-all;
+}
+
+/* 统一 font-weight 在不同平台的表现 */
+text {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === 卡片 === */
+.card {
+  background-color: $tcm-bg-light;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+/* === 按钮 === */
+.btn-primary {
+  background: linear-gradient(135deg, $tcm-primary 0%, $tcm-primary-dark 100%);
+  color: #fff;
+  border: none;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+  
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.btn-outline {
+  background: transparent;
+  color: $tcm-primary;
+  border: 2rpx solid $tcm-primary;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:active {
+    background: rgba($tcm-primary, 0.05);
+  }
+}
+
+/* === 标签 === */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  
+  &-primary {
+    @extend .tag;
+    background: rgba($tcm-primary, 0.1);
+    color: $tcm-primary;
+  }
+  
+  &-secondary {
+    @extend .tag;
+    background: rgba($tcm-secondary, 0.1);
+    color: $tcm-secondary;
+  }
+}
+
+/* === 干支显示 === */
+.ganzhi-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64rpx;
+  height: 56rpx;
+  padding: 0 12rpx;
+  border-radius: $radius-sm;
+  background: rgba($tcm-primary, 0.08);
+  color: $tcm-primary;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  font-family: 'KaiTi', 'STKaiti', serif;
+}
+
+/* === 五行标签 === */
+.wuxing-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: 500;
+}
+
+/* === 穴位按钮 === */
+.point-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 24rpx;
+  border-radius: $radius-md;
+  background: rgba($tcm-primary, 0.08);
+  color: $tcm-primary;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  transition: all 0.2s;
+  
+  &:active {
+    transform: scale(0.97);
+    background: rgba($tcm-primary, 0.15);
+  }
+  
+  &__name {
+    font-family: 'KaiTi', 'STKaiti', serif;
+    font-weight: 600;
+    font-size: $font-size-base;
+  }
+  
+  &__code {
+    font-size: $font-size-xs;
+    opacity: 0.6;
+  }
+}
+
+/* === 分割线 === */
+.divider {
+  height: 1rpx;
+  background: rgba($tcm-primary, 0.1);
+}
+
+/* === 过渡动画 === */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-up-enter-from {
+  transform: translateY(30rpx);
+  opacity: 0;
+}
+.slide-up-leave-to {
+  transform: translateY(-30rpx);
+  opacity: 0;
+}
