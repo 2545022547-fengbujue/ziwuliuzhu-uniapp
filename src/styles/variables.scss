@@ -1,0 +1,64 @@
+/* ============================================
+   子午流注取穴 - 全局 SCSS 变量
+   中医主题色彩体系
+   ============================================ */
+
+// === 主色调 ===
+$tcm-primary: #8B4513;        // 棕色 - 主色（古典中医）
+$tcm-primary-light: #A0522D;  // 浅棕
+$tcm-primary-dark: #6B3410;   // 深棕
+
+// === 辅助色 ===
+$tcm-secondary: #5B8C3E;      // 草绿 - 辅助色
+$tcm-jade: #2E8B57;           // 翠玉绿
+$tcm-water: #1565C0;          // 藏青蓝
+
+// === 功能色 ===
+$tcm-red: #D32F2F;            // 警告/闭穴
+$tcm-gold: #B8860B;           // 金色
+
+// === 背景色 ===
+$tcm-bg: #F8F4EF;             // 宣纸底色
+$tcm-bg-light: #FFFDF5;       // 卡片底色
+$tcm-bg-dark: #F0E6D8;        // 深底色
+
+// === 文字色 ===
+$tcm-text: #2C2C2C;           // 主文字
+$tcm-text-secondary: #666;    // 辅助文字
+$tcm-text-hint: #999;         // 提示文字
+
+// === 五行配色 ===
+$wuxing-wood: #2E7D32;        // 木 - 青绿
+$wuxing-fire: #D32F2F;        // 火 - 朱红
+$wuxing-earth: #F57C00;       // 土 - 琥珀
+$wuxing-metal: #B8860B;       // 金 - 暗金
+$wuxing-water: #1565C0;       // 水 - 藏青
+
+// === 间距（手机端适配，适当增大）===
+$spacing-xs: 10rpx;
+$spacing-sm: 18rpx;
+$spacing-md: 28rpx;
+$spacing-lg: 36rpx;
+$spacing-xl: 52rpx;
+
+// === 圆角 ===
+$radius-sm: 8rpx;
+$radius-md: 16rpx;
+$radius-lg: 24rpx;
+$radius-xl: 32rpx;
+
+// === 阴影 ===
+$shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
+
+// === 字体（手机端适配，比桌面端大2-4rpx）===
+$font-size-xs: 22rpx;
+$font-size-sm: 26rpx;
+$font-size-base: 30rpx;
+$font-size-md: 34rpx;
+$font-size-lg: 38rpx;
+$font-size-xl: 48rpx;
+
+// === 导航栏 ===
+$navbar-height: 44px;
