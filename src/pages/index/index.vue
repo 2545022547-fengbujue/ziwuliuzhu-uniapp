@@ -240,7 +240,7 @@ const currentGanZhi = computed(() => {
     date = new Date(selectedDateStr.value)
     hourIndex = selectedHourIdx.value
   } else {
-    date = new Date()
+    date = store.currentTime  // 使用 store 的响应式时间，每秒更新
     hourIndex = getHourIndexFromDate(date)
   }
 
@@ -267,14 +267,20 @@ const currentGanZhi = computed(() => {
 })
 
 // 当前日期时间格式化字符串（如"2026年04月30日 22:30"）
+// 依赖 store.currentTime 的响应式更新，每秒刷新一次
 const currentDateTimeStr = computed(() => {
-  const d = store.isManualMode ? new Date(selectedDateStr.value) : new Date()
+  const d = store.isManualMode ? new Date(selectedDateStr.value) : store.currentTime
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
   const h = String(d.getHours()).padStart(2, '0')
   const min = String(d.getMinutes()).padStart(2, '0')
   return `${y}年${m}月${day}日 ${h}:${min}`
+})
+
+// 当前时辰索引（响应式，每秒更新）
+const currentHourIndex = computed(() => {
+  return getHourIndexFromDate(store.currentTime)
 })
 
 // === 手动模式状态 ===
@@ -339,12 +345,20 @@ function openCityPicker() {
 
 // === 生命周期 ===
 onMounted(() => {
-  // 每60秒自动更新时间（仅自动模式下生效）
+  // 每秒更新当前时间（轻量操作，只更新时间戳，不重新计算取穴）
+  // currentDateTimeStr 和 currentGanZhi 会自动响应式刷新
   timer = setInterval(() => {
     if (!store.isManualMode) {
-      store.updateCurrentTime()
+      const now = new Date()
+      const newHour = getHourIndexFromDate(now)
+      store.currentTime = now
+      // 仅在时辰变化时才重新计算取穴结果（避免每秒都做重计算）
+      if (newHour !== store.currentHour) {
+        store.currentHour = newHour
+        store.updateCurrentTime()
+      }
     }
-  }, 60000)
+  }, 1000)
 })
 
 onUnmounted(() => {
