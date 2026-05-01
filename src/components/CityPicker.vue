@@ -373,7 +373,7 @@ defineExpose({ open, close })
 .tip-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
   width: 100%;
   max-width: 100%;
 }

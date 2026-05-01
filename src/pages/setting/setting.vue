@@ -70,11 +70,13 @@
  *   2. 四种取穴方法的说明介绍
  *   3. 关于页面入口
  *
- * 城市选择：
- *   复用 CityPicker 弹窗组件（和首页完全一致），选择后更新 store 的经度和城市名
+ * 真太阳时交互：
+ *   - 用户打开真太阳时开关时，自动弹出 CityPicker 城市选择弹窗（延迟 100ms）
+ *   - 用户选择城市后，更新 store 的经度和城市名，自动重新计算取穴结果
+ *   - 关闭开关时，经度重置为默认值（104°，中国大陆中心）
  *
- * 注意：之前用 <picker> 原生下拉框选择城市，后来改成了 CityPicker 弹窗
- *   原因：下拉框在手机端体验差（300+ 城市滚动太长），弹窗支持搜索功能
+ * 城市选择：
+ *   复用 CityPicker 弹窗组件，选择后更新 store 的经度和城市名
  */
 import { ref, computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
@@ -96,9 +98,15 @@ const methodDescs = [
   { id: 'feiteng', icon: '⚡', name: '飞腾八法', desc: '取奇经八脉交会穴，以天干推算，按时取穴，方法更为简便。' }
 ]
 
-/** 真太阳时开关变化回调 */
+/** 真太阳时开关变化回调，开启时自动弹出城市选择 */
 function onSolarTimeToggle(e) {
   store.toggleTrueSolarTime(e.detail.value)
+  // 开启真太阳时时，自动弹出城市选择弹窗
+  if (e.detail.value) {
+    setTimeout(() => {
+      openCityPicker()
+    }, 100)
+  }
 }
 
 /** 打开城市选择弹窗（复用 CityPicker 组件） */

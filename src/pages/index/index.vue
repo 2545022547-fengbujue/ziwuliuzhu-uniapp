@@ -136,6 +136,29 @@
     <!-- 穴位详情弹窗 -->
     <PointDetail v-if="store.showDetail" />
 
+    <!-- 手动查询确认弹窗 -->
+    <view v-if="showQueryConfirm" class="confirm-overlay" @tap="showQueryConfirm = false">
+      <view class="confirm-popup" @tap.stop>
+        <text class="confirm-title">确认查询</text>
+        <view class="confirm-info">
+          <text class="confirm-label">日期</text>
+          <text class="confirm-value">{{ selectedDateStr }}</text>
+        </view>
+        <view class="confirm-info">
+          <text class="confirm-label">时辰</text>
+          <text class="confirm-value">{{ hourLabels[selectedHourIdx] }}</text>
+        </view>
+        <view class="confirm-btns">
+          <view class="confirm-cancel" @tap="showQueryConfirm = false">
+            <text>取消</text>
+          </view>
+          <view class="confirm-ok" @tap="confirmQuery">
+            <text>确认查询</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
   </view>
 </template>
 
@@ -145,21 +168,30 @@
  *
  * 功能：
  *   1. 显示当前干支时间（年/月/日/时）
- *   2. 自动模式：每60秒自动更新时间并重新计算
- *   3. 手动模式：用户选择日期和时辰查询
+ *   2. 自动模式：每秒更新时间显示，当时辰变动时才重新计算取穴结果
+ *   3. 手动模式：用户选择日期和时辰查询，需确认后才更新结果
  *   4. 取穴方法切换（纳甲法、纳子法、灵龟八法、飞腾八法）
- *   6. 反克法补充（纳甲法闭穴时自动显示）
- *   7. 其他方法对比（底部显示其他3种方法的结果）
+ *   5. 反克法补充（纳甲法闭穴时自动显示）
+ *   6. 其他方法对比（底部显示其他3种方法的结果）
  *
  * 核心逻辑：
  *   - currentGanZhi：独立计算干支（照搬电脑端 TimePicker 的逻辑）
  *   - 五鼠遁（日上起时法）：根据日天干推算时辰天干
- *   - 每60秒轮询更新（仅自动模式下）
+ *   - 每秒轮询更新时间显示（仅自动模式下），时辰变动时才重新计算取穴
+ *   - 手动模式使用 confirmedDateStr/confirmedHourIdx 已确认参数，
+ *     选择器改动不会立即生效，需点查询→确认后才更新显示和计算
+ *
+ * 手动模式查询流程：
+ *   选择日期/时辰 → 点"查询" → 弹出确认弹窗 → 确认 → 更新时间和干支及取穴结果
  *
  * 组件引用：
  *   - AppNavbar：自定义导航栏
  *   - ResultPanel：取穴结果面板（核心展示组件）
  *   - PointDetail：穴位详情弹窗（通过 store 控制显示）
+ *
+ * 注意：
+ *   - 真太阳时校正功能已移至设置页，首页不再包含该功能
+ *   - CityPicker 组件仅在设置页使用
  */
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAppStore } from '@/stores/app.js'
@@ -207,9 +239,9 @@ const wuShuDun = {
 const currentGanZhi = computed(() => {
   let date, hourIndex
   if (store.isManualMode) {
-    if (!selectedDateStr.value) return null
-    date = new Date(selectedDateStr.value)
-    hourIndex = selectedHourIdx.value
+    if (!confirmedDateStr.value) return null
+    date = new Date(confirmedDateStr.value)
+    hourIndex = confirmedHourIdx.value
   } else {
     date = store.currentTime  // 使用 store 的响应式时间，每秒更新
     hourIndex = getHourIndexFromDate(date)
@@ -242,11 +274,12 @@ const currentGanZhi = computed(() => {
 // 手动模式下显示所选时辰的起始时间（如未时→13:00）
 const currentDateTimeStr = computed(() => {
   if (store.isManualMode) {
-    const parts = selectedDateStr.value.split('-')
+    if (!confirmedDateStr.value) return '--'
+    const parts = confirmedDateStr.value.split('-')
     const y = parts[0]
     const m = parts[1]
     const day = parts[2]
-    const h = String(SHICHEN_START_HOURS[selectedHourIdx.value]).padStart(2, '0')
+    const h = String(SHICHEN_START_HOURS[confirmedHourIdx.value]).padStart(2, '0')
     return `${y}年${m}月${day}日 ${h}:00`
   }
   const d = store.currentTime
@@ -264,9 +297,13 @@ const currentHourIndex = computed(() => {
 })
 
 // === 手动模式状态 ===
-const selectedDateStr = ref(formatDate(new Date()))  // 手动模式选择的日期（"YYYY-MM-DD" 格式）
-const selectedHourIdx = ref(0)                         // 手动模式选择的时辰索引（0=子时, 1=丑时...）
+const selectedDateStr = ref(formatDate(new Date()))  // 手动模式选择的日期（"YYYY-MM-DD" 格式，待确认）
+const selectedHourIdx = ref(0)                         // 手动模式选择的时辰索引（待确认）
 const hourLabels = HOUR_OPTIONS.map(h => h.label)      // 时辰下拉选项标签（"子时 23:00-01:00"）
+const showQueryConfirm = ref(false)                    // 是否显示查询确认弹窗
+// 已确认的查询参数（用于显示时间和干支，确认后才更新）
+const confirmedDateStr = ref('')
+const confirmedHourIdx = ref(-1)
 
 // 是否显示反克法补充（仅纳甲法闭穴时显示）
 const showFankeSupplement = computed(() => {
@@ -292,6 +329,11 @@ function switchToManual() {
   const now = new Date()
   selectedDateStr.value = formatDate(now)
   selectedHourIdx.value = getHourIndexFromDate(now)
+  // 初始化已确认参数，切换时立即显示当前时间
+  confirmedDateStr.value = selectedDateStr.value
+  confirmedHourIdx.value = selectedHourIdx.value
+  // 用当前时间初始化查询结果
+  store.queryTime(now, selectedHourIdx.value)
 }
 
 /** 日期选择器变化回调 */
@@ -304,8 +346,17 @@ function onHourChange(e) {
   selectedHourIdx.value = Number(e.detail.value)
 }
 
-/** 手动查询：用选择的日期和时辰计算取穴结果 */
+/** 手动查询：弹出确认弹窗 */
 function handleQuery() {
+  showQueryConfirm.value = true
+}
+
+/** 确认查询：关闭弹窗后执行计算 */
+function confirmQuery() {
+  showQueryConfirm.value = false
+  // 保存已确认的参数，触发时间和干支显示更新
+  confirmedDateStr.value = selectedDateStr.value
+  confirmedHourIdx.value = selectedHourIdx.value
   const date = new Date(selectedDateStr.value)
   store.queryTime(date, selectedHourIdx.value)
 }
@@ -697,5 +748,79 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+}
+
+/* === 查询确认弹窗 === */
+.confirm-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-popup {
+  width: 75%;
+  background: #FFFDF5;
+  border-radius: 28rpx;
+  padding: 48rpx 40rpx;
+  box-shadow: 0 8rpx 30rpx rgba(0, 0, 0, 0.18);
+}
+
+.confirm-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: $tcm-primary;
+  text-align: center;
+  margin-bottom: 36rpx;
+}
+
+.confirm-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid rgba($tcm-primary, 0.06);
+}
+
+.confirm-label {
+  font-size: $font-size-sm;
+  color: $tcm-text-hint;
+}
+
+.confirm-value {
+  font-size: $font-size-sm;
+  color: $tcm-text;
+  font-weight: 500;
+}
+
+.confirm-btns {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 40rpx;
+}
+
+.confirm-cancel {
+  flex: 1;
+  padding: 24rpx 0;
+  background: $tcm-bg;
+  border-radius: 20rpx;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $tcm-text-secondary;
+}
+
+.confirm-ok {
+  flex: 1;
+  padding: 24rpx 0;
+  background: linear-gradient(135deg, $tcm-primary 0%, $tcm-primary-dark 100%);
+  border-radius: 20rpx;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4rpx 16rpx rgba(139, 69, 19, 0.2);
 }
 </style>
