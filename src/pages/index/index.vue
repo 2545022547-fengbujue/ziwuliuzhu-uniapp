@@ -5,7 +5,7 @@
     布局说明：
     - 顶部：导航栏 + 状态栏占位
     - 中间：可滚动区域（干支卡片、方法切换、结果面板）
-    - 底部：弹窗（CityPicker、PointDetail）
+    - 底部：弹窗（PointDetail）
   -->
   <view class="page">
     <!-- 导航栏 -->
@@ -57,33 +57,6 @@
           </view>
           <view class="query-btn" @tap="handleQuery">
             <text class="query-btn-text">🔍 查询</text>
-          </view>
-        </view>
-
-        <!-- 真太阳时设置 -->
-        <view class="solar-time-section">
-          <view class="solar-toggle-row">
-            <view class="solar-left">
-              <text class="solar-icon">🌍</text>
-              <text class="solar-label">真太阳时校正</text>
-            </view>
-            <switch
-              :checked="store.useTrueSolarTime"
-              @change="onSolarTimeToggle"
-              color="#8B4513"
-            />
-          </view>
-          <view v-if="store.useTrueSolarTime" class="solar-detail">
-            <view class="solar-city-row">
-              <text class="solar-city-label">当前城市</text>
-              <view class="city-picker-btn" @tap="openCityPicker">
-                <text class="city-name-text">{{ store.selectedCity }}</text>
-                <text class="city-arrow">▶</text>
-              </view>
-            </view>
-            <view class="solar-info-row">
-              <text class="solar-longitude">经度：{{ store.longitude.toFixed(1) }}°</text>
-            </view>
           </view>
         </view>
 
@@ -163,8 +136,6 @@
     <!-- 穴位详情弹窗 -->
     <PointDetail v-if="store.showDetail" />
 
-    <!-- 城市选择弹窗 -->
-    <CityPicker ref="cityPickerRef" />
   </view>
 </template>
 
@@ -176,8 +147,7 @@
  *   1. 显示当前干支时间（年/月/日/时）
  *   2. 自动模式：每60秒自动更新时间并重新计算
  *   3. 手动模式：用户选择日期和时辰查询
- *   4. 真太阳时校正：根据城市经度校正时辰
- *   5. 取穴方法切换（纳甲法、纳子法、灵龟八法、飞腾八法）
+ *   4. 取穴方法切换（纳甲法、纳子法、灵龟八法、飞腾八法）
  *   6. 反克法补充（纳甲法闭穴时自动显示）
  *   7. 其他方法对比（底部显示其他3种方法的结果）
  *
@@ -190,7 +160,6 @@
  *   - AppNavbar：自定义导航栏
  *   - ResultPanel：取穴结果面板（核心展示组件）
  *   - PointDetail：穴位详情弹窗（通过 store 控制显示）
- *   - CityPicker：城市选择弹窗（通过 ref 调用）
  */
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAppStore } from '@/stores/app.js'
@@ -200,12 +169,10 @@ import { getGanZhi, HEAVENLY_STEMS, EARTHLY_BRANCHES } from '@/services/ganzhi.j
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
-import CityPicker from '@/components/CityPicker.vue'
+
 
 const store = useAppStore()
 const { statusBarHeight, screenHeight, safeAreaBottom } = useSystemInfo()
-const cityPickerRef = ref(null)
-
 // 导航栏高度 = 状态栏 + 44px
 const navHeight = computed(() => statusBarHeight.value + 44)
 // 可滚动区域高度 = 屏幕高度 - 导航栏 - 底部安全区 - tab栏
@@ -328,19 +295,6 @@ function onHourChange(e) {
 function handleQuery() {
   const date = new Date(selectedDateStr.value)
   store.queryTime(date, selectedHourIdx.value)
-}
-
-/** 真太阳时开关变化回调 */
-function onSolarTimeToggle(e) {
-  store.toggleTrueSolarTime(e.detail.value)
-}
-
-/** 打开城市选择弹窗 */
-function openCityPicker() {
-  cityPickerRef.value.open((cityData) => {
-    // 回调：用户选择城市后，更新经度和城市名，并自动重新计算
-    store.updateLongitude(cityData.longitude, cityData.name)
-  })
 }
 
 // === 生命周期 ===
@@ -477,90 +431,6 @@ onUnmounted(() => {
   color: #fff;
   font-size: $font-size-sm;
   font-weight: 600;
-}
-
-/* === 真太阳时 === */
-.solar-time-section {
-  margin-bottom: $spacing-md;
-  padding: $spacing-md;
-  background: rgba($tcm-primary, 0.02);
-  border-radius: 20rpx;
-}
-
-.solar-toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.solar-left {
-  display: flex;
-  align-items: center;
-  gap: $spacing-xs;
-}
-
-.solar-icon {
-  font-size: $font-size-md;
-}
-
-.solar-label {
-  font-size: $font-size-sm;
-  color: $tcm-text;
-  font-weight: 500;
-}
-
-.solar-detail {
-  margin-top: $spacing-md;
-  padding-top: $spacing-md;
-  border-top: 1rpx solid rgba($tcm-primary, 0.08);
-}
-
-.solar-city-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: $spacing-sm;
-}
-
-.solar-city-label {
-  font-size: $font-size-xs;
-  color: $tcm-text-secondary;
-  flex-shrink: 0;
-}
-
-.city-picker-btn {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 10rpx 24rpx;
-  background: #fff;
-  border: 1rpx solid rgba($tcm-primary, 0.15);
-  border-radius: 16rpx;
-  max-width: 55%;
-}
-
-.city-name-text {
-  font-size: $font-size-sm;
-  color: $tcm-primary;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.city-arrow {
-  font-size: 16rpx;
-  color: $tcm-text-hint;
-  flex-shrink: 0;
-}
-
-.solar-info-row {
-  margin-top: 4rpx;
-}
-
-.solar-longitude {
-  font-size: $font-size-xs;
-  color: $tcm-text-hint;
 }
 
 /* === 当前日期时间 === */

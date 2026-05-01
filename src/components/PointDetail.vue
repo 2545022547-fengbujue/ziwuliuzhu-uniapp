@@ -27,15 +27,15 @@
           <view class="info-grid">
             <view class="info-item">
               <text class="info-label">所属经络</text>
-              <text class="info-value">{{ point?.meridian || '-' }}</text>
+              <text class="info-value info-value-center">{{ point?.meridian || '-' }}</text>
             </view>
             <view class="info-item">
               <text class="info-label">穴位类别</text>
-              <text class="info-value">{{ point?.category || '-' }}</text>
+              <text class="info-value info-value-center">{{ formatCategory(point?.category) || '-' }}</text>
             </view>
             <view class="info-item">
               <text class="info-label">五行属性</text>
-              <text class="info-value" :style="getWuxingTextStyle(point?.wuxing)">
+              <text class="info-value info-value-center wuxing-value" :style="getWuxingTextStyle(point?.wuxing)">
                 {{ point?.wuxing || '-' }}
               </text>
             </view>
@@ -136,6 +136,15 @@ function getWuxingTextStyle(wuxing) {
   return styles[wuxing] || { color: '#4b5563' }
 }
 
+/**
+ * 格式化穴位类别，去掉顿号
+ * "井穴、输穴" → "井穴 输穴"
+ */
+function formatCategory(category) {
+  if (!category) return ''
+  return category.replace(/、/g, ' ')
+}
+
 function handleClose() {
   store.closeDetail()
 }
@@ -210,7 +219,7 @@ function handleClose() {
 .header-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0px;
   flex: 1;
 }
 
@@ -307,6 +316,15 @@ function handleClose() {
   font-weight: 500;
   color: #2C2C2C;
   word-break: keep-all;
+}
+
+.info-value-center {
+  text-align: center;
+}
+
+.wuxing-value {
+  font-size: 20px;
+  font-weight: 700;
 }
 
 /* === 定位 === */
