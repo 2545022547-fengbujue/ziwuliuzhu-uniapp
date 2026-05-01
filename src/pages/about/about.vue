@@ -29,6 +29,13 @@
           <text class="info-value">Android / iOS</text>
         </view>
       </view>
+
+      <!-- 免责声明 -->
+      <view class="disclaimer-card">
+        <text class="disclaimer-text">
+          免责声明：本软件所提供的取穴结果基于传统中医时间医学理论，仅供参考，不作为临床诊疗的唯一依据。实际应用中应以临床实际为准，遵循中医"三因制宜"（因时、因地、因人）原则，结合患者具体情况进行辨证施治。
+        </text>
+      </view>
     </view>
   </view>
 </template>
@@ -83,4 +90,16 @@ function goBack() {
 }
 .info-label { font-size: $font-size-sm; color: $tcm-text; }
 .info-value { font-size: $font-size-sm; color: $tcm-text-secondary; }
+
+.disclaimer-card {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+}
+
+.disclaimer-text {
+  font-size: 22rpx;
+  color: $tcm-text-hint;
+  line-height: 1.8;
+  text-align: justify;
+}
 </style>

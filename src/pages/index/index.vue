@@ -187,6 +187,10 @@ const methods = [
   { id: 'feiteng', name: '飞腾八法', icon: '⚡' }
 ]
 
+// 时辰起始小时数（用于手动模式显示时间）
+// 子时23点、丑时1点、寅时3点、卯时5点...亥时21点
+const SHICHEN_START_HOURS = [23, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21]
+
 // 五鼠遁（日上起时法）— 根据日天干推算时辰天干的起始索引
 // 甲己日起甲子时（索引0），乙庚日起丙子时（索引2），以此类推
 const wuShuDun = {
@@ -235,8 +239,17 @@ const currentGanZhi = computed(() => {
 
 // 当前日期时间格式化字符串（如"2026年04月30日 22:30"）
 // 依赖 store.currentTime 的响应式更新，每秒刷新一次
+// 手动模式下显示所选时辰的起始时间（如未时→13:00）
 const currentDateTimeStr = computed(() => {
-  const d = store.isManualMode ? new Date(selectedDateStr.value) : store.currentTime
+  if (store.isManualMode) {
+    const parts = selectedDateStr.value.split('-')
+    const y = parts[0]
+    const m = parts[1]
+    const day = parts[2]
+    const h = String(SHICHEN_START_HOURS[selectedHourIdx.value]).padStart(2, '0')
+    return `${y}年${m}月${day}日 ${h}:00`
+  }
+  const d = store.currentTime
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
