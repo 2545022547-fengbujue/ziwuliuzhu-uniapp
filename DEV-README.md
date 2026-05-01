@@ -1,6 +1,6 @@
 # 子午流注取穴 uni-app 移动端 — 开发文档
 
-> 最后更新：2026-05-01
+> 最后更新：2026-05-01（新增：查询确认弹窗、真太阳时自动弹窗、免责声明、应用图标、代码注释更新）
 > 项目路径：`D:\WorkBuddyWorkspaces\ziwuliuzhu-uniapp`
 > 桌面版（Vue3 + Electron）路径：`D:\WorkBuddyWorkspaces\子午流注取穴`
 
@@ -230,8 +230,10 @@ store.closeDetail()       // 关闭弹窗
 ```
 
 **显示内容**：
-1. 头部：穴位名称（楷体）+ 穴位代码（右对齐，小字号）
-2. 基本信息：所属经络、穴位类别、五行属性（彩色）
+1. 头部：穴位名称（楷体）+ 穴位代码（右对齐，小字号），间距 gap: 0px
+2. 基本信息：所属经络、穴位类别（去除顿号显示）、五行属性（彩色，20px 加粗）
+   - 三个信息栏的内容文字居中，标题（label）左对齐
+   - 穴位类别中的顿号在模板层通过 `formatCategory()` 去除，不修改原数据
 3. 定位：穴位位置描述
 4. 功能主治：功能标签（绿色）+ 主治标签（蓝色）
 5. 操作方法：针刺、艾灸
@@ -241,6 +243,8 @@ store.closeDetail()       // 关闭弹窗
 - 定位文字换行不美观：用 `word-break: normal; overflow-wrap: break-word` 避免在文字中间断行
 - 穴位代码右对齐：用 `align-self: flex-end` + `margin-right: -28px`
 - 字体：安卓不支持 KaiTi，font-family 需加 `'KaiTi', '楷体', 'STKaiti', 'FangSong', 'SimSun', serif`
+- 五行属性加大加粗：`.wuxing-value { font-size: 20px; font-weight: 700; }`
+- 去顿号：`formatCategory(category) { return category.replace(/、/g, ' ') }`
 
 ### 3.4 AppNavbar.vue — 导航栏
 
@@ -330,27 +334,52 @@ store.closeDetail()       // 关闭弹窗
 ```
 ┌─ AppNavbar（导航栏）
 ├─ 干支信息卡片（年/月/日/时 标签）
-├─ 时间切换区（自动/手动模式切换 + 日期时辰选择）
+│   ├─ 时间切换区（自动/手动模式切换 + 日期时辰选择）
+│   └─ 手动查询需确认后才更新（确认弹窗）
 ├─ 取穴方法标签栏（纳甲/纳子/灵龟/飞腾）
 ├─ 主 ResultPanel（当前选中方法的结果）
 ├─ 反克法补充区（纳甲法闭穴时自动显示）
 ├─ 其他方法对比区（底部显示其余3种方法）
-└─ CityPicker 弹窗（默认隐藏）
-    PointDetail 弹窗（通过 store 控制，默认隐藏）
+└─ 穴位详情弹窗 PointDetail（通过 store 控制，默认隐藏）
+    手动查询确认弹窗（v-if 控制，默认隐藏）
 ```
+
+**注意**：真太阳时校正功能已移至设置页，CityPicker 仅在设置页使用。
 
 ### 5.2 自动更新机制
 
 ```js
-// 每60秒自动更新（仅自动模式下生效）
+// 每秒更新时间显示（仅自动模式下生效）
+// 当时辰变动时（如 08:59→09:00），才重新计算取穴结果
 onMounted(() => {
   timer = setInterval(() => {
     if (!store.isManualMode) {
-      store.updateCurrentTime()
+      const now = new Date()
+      const newHour = getHourIndexFromDate(now)
+      store.currentTime = now
+      if (newHour !== store.currentHour) {
+        store.currentHour = newHour
+        store.updateCurrentTime()
+      }
     }
-  }, 60000)
+  }, 1000)
 })
 ```
+
+**时辰变动检测**：每秒通过 `getHourIndexFromDate(now)` 计算时辰索引（0-11），与 `store.currentHour` 比较。当时钟跨越边界（如 08:59→09:00），索引从 4 变为 5，触发重新计算。
+
+### 5.3 手动查询确认机制
+
+手动模式下，用户选择日期和时辰后，需点击"查询"→弹出确认弹窗→确认后才更新显示和结果。
+
+**核心变量**：
+- `selectedDateStr` / `selectedHourIdx`：选择器的当前值（未确认，可随时修改）
+- `confirmedDateStr` / `confirmedHourIdx`：已确认的参数（用于显示和计算）
+- `showQueryConfirm`：确认弹窗显示状态
+
+**流程**：选择器改动 → 点"查询" → 弹窗确认 → confirmedXxx 更新 → 时间/干支/取穴结果更新
+
+**作用**：防止用户在选择过程中触发实时计算，确保查询结果的准确性。
 
 ### 5.3 干支独立计算
 
@@ -508,11 +537,93 @@ $radius-xl: 32rpx;
 
 ---
 
-## 九、后续待完成
+## 九、应用图标
 
-- [ ] CityPicker 搜索框输入在真机上的最终验证
+### 9.1 图标说明
+
+应用使用仿 Electron Forge 默认的原子轨道图标：
+- 黑色圆形背景 + 白色三轨道原子 + 白色原子核
+- 用 Python Pillow 生成（1024×1024 像素）
+
+### 9.2 图标文件位置
+
+| 路径 | 说明 |
+|------|------|
+| `src/static/icons/atom.svg` | 矢量源文件 |
+| `src/static/icons/atom.png` | 1024×1024 原图 |
+| `src/static/icons/icon.png` | uni-app 应用图标 |
+| `src/static/icons/logo.png` | logo 副本 |
+| `src/static/logo.png` | H5 页面用（uni-app 默认读取路径） |
+
+### 9.3 如需修改图标
+
+用 Python Pillow 重新生成即可，生成脚本参考 2026-05-01 日记忆。图标需重新云打包才能在 APK 中生效。
+
+---
+
+## 十、Android APK 打包
+
+### 10.1 打包方式
+
+使用 HBuilderX CLI 云端打包，无需本地安装 Android SDK。
+
+### 10.2 打包命令
+
+```bash
+"D:/WorkBuddyWorkspaces/HBuilderX/cli" pack \
+  --project "D:/WorkBuddyWorkspaces/ziwuliuzhu-uniapp" \
+  --platform android \
+  --android.packagename "com.ziwuliuzhu.acupuncture" \
+  --android.androidpacktype 3
+```
+
+- `--android.androidpacktype 3`：使用 DCloud 云端证书
+- 包名：`com.ziwuliuzhu.acupuncture`
+- AppID：`__UNI__D99F77B`
+
+### 10.3 打包前提
+
+1. DCloud 账号必须绑定手机号
+2. AppID 必须在 DCloud 开发者中心创建
+3. 项目必须先通过 `cli project open` 导入 HBuilderX
+4. HBuilderX 主程序必须在运行中
+
+### 10.4 APK 输出位置
+
+打包完成后 APK 下载到：`C:\Users\黄文路\Downloads\子午流注取穴.apk`
+
+---
+
+## 十一、免责声明
+
+关于页面底部显示免责声明：
+
+> 免责声明：软件所提供的取穴结果仅供参考，不作为任何临床诊疗依据。实际应用中应以临床实际为准，因时、因地、因人，结合患者具体情况进行辨证施治。
+
+---
+
+## 十二、已完成与后续待完成
+
+### 已完成
+
+- [x] 项目骨架搭建（uni-app Vue3 + Vite）
+- [x] 算法层/数据层迁移（从桌面版）
+- [x] 手机端 UI 适配（字号、间距、弹窗布局）
+- [x] 城市选择弹窗优化（input 聚焦、scroll-view、布局溢出）
+- [x] 穴位详情弹窗优化（背景截断、排版、五行加粗、去顿号）
+- [x] 取穴界面移除真太阳时（仅保留设置页）
+- [x] 手动查询确认弹窗机制
+- [x] 设置页开启真太阳时自动弹出城市选择
+- [x] 应用原子图标生成（黑色背景 + 白色轨道）
+- [x] 时间自动更新（每秒刷新，时辰变动时重新计算）
+- [x] 代码注释完善
+- [x] Git 备份推送到 GitHub
+- [x] Android APK 云打包
+
+### 待完成
+
+- [ ] 微信小程序适配（待办 #22）
 - [ ] uview-plus 组件库集成（按需使用）
-- [ ] App 打包（需 HBuilderX 本地安装，云打包生成 APK/IPA）
 - [ ] 页面切换动画
 - [ ] 性能优化（懒加载、分包）
 - [ ] 深色模式支持

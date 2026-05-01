@@ -33,7 +33,7 @@
       <!-- 免责声明 -->
       <view class="disclaimer-card">
         <text class="disclaimer-text">
-          免责声明：本软件所提供的取穴结果基于传统中医时间医学理论，仅供参考，不作为临床诊疗的唯一依据。实际应用中应以临床实际为准，遵循中医"三因制宜"（因时、因地、因人）原则，结合患者具体情况进行辨证施治。
+          免责声明：软件所提供的取穴结果仅供参考，不作为任何临床诊疗依据。实际应用中应以临床实际为准，因时、因地、因人，结合患者具体情况进行辨证施治。
         </text>
       </view>
     </view>
@@ -41,6 +41,17 @@
 </template>
 
 <script setup>
+/**
+ * 关于页 - about.vue
+ *
+ * 功能：
+ *   1. 显示应用名称、版本号、简介
+ *   2. 显示技术栈和适用平台信息
+ *   3. 免责声明（底部小字）
+ *
+ * 免责声明：
+ *   软件取穴结果仅供参考，不作为临床诊疗依据，需结合三因制宜辨证施治
+ */
 import { computed } from 'vue'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
