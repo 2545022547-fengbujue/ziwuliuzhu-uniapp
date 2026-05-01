@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 黑色圆形背景 -->
+  <circle cx="256" cy="256" r="256" fill="#1e1e1e"/>
+  <!-- 原子轨道椭圆（三个方向） -->
+  <ellipse cx="256" cy="256" rx="180" ry="70" fill="none" stroke="white" stroke-width="12" transform="rotate(0,256,256)"/>
+  <ellipse cx="256" cy="256" rx="180" ry="70" fill="none" stroke="white" stroke-width="12" transform="rotate(60,256,256)"/>
+  <ellipse cx="256" cy="256" rx="180" ry="70" fill="none" stroke="white" stroke-width="12" transform="rotate(120,256,256)"/>
+  <!-- 中心圆（原子核） -->
+  <circle cx="256" cy="256" r="30" fill="white"/>
+</svg>
