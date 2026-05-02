@@ -66,12 +66,13 @@
           <view class="dot primary"></view>
           <text>当前开穴</text>
         </view>
-        <view class="points-grid">
+        <view class="points-grid" :style="gridStyle">
           <view
-            v-for="point in result.openPoints"
+            v-for="point in displayPoints"
             :key="point.id"
             class="point-btn"
             :class="{ open: point.isOpen }"
+            :style="getPointStyle(point)"
             @tap="handlePointClick(point)"
           >
             <text class="point-name">{{ point.name }}</text>
@@ -152,6 +153,20 @@ const store = useAppStore()
 // 从 store 中获取当前方法的计算结果（响应式）
 const result = computed(() => store.results[props.method])
 
+// 穴位显示列表：纳子法按名字字数排序（两字在前、三字在后），其他方法不变
+const displayPoints = computed(() => {
+  if (!result.value?.openPoints) return []
+  const points = result.value.openPoints
+  if (props.method !== 'nazi') return points
+  return [...points].sort((a, b) => (a.name?.length || 0) - (b.name?.length || 0))
+})
+
+// 网格容器样式：纳子法缩小间距
+const gridStyle = computed(() => {
+  if (props.method !== 'nazi') return null
+  return { gap: '10rpx' }
+})
+
 // 方法中文名映射
 const methodName = computed(() => {
   const names = { najia: '纳甲法', nazi: '纳子法', lingui: '灵龟八法', feiteng: '飞腾八法', fanke: '反克法' }
@@ -178,6 +193,18 @@ function getWuxingStyle(wuxing) {
     '水': { color: '#1565C0', bg: 'rgba(21,101,192,0.08)' }  // 藏青
   }
   return styles[wuxing] || { color: '#4b5563', bg: '#f3f4f6' }
+}
+
+/**
+ * 穴位按钮样式：纳子法缩小 padding 让一行放三个
+ */
+function getPointStyle(point) {
+  if (props.method !== 'nazi') return null
+  var isLong = point.name && point.name.length > 2
+  return {
+    padding: isLong ? '14rpx 20rpx' : '14rpx 16rpx',
+    gap: '6rpx'
+  }
 }
 
 /**

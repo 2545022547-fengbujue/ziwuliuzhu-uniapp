@@ -28,11 +28,19 @@
     }
   },
   "mp-weixin": {
-    "appid": "",
+    "appid": "wx32e2d3fcf6cdb9d4",
     "setting": {
-      "urlCheck": false
+      "urlCheck": false,
+      "es6": true,
+      "postcss": true,
+      "minified": true
     },
-    "usingComponents": true
+    "usingComponents": true,
+    "optimization": {
+      "subPackages": true
+    },
+    "permission": {},
+    "requiredPrivateInfos": []
   },
   "h5": {
     "title": "子午流注取穴",

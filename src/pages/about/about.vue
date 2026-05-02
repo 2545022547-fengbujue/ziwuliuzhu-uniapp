@@ -26,7 +26,7 @@
         </view>
         <view class="info-row">
           <text class="info-label">适用平台</text>
-          <text class="info-value">Android / iOS</text>
+          <text class="info-value">Android / iOS / 微信小程序</text>
         </view>
       </view>
 
