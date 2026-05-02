@@ -15,6 +15,11 @@
     },
     "distribute": {
       "android": {
+        "icons": {
+          "hdpi": "static/icons/icon.png",
+          "xhdpi": "static/icons/icon.png",
+          "xxhdpi": "static/icons/icon.png"
+        },
         "permissions": [
           "<uses-permission android:name=\"android.permission.INTERNET\" />",
           "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />"
