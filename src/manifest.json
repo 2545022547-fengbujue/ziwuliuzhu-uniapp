@@ -13,13 +13,17 @@
       "autoclose": true,
       "waiting": true
     },
+    "icons": {
+      "android": {
+        "48": "/static/icons/icon-48.png",
+        "72": "/static/icons/icon-72.png",
+        "96": "/static/icons/icon-96.png",
+        "144": "/static/icons/icon-144.png",
+        "192": "/static/icons/icon-192.png"
+      }
+    },
     "distribute": {
       "android": {
-        "icons": {
-          "hdpi": "static/icons/icon.png",
-          "xhdpi": "static/icons/icon.png",
-          "xxhdpi": "static/icons/icon.png"
-        },
         "permissions": [
           "<uses-permission android:name=\"android.permission.INTERNET\" />",
           "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />"
