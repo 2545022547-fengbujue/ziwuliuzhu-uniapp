@@ -57,4 +57,4 @@ npm run build:h5
 
 ## 许可
 
-Apache-2.0
+[AGPL-3.0](LICENSE)
