@@ -18,12 +18,12 @@ export const FANKE_TABLE = {
   '己+甲子': { code: 'GB38', name: '阳辅', wuxing: '火', type: '经穴' },
   '戊+甲寅': { code: 'GB43', name: '侠溪', wuxing: '水', type: '荥穴' },
   '丁+甲辰': { code: 'GB34', name: '阳陵泉', wuxing: '土', type: '合穴' },
-  '丙+甲午': { code: 'GB40', name: '丘墟', wuxing: '木', type: '输穴' },
+  '丙+甲午': { code: 'GB41', name: '足临泣', wuxing: '木', type: '输穴' },
   '乙+甲申': { code: 'TE2', name: '液门', wuxing: '水', type: '气纳三焦' },
   
   // 六乙（乙开头的六个时辰）
   '乙+乙酉': { code: 'LR1', name: '大敦', wuxing: '木', type: '井穴' },
-  '己+乙亥': { code: 'LR5', name: '中封', wuxing: '金', type: '经穴' },
+  '己+乙亥': { code: 'LR4', name: '中封', wuxing: '金', type: '经穴' },
   '己+乙丑': { code: 'LR2', name: '行间', wuxing: '火', type: '荥穴' },
   '戊+乙卯': { code: 'LR8', name: '曲泉', wuxing: '水', type: '合穴' },
   '丁+乙巳': { code: 'LR3', name: '太冲', wuxing: '土', type: '输穴' },
@@ -39,7 +39,7 @@ export const FANKE_TABLE = {
   
   // 六丁（丁开头的六个时辰）
   '丁+丁未': { code: 'HT9', name: '少冲', wuxing: '木', type: '井穴' },
-  '辛+丁酉': { code: 'HT5', name: '灵道', wuxing: '金', type: '经穴' },
+  '辛+丁酉': { code: 'HT4', name: '灵道', wuxing: '金', type: '经穴' },
   '庚+丁亥': { code: 'HT8', name: '少府', wuxing: '火', type: '荥穴' },
   '庚+丁丑': { code: 'HT3', name: '少海', wuxing: '水', type: '合穴' },
   '己+丁卯': { code: 'HT7', name: '神门', wuxing: '土', type: '输穴' },
@@ -51,7 +51,7 @@ export const FANKE_TABLE = {
   '辛+戊戌': { code: 'ST44', name: '内庭', wuxing: '水', type: '荥穴' },
   '辛+戊子': { code: 'ST36', name: '足三里', wuxing: '土', type: '合穴' },
   '庚+戊寅': { code: 'ST43', name: '陷谷', wuxing: '木', type: '输穴' },
-  '己+戊辰': { code: 'TE5', name: '支沟', wuxing: '火', type: '气纳三焦' },
+  '己+戊辰': { code: 'TE6', name: '支沟', wuxing: '火', type: '气纳三焦' },
   
   // 六己（己开头的六个时辰）
   '己+己巳': { code: 'SP1', name: '隐白', wuxing: '木', type: '井穴' },

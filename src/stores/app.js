@@ -26,11 +26,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { getGanZhi, HEAVENLY_STEMS, EARTHLY_BRANCHES } from '@/services/ganzhi.js'
+import { WU_SHU_DUN } from '@/data/constants.js'
 import { calculateNajia, calculateFanke } from '@/services/najia.js'
 import { calculateNazi } from '@/services/nazi.js'
 import { calculateLingui } from '@/services/lingui.js'
 import { calculateFeiteng } from '@/services/feiteng.js'
 import { getHourIndexFromDate } from '@/utils/date.js'
+import { APP_CONFIG } from '@/config/index.js'
 
 export const useAppStore = defineStore('app', () => {
   // === 时间状态 ===
@@ -52,33 +54,19 @@ export const useAppStore = defineStore('app', () => {
     fanke: null
   })
 
-  // === 穴位数据库 ===
-  const acupuncturePoints = ref([])
-
   // === UI 状态 ===
   const showDetail = ref(false)
   const selectedPoint = ref(null)
+  const naziMode = ref('daily')  // 纳子法模式：'daily'(一日六十六穴) | 'bumu'(补母泻子)
 
   // === 真太阳时设置 ===
   const useTrueSolarTime = ref(false)
-  const longitude = ref(104) // 默认经度（中国大陆中心）
+  const longitude = ref(APP_CONFIG.defaultLongitude) // 默认北京经度
   const selectedCity = ref('北京')
-
-  // === 五鼠遁（日上起时法）===
-  const wuShuDun = {
-    '甲': 0, '己': 0,
-    '乙': 2, '庚': 2,
-    '丙': 4, '辛': 4,
-    '丁': 6, '壬': 6,
-    '戊': 8, '癸': 8
-  }
 
   // === 计算属性 ===
   const currentResults = computed(() => results.value[activeMethod.value])
-  const currentGanZhi = computed(() => {
-    const r = results.value.najia
-    return r ? r.ganzhi : null
-  })
+  const currentGanZhi = ref(null)
 
   // === 构建干支信息 ===
   function buildGanZhi(date, hourIndex) {
@@ -86,7 +74,7 @@ export const useAppStore = defineStore('app', () => {
     const dayStem = baseGanZhi.day.heavenlyStem
     const hourBranchIndex = hourIndex
     const hourBranch = EARTHLY_BRANCHES[hourBranchIndex]
-    const startStemIndex = wuShuDun[dayStem] || 0
+    const startStemIndex = WU_SHU_DUN[dayStem] || 0
     const hourStemIndex = (startStemIndex + hourBranchIndex) % 10
     const hourStem = HEAVENLY_STEMS[hourStemIndex]
 
@@ -106,11 +94,18 @@ export const useAppStore = defineStore('app', () => {
   function calculateResults(ganzhi, hourIndex) {
     return {
       najia: calculateNajia(ganzhi, hourIndex),
-      nazi: calculateNazi(ganzhi, hourIndex, '平补平泻'),
+      nazi: calculateNazi(ganzhi, hourIndex),
       lingui: calculateLingui(ganzhi, hourIndex),
       feiteng: calculateFeiteng(ganzhi, hourIndex),
       fanke: calculateFanke(ganzhi, hourIndex)
     }
+  }
+
+  // === 内部：重新计算干支和取穴结果 ===
+  function _recalculate(date, hourIndex) {
+    const ganzhi = buildGanZhi(date, hourIndex)
+    currentGanZhi.value = ganzhi
+    results.value = calculateResults(ganzhi, hourIndex)
   }
 
   // === 更新当前系统时间（自动模式）===
@@ -118,9 +113,7 @@ export const useAppStore = defineStore('app', () => {
     const now = new Date()
     currentTime.value = now
     currentHour.value = getHourIndexFromDate(now)
-
-    const ganzhi = buildGanZhi(now, currentHour.value)
-    results.value = calculateResults(ganzhi, currentHour.value)
+    _recalculate(now, currentHour.value)
   }
 
   // === 用户选择时间查询（手动模式）===
@@ -128,9 +121,7 @@ export const useAppStore = defineStore('app', () => {
     selectedDate.value = date
     selectedHour.value = hour
     isManualMode.value = true
-
-    const ganzhi = buildGanZhi(date, hour)
-    results.value = calculateResults(ganzhi, hour)
+    _recalculate(date, hour)
   }
 
   // === 切换回自动模式 ===
@@ -139,16 +130,22 @@ export const useAppStore = defineStore('app', () => {
     updateCurrentTime()
   }
 
+  // === 切换到手动模式 ===
+  function switchToManualMode(date, hour) {
+    isManualMode.value = true
+    selectedDate.value = date
+    selectedHour.value = hour
+    _recalculate(date, hour)
+  }
+
   // === 更新经度 ===
   function updateLongitude(newLongitude, city) {
     longitude.value = newLongitude
     useTrueSolarTime.value = true
     if (city) selectedCity.value = city
 
-    // 重新计算
     if (isManualMode.value) {
-      const ganzhi = buildGanZhi(selectedDate.value, selectedHour.value)
-      results.value = calculateResults(ganzhi, selectedHour.value)
+      _recalculate(selectedDate.value, selectedHour.value)
     } else {
       updateCurrentTime()
     }
@@ -158,12 +155,11 @@ export const useAppStore = defineStore('app', () => {
   function toggleTrueSolarTime(enabled) {
     useTrueSolarTime.value = enabled
     if (!enabled) {
-      longitude.value = 104
+      longitude.value = APP_CONFIG.defaultLongitude
     }
-    // 重新计算
+
     if (isManualMode.value) {
-      const ganzhi = buildGanZhi(selectedDate.value, selectedHour.value)
-      results.value = calculateResults(ganzhi, selectedHour.value)
+      _recalculate(selectedDate.value, selectedHour.value)
     } else {
       updateCurrentTime()
     }
@@ -172,6 +168,11 @@ export const useAppStore = defineStore('app', () => {
   // === 设置当前方法 ===
   function setActiveMethod(method) {
     activeMethod.value = method
+  }
+
+  // === 纳子法模式切换 ===
+  function setNaziMode(mode) {
+    naziMode.value = mode
   }
 
   // === 穴位详情 ===
@@ -197,9 +198,9 @@ export const useAppStore = defineStore('app', () => {
     isManualMode,
     activeMethod,
     results,
-    acupuncturePoints,
     showDetail,
     selectedPoint,
+    naziMode,
     useTrueSolarTime,
     longitude,
     selectedCity,
@@ -210,9 +211,11 @@ export const useAppStore = defineStore('app', () => {
     updateCurrentTime,
     queryTime,
     switchToAutoMode,
+    switchToManualMode,
     updateLongitude,
     toggleTrueSolarTime,
     setActiveMethod,
+    setNaziMode,
     selectPoint,
     closeDetail
   }
@@ -227,10 +230,14 @@ export const useAppStore = defineStore('app', () => {
             try { return uni.getStorageSync(key) } catch { return null }
           },
           setItem: (key, value) => {
-            try { uni.setStorageSync(key, value) } catch {}
+            try { uni.setStorageSync(key, value) } catch (e) {
+              console.warn('[持久化写入失败]', key, e)
+            }
           },
           removeItem: (key) => {
-            try { uni.removeStorageSync(key) } catch {}
+            try { uni.removeStorageSync(key) } catch (e) {
+              console.warn('[持久化删除失败]', key, e)
+            }
           }
         },
         paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod']

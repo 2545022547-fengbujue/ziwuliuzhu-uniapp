@@ -8,7 +8,7 @@
       </template>
     </AppNavbar>
     <view :style="{ height: navHeight + 'px' }"></view>
-    <scroll-view scroll-y class="page-scroll">
+    <scroll-view scroll-y class="page-scroll" :style="{ height: scrollHeight + 'px' }">
       <view class="result-content">
         <view v-for="method in allMethods" :key="method" class="result-section">
           <ResultPanel :method="method" />
@@ -27,6 +27,7 @@ import ResultPanel from '@/components/ResultPanel.vue'
 
 const { statusBarHeight, screenHeight, safeAreaBottom } = useSystemInfo()
 const navHeight = computed(() => statusBarHeight.value + 44)
+const scrollHeight = computed(() => screenHeight.value - navHeight.value - safeAreaBottom.value)
 const safeBottom = computed(() => safeAreaBottom.value)
 const allMethods = ['najia', 'nazi', 'lingui', 'feiteng']
 
@@ -40,7 +41,7 @@ function goBack() {
   min-height: 100vh;
   background-color: $tcm-bg;
 }
-.page-scroll { width: 100%; height: calc(100vh - 200rpx); }
+.page-scroll { width: 100%; }
 .back-btn { padding: 10rpx; }
 .back-icon { font-size: 40rpx; color: #fff; }
 .result-content { padding: $spacing-md; }

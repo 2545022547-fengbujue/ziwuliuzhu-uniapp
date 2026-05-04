@@ -55,7 +55,7 @@ const rightStyle = computed(() => {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 999;
+  z-index: 100;
 
   &-content {
     display: flex;

@@ -2,7 +2,7 @@
   <view class="page">
     <AppNavbar title="设置" />
     <view :style="{ height: navHeight + 'px' }"></view>
-    <scroll-view scroll-y class="page-scroll">
+    <scroll-view scroll-y class="page-scroll" :style="{ height: scrollHeight + 'px' }">
       <view class="setting-content">
         <!-- 真太阳时设置 -->
         <view class="setting-card">
@@ -85,9 +85,10 @@ import AppNavbar from '@/components/AppNavbar.vue'
 import CityPicker from '@/components/CityPicker.vue'
 
 const store = useAppStore()
-const { statusBarHeight, safeAreaBottom } = useSystemInfo()
+const { statusBarHeight, safeAreaBottom, screenHeight } = useSystemInfo()
 const navHeight = computed(() => statusBarHeight.value + 44)
 const safeBottom = computed(() => safeAreaBottom.value)
+const scrollHeight = computed(() => screenHeight.value - navHeight.value - safeAreaBottom.value - 50)
 const cityPickerRef = ref(null)
 
 // 取穴方法说明列表

@@ -1,7 +1,47 @@
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
+
+// 模块级单例：所有调用者共享同一份数据，只在首次调用时获取一次
+const statusBarHeight = ref(20)
+const screenWidth = ref(375)
+const screenHeight = ref(667)
+const safeAreaBottom = ref(0)
+const platform = ref('')
+const menuButtonInfo = ref(null)
+let initialized = false
+
+function initSystemInfo() {
+  if (initialized) return
+  initialized = true
+
+  const info = uni.getSystemInfoSync()
+  statusBarHeight.value = info.statusBarHeight || 20
+  screenWidth.value = info.screenWidth || 375
+  screenHeight.value = info.screenHeight || 667
+  platform.value = info.platform || ''
+
+  // 安全区域：兼容不同平台的获取方式
+  if (info.safeAreaInsets && info.safeAreaInsets.bottom !== undefined) {
+    safeAreaBottom.value = info.safeAreaInsets.bottom
+  } else if (info.safeArea && info.safeArea.bottom !== undefined) {
+    safeAreaBottom.value = info.screenHeight - info.safeArea.bottom
+  }
+
+  // 微信小程序：获取胶囊按钮位置信息（运行时检测，跨平台安全）
+  try {
+    if (typeof wx !== 'undefined' && wx.getMenuButtonBoundingClientRect) {
+      const menuButton = wx.getMenuButtonBoundingClientRect()
+      menuButtonInfo.value = {
+        ...menuButton,
+        screenWidth: info.screenWidth
+      }
+    }
+  } catch (e) {
+    // 非小程序环境，忽略
+  }
+}
 
 /**
- * useSystemInfo - 系统信息组合式函数
+ * useSystemInfo - 系统信息组合式函数（单例模式）
  *
  * 功能：
  *   - 获取状态栏高度、屏幕尺寸、安全区域等信息
@@ -16,40 +56,7 @@ import { ref, onMounted } from 'vue'
  *   - menuButtonInfo: 微信小程序胶囊按钮信息（仅小程序端有值，其他平台为 null）
  */
 export function useSystemInfo() {
-  const statusBarHeight = ref(20)
-  const screenWidth = ref(375)
-  const screenHeight = ref(667)
-  const safeAreaBottom = ref(0)
-  const platform = ref('')
-  const menuButtonInfo = ref(null)
-
-  onMounted(() => {
-    const info = uni.getSystemInfoSync()
-    statusBarHeight.value = info.statusBarHeight || 20
-    screenWidth.value = info.screenWidth || 375
-    screenHeight.value = info.screenHeight || 667
-    platform.value = info.platform || ''
-
-    // 安全区域：兼容不同平台的获取方式
-    if (info.safeAreaInsets && info.safeAreaInsets.bottom !== undefined) {
-      safeAreaBottom.value = info.safeAreaInsets.bottom
-    } else if (info.safeArea && info.safeArea.bottom !== undefined) {
-      safeAreaBottom.value = info.screenHeight - info.safeArea.bottom
-    }
-
-    // 微信小程序：获取胶囊按钮位置信息（运行时检测，跨平台安全）
-    try {
-      if (typeof wx !== 'undefined' && wx.getMenuButtonBoundingClientRect) {
-        const menuButton = wx.getMenuButtonBoundingClientRect()
-        menuButtonInfo.value = {
-          ...menuButton,
-          screenWidth: info.screenWidth
-        }
-      }
-    } catch (e) {
-      // 非小程序环境，忽略
-    }
-  })
+  initSystemInfo()
 
   return {
     statusBarHeight,

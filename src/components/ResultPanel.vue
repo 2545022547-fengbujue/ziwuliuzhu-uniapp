@@ -58,10 +58,43 @@
         <view v-if="result.hourMeridian" class="tag-primary">
           <text>值时：{{ result.hourMeridian.name }}</text>
         </view>
+        <!-- 纳子法模式切换胶囊 -->
+        <view v-if="isNazi" class="nazi-mode-switch">
+          <view class="switch-option" :class="{ active: store.naziMode === 'daily' }" @tap="store.setNaziMode('daily')">
+            <text>六十六穴</text>
+          </view>
+          <view class="switch-option" :class="{ active: store.naziMode === 'bumu' }" @tap="store.setNaziMode('bumu')">
+            <text>补母泻子</text>
+          </view>
+        </view>
       </view>
 
-      <!-- 开穴列表 -->
-      <view v-if="result?.openPoints?.length" class="section">
+      <!-- 补母泻子法开穴列表（纳子法 bumu 模式） -->
+      <view v-if="isNazi && store.naziMode === 'bumu' && bumuPoints.length" class="section">
+        <view class="section-title">
+          <view class="dot primary"></view>
+          <text>当前开穴</text>
+        </view>
+        <view class="points-grid" :style="gridStyle">
+          <view
+            v-for="bp in bumuPoints"
+            :key="bp.point.id"
+            class="point-btn"
+            :class="{ open: bp.point.isOpen }"
+            :style="getPointStyle(bp.point)"
+            @tap="handlePointClick(bp.point)"
+          >
+            <text class="point-name">{{ bp.point.name }}</text>
+            <text class="point-code">{{ bp.point.code }}</text>
+            <view v-if="bp.point.wuxing" class="wuxing-tag" :style="getWuxingStyle(bp.point.wuxing)">
+              <text class="wuxing-text" :style="{ color: getWuxingStyle(bp.point.wuxing).color }">{{ bp.point.wuxing }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 开穴列表（非补母泻子模式时显示） -->
+      <view v-if="result?.openPoints?.length && !(isNazi && store.naziMode === 'bumu')" class="section">
         <view class="section-title">
           <view class="dot primary"></view>
           <text>当前开穴</text>
@@ -82,6 +115,12 @@
             </view>
           </view>
         </view>
+      </view>
+
+      <!-- 补母泻子法底部提示 -->
+      <view v-if="isNazi && store.naziMode === 'bumu'" class="bumu-tip">
+        <text class="bumu-tip-icon">ⓘ</text>
+        <text class="bumu-tip-text">当其时泻其子，过其时补其母</text>
       </view>
 
       <!-- 九宫信息（灵龟八法） -->
@@ -141,6 +180,7 @@
  */
 import { computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
+import { getWuxingStyle } from '@/utils/wuxing.js'
 
 // Props 定义
 const props = defineProps({
@@ -152,6 +192,21 @@ const store = useAppStore()
 
 // 从 store 中获取当前方法的计算结果（响应式）
 const result = computed(() => store.results[props.method])
+
+// 是否纳子法
+const isNazi = computed(() => props.method === 'nazi')
+
+// 补母泻子法4个穴位的渲染数据（与六十六穴统一用 points-grid 展示）
+const bumuPoints = computed(() => {
+  const r = result.value
+  if (!r) return []
+  const items = []
+  if (r.benPoint) items.push({ point: r.benPoint })
+  if (r.yuanPoint) items.push({ point: r.yuanPoint })
+  if (r.muPoint) items.push({ point: r.muPoint })
+  if (r.ziPoint) items.push({ point: r.ziPoint })
+  return items
+})
 
 // 穴位显示列表：纳子法按名字字数排序（两字在前、三字在后），其他方法不变
 const displayPoints = computed(() => {
@@ -180,27 +235,11 @@ const methodIcon = computed(() => {
 })
 
 /**
- * 根据五行属性返回对应的颜色样式
- * @param {string} wuxing - 五行属性（木/火/土/金/水）
- * @returns {{ color: string, bg: string }} 颜色和背景色
- */
-function getWuxingStyle(wuxing) {
-  const styles = {
-    '木': { color: '#2E7D32', bg: 'rgba(46,125,50,0.08)' },  // 青绿
-    '火': { color: '#D32F2F', bg: 'rgba(211,47,47,0.08)' },  // 朱红
-    '土': { color: '#F57C00', bg: 'rgba(245,124,0,0.08)' },  // 琥珀
-    '金': { color: '#B8860B', bg: 'rgba(184,134,11,0.1)' },  // 暗金
-    '水': { color: '#1565C0', bg: 'rgba(21,101,192,0.08)' }  // 藏青
-  }
-  return styles[wuxing] || { color: '#4b5563', bg: '#f3f4f6' }
-}
-
-/**
  * 穴位按钮样式：纳子法缩小 padding 让一行放三个
  */
 function getPointStyle(point) {
   if (props.method !== 'nazi') return null
-  var isLong = point.name && point.name.length > 2
+  const isLong = point.name && point.name.length > 2
   return {
     padding: isLong ? '14rpx 20rpx' : '14rpx 16rpx',
     gap: '6rpx'
@@ -253,7 +292,7 @@ function handlePointClick(point) {
   font-size: 32rpx;
   font-weight: 600;
   color: #fff;
-  font-family: 'KaiTi', 'STKaiti', 'Noto Serif SC', serif;
+  font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', 'Noto Serif SC', serif;
 }
 
 .panel-body {
@@ -272,6 +311,7 @@ function handlePointClick(point) {
 .result-ganzhi-date {
   font-size: $font-size-xs;
   color: $tcm-text-hint;
+  font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
 }
 
 .result-ganzhi-hour-wrap {
@@ -296,9 +336,9 @@ function handlePointClick(point) {
 
 .result-ganzhi-hour-text {
   font-size: $font-size-sm;
-  font-weight: 600;
+  font-weight: 700;
   color: $tcm-primary;
-  font-family: 'KaiTi', 'STKaiti', serif;
+  font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
 }
 
 /* === 警告框 === */
@@ -375,9 +415,9 @@ function handlePointClick(point) {
 
 .point-name {
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: 700;
   color: $tcm-primary;
-  font-family: 'KaiTi', 'STKaiti', serif;
+  font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
 }
 
 .point-code {
@@ -495,6 +535,49 @@ function handlePointClick(point) {
 
 .empty-text {
   font-size: $font-size-sm;
+  color: $tcm-text-hint;
+}
+
+/* === 纳子法模式切换 === */
+.nazi-mode-switch {
+  display: flex;
+  border: 1rpx solid rgba($tcm-primary, 0.15);
+  border-radius: 12rpx;
+  overflow: hidden;
+  margin-left: auto;
+}
+
+.switch-option {
+  padding: 4rpx 14rpx;
+  font-size: 22rpx;
+  color: $tcm-text-secondary;
+  background: rgba($tcm-primary, 0.04);
+
+  &.active {
+    color: #fff;
+    background: $tcm-primary;
+  }
+}
+
+/* === 补母泻子法底部提示 === */
+.bumu-tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx;
+  background: rgba($tcm-text, 0.04);
+  border-radius: 14rpx;
+  margin-top: $spacing-md;
+}
+
+.bumu-tip-icon {
+  font-size: 24rpx;
+  color: $tcm-text-hint;
+}
+
+.bumu-tip-text {
+  font-size: 24rpx;
   color: $tcm-text-hint;
 }
 </style>

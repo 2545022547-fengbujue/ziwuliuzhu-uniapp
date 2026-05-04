@@ -67,18 +67,18 @@
         </view>
 
         <!-- 干支显示：乙巳年 辛巳月 癸亥日 丁巳时 -->
-        <view v-if="currentGanZhi" class="ganzhi-display">
+        <view v-if="store.currentGanZhi" class="ganzhi-display">
           <view class="ganzhi-tag-item">
-            <text class="ganzhi-tag-text">{{ currentGanZhi.year.ganZhi }}年</text>
+            <text class="ganzhi-tag-text">{{ store.currentGanZhi.year.ganZhi }}年</text>
           </view>
           <view class="ganzhi-tag-item">
-            <text class="ganzhi-tag-text">{{ currentGanZhi.month.ganZhi }}月</text>
+            <text class="ganzhi-tag-text">{{ store.currentGanZhi.month.ganZhi }}月</text>
           </view>
           <view class="ganzhi-tag-item highlight">
-            <text class="ganzhi-tag-text">{{ currentGanZhi.day.ganZhi }}日</text>
+            <text class="ganzhi-tag-text">{{ store.currentGanZhi.day.ganZhi }}日</text>
           </view>
           <view class="ganzhi-tag-item highlight">
-            <text class="ganzhi-tag-text">{{ currentGanZhi.hour.ganZhi }}时</text>
+            <text class="ganzhi-tag-text">{{ store.currentGanZhi.hour.ganZhi }}时</text>
           </view>
         </view>
       </view>
@@ -134,7 +134,7 @@
     </scroll-view>
 
     <!-- 穴位详情弹窗 -->
-    <PointDetail v-if="store.showDetail" />
+    <PointDetail v-show="store.showDetail" />
 
     <!-- 手动查询确认弹窗 -->
     <view v-if="showQueryConfirm" class="confirm-overlay" @tap="showQueryConfirm = false">
@@ -175,8 +175,8 @@
  *   6. 其他方法对比（底部显示其他3种方法的结果）
  *
  * 核心逻辑：
- *   - currentGanZhi：独立计算干支（照搬电脑端 TimePicker 的逻辑）
- *   - 五鼠遁（日上起时法）：根据日天干推算时辰天干
+ *   - currentGanZhi：由 store 维护，页面直接读取
+ *   - 五鼠遁（日上起时法）：根据日天干推算时辰天干（在 store.buildGanZhi 中实现）
  *   - 每分钟轮询更新时间显示（仅自动模式下），时辰变动时才重新计算取穴
  *   - 页面隐藏/锁屏时暂停定时器，返回前台时恢复，节省电量
  *   - 手动模式使用 confirmedDateStr/confirmedHourIdx 已确认参数，
@@ -200,7 +200,6 @@ import { onShow, onHide } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import { formatDate, getHourIndexFromDate, HOUR_OPTIONS } from '@/utils/date.js'
-import { getGanZhi, HEAVENLY_STEMS, EARTHLY_BRANCHES } from '@/services/ganzhi.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
@@ -226,53 +225,7 @@ const methods = [
 // 子时23点、丑时1点、寅时3点、卯时5点...亥时21点
 const SHICHEN_START_HOURS = [23, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21]
 
-// 五鼠遁（日上起时法）— 根据日天干推算时辰天干的起始索引
-// 甲己日起甲子时（索引0），乙庚日起丙子时（索引2），以此类推
-const wuShuDun = {
-  '甲': 0, '己': 0,
-  '乙': 2, '庚': 2,
-  '丙': 4, '辛': 4,
-  '丁': 6, '壬': 6,
-  '戊': 8, '癸': 8
-}
-
-// 独立计算干支（照搬电脑端 TimePicker 的 currentGanZhi 计算逻辑）
-// 为什么不直接用 store 的结果？因为首页需要显示完整的干支信息（年/月/日/时）
-// 而 store 的 results 只保存各方法的取穴结果
-const currentGanZhi = computed(() => {
-  let date, hourIndex
-  if (store.isManualMode) {
-    if (!confirmedDateStr.value) return null
-    date = new Date(confirmedDateStr.value)
-    hourIndex = confirmedHourIdx.value
-  } else {
-    // 依赖 minuteTick 触发重新计算，直接读手机本地时间
-    void minuteTick.value
-    date = new Date()
-    hourIndex = getHourIndexFromDate(date)
-  }
-
-  // 获取年/月/日干支（含真太阳时校正）
-  const baseGanZhi = getGanZhi(date, store.longitude, store.useTrueSolarTime)
-  // 用五鼠遁推算时辰天干
-  const dayStem = baseGanZhi.day.heavenlyStem
-  const hourBranchIndex = hourIndex
-  const hourBranch = EARTHLY_BRANCHES[hourBranchIndex]
-  const startStemIndex = wuShuDun[dayStem] || 0
-  const hourStemIndex = (startStemIndex + hourBranchIndex) % 10
-  const hourStem = HEAVENLY_STEMS[hourStemIndex]
-
-  return {
-    year: baseGanZhi.year,    // 年干支（如"乙巳"）
-    month: baseGanZhi.month,  // 月干支（如"辛巳"）
-    day: baseGanZhi.day,      // 日干支（如"癸亥"）
-    hour: {
-      heavenlyStem: hourStem,      // 时天干
-      earthlyBranch: hourBranch,   // 时地支
-      ganZhi: hourStem + hourBranch // 时干支（如"丁巳"）
-    }
-  }
-})
+// 干支信息由 store 维护，页面直接读取 store.currentGanZhi
 
 // 当前日期时间格式化字符串（如"2026年04月30日 22:30"）
 // 自动模式下直接读取手机本地时间，依赖 minuteTick 每分钟更新一次，避免每秒重渲染耗电
@@ -335,15 +288,13 @@ function switchToAuto() {
 
 /** 切换到手动模式，初始化为当前时间 */
 function switchToManual() {
-  store.isManualMode = true
   const now = new Date()
+  const hourIdx = getHourIndexFromDate(now)
   selectedDateStr.value = formatDate(now)
-  selectedHourIdx.value = getHourIndexFromDate(now)
-  // 初始化已确认参数，切换时立即显示当前时间
+  selectedHourIdx.value = hourIdx
   confirmedDateStr.value = selectedDateStr.value
-  confirmedHourIdx.value = selectedHourIdx.value
-  // 用当前时间初始化查询结果
-  store.queryTime(now, selectedHourIdx.value)
+  confirmedHourIdx.value = hourIdx
+  store.switchToManualMode(now, hourIdx)
 }
 
 /** 日期选择器变化回调 */
@@ -393,8 +344,6 @@ onShow(() => {
     const now = new Date()
     const newHour = getHourIndexFromDate(now)
     if (newHour !== store.currentHour) {
-      store.currentHour = newHour
-      store.currentTime = now
       store.updateCurrentTime()
     }
   }
@@ -413,8 +362,6 @@ function startTimer() {
       const newHour = getHourIndexFromDate(now)
       // 仅在时辰变化时才重新计算取穴结果
       if (newHour !== store.currentHour) {
-        store.currentHour = newHour
-        store.currentTime = now
         store.updateCurrentTime()
       }
     }
@@ -587,7 +534,7 @@ function stopTimer() {
   font-size: $font-size-sm;
   color: $tcm-primary;
   font-weight: 600;
-  font-family: 'KaiTi', 'STKaiti', serif;
+  font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', serif;
 }
 
 /* === 方法切换 === */
@@ -796,7 +743,7 @@ function stopTimer() {
 .confirm-overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 1000;
+  z-index: 300;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;

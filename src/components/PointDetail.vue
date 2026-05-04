@@ -3,17 +3,16 @@
     <view class="popup" @tap.stop>
       <!-- 头部 -->
       <view class="popup-header">
-        <view class="header-info">
-          <view class="header-icon-wrap">
-            <text class="header-icon">📍</text>
-          </view>
-          <view class="header-text">
-            <text class="point-name">{{ point?.name }}</text>
-            <text class="point-code">{{ point?.code }}</text>
-          </view>
+        <view class="header-icon-wrap">
+          <text class="header-icon">📍</text>
         </view>
         <view class="close-btn" @tap="handleClose">
           <text class="close-icon">✕</text>
+        </view>
+        <!-- 穴位名称+编码：绝对定位，独立于图标和关闭按钮 -->
+        <view class="header-name-layer">
+          <text class="point-name">{{ point?.name }}</text>
+          <text class="point-code">{{ point?.code }}</text>
         </view>
       </view>
 
@@ -35,7 +34,7 @@
             </view>
             <view class="info-item">
               <text class="info-label">五行属性</text>
-              <text class="info-value info-value-center wuxing-value" :style="getWuxingTextStyle(point?.wuxing)">
+              <text class="info-value info-value-center wuxing-value" :style="{ color: getWuxingColor(point?.wuxing) }">
                 {{ point?.wuxing || '-' }}
               </text>
             </view>
@@ -98,6 +97,11 @@
           <text class="caution-text">{{ point.contraindications }}</text>
         </view>
 
+        <!-- 纳子法补母泻子说明（仅在补母泻子法模式下点击母穴/子穴时显示） -->
+        <view v-if="naziBumuTip" class="nazi-bumu-tip">
+          <text class="nazi-bumu-tip-text">{{ naziBumuTip }}</text>
+        </view>
+
         <view style="height: 40rpx;"></view>
       </scroll-view>
     </view>
@@ -121,20 +125,19 @@
  */
 import { computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
+import { getWuxingColor } from '@/utils/wuxing.js'
 
 const store = useAppStore()
 const point = computed(() => store.selectedPoint)
 
-function getWuxingTextStyle(wuxing) {
-  const styles = {
-    '木': { color: '#2E7D32' },
-    '火': { color: '#D32F2F' },
-    '土': { color: '#F57C00' },
-    '金': { color: '#B8860B' },
-    '水': { color: '#1565C0' }
-  }
-  return styles[wuxing] || { color: '#4b5563' }
-}
+// 纳子法补母泻子说明文字
+const naziBumuTip = computed(() => {
+  const t = point.value?.naziType
+  if (!t) return ''
+  if (t === '母穴（补）') return '此穴为母穴，经脉虚证在经气方衰时取此行补法'
+  if (t === '子穴（泻）') return '此穴为子穴，经脉实证在当前时辰取此行泻法'
+  return ''
+})
 
 /**
  * 格式化穴位类别，去掉顿号
@@ -164,11 +167,13 @@ function handleClose() {
          否则在 uni-app H5 模式下会出现右边截断的问题
    ============================================ */
 
+/* CSS 必须用 px 单位（不用 rpx），否则在部分设备上弹窗布局异常（与 CityPicker 同理） */
+
 /* === 遮罩层 === */
 .overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 1000;
+  z-index: 200;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
@@ -193,12 +198,8 @@ function handleClose() {
   padding: 24px 20px;
   border-bottom: 1px solid rgba(139, 69, 19, 0.08);
   flex-shrink: 0;
-}
-
-.header-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  position: relative;
+  min-height: 72px;
 }
 
 .header-icon-wrap {
@@ -210,24 +211,29 @@ function handleClose() {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  z-index: 2;
 }
 
 .header-icon {
   font-size: 20px;
 }
 
-.header-text {
+.header-name-layer {
+  position: absolute;
+  left: 76px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
-  flex-direction: column;
-  gap: 0px;
-  flex: 1;
+  align-items: baseline;
+  gap: 6px;
+  z-index: 1;
 }
 
 .point-name {
-  font-size: 26px;
+  font-size: 38px;
   font-weight: 700;
   color: #2C2C2C;
-  font-family: 'KaiTi', '楷体', 'STKaiti', 'FangSong', 'SimSun', serif;
+  font-family: 'KaitiGB2312', 'KaiTi', '楷体', 'STKaiti', serif;
   line-height: 1.2;
 }
 
@@ -236,8 +242,7 @@ function handleClose() {
   color: #999;
   font-family: monospace;
   letter-spacing: 0.5px;
-  align-self: flex-end;
-  margin-right: -28px;
+  transform: translateY(4px);
 }
 
 .close-btn {
@@ -436,5 +441,20 @@ function handleClose() {
   line-height: 1.7;
   word-break: break-all;
   text-align: justify;
+}
+
+/* === 纳子法补母泻子说明 === */
+.nazi-bumu-tip {
+  padding: 12px;
+  margin-bottom: 12px;
+  background: rgba(46, 139, 87, 0.05);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.nazi-bumu-tip-text {
+  font-size: 12px;
+  color: rgba(46, 139, 87, 0.6);
+  line-height: 1.6;
 }
 </style>
