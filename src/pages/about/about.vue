@@ -79,7 +79,7 @@ function goBack() {
 }
 
 .logo-icon { font-size: 120rpx; margin-bottom: $spacing-md; }
-.app-name { font-size: $font-size-xl; font-weight: 700; color: $tcm-primary; font-family: 'KaiTi', serif; }
+.app-name { font-size: $font-size-xl; font-weight: 700; color: $tcm-primary; font-family: 'KaitiGB2312', 'KaiTi', serif; }
 .app-version { font-size: $font-size-sm; color: $tcm-text-hint; margin-top: $spacing-xs; }
 
 .desc-card, .info-card {

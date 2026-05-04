@@ -130,7 +130,7 @@
  *   - 不能用 @tap.stop 阻止事件冒泡，否则 input 也无法交互
  *   - CSS 必须用 px 单位（不用 rpx），否则在部分设备上布局异常
  */
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onUnmounted } from 'vue'
 import { CITIES, searchCities } from '@/data/city-coordinates.js'
 
 const show = ref(false)
@@ -141,13 +141,16 @@ const expandedProvinces = ref([])
 // 控制 input 聚焦状态（关键：uni-app H5 弹窗中 input 聚焦的唯一可靠方案）
 const inputFocused = ref(false)
 
-const provinces = computed(() => {
+// 模块级缓存：省份分组数据在应用生命周期内不会变化
+let _provincesCache = null
+function buildProvinces() {
+  if (_provincesCache) return _provincesCache
   const map = {}
   CITIES.forEach(city => {
     if (!map[city.province]) map[city.province] = []
     map[city.province].push(city)
   })
-  return Object.entries(map)
+  _provincesCache = Object.entries(map)
     .map(([name, cities]) => ({
       name,
       cities: cities.sort((a, b) => a.pinyin.localeCompare(b.pinyin))
@@ -157,7 +160,10 @@ const provinces = computed(() => {
       if (b.name === '直辖市') return 1
       return a.name.localeCompare(b.name)
     })
-})
+  return _provincesCache
+}
+
+const provinces = computed(() => buildProvinces())
 
 const searchResults = computed(() => {
   if (!searchText.value) return []
@@ -165,28 +171,37 @@ const searchResults = computed(() => {
 })
 
 // 防止 overlay 点击穿透
-let popupTapped = false
+const popupTapped = ref(false)
+let tapTimer = null
+let focusTimer = null
+let openTimer = null
+
+onUnmounted(() => {
+  if (tapTimer) clearTimeout(tapTimer)
+  if (focusTimer) clearTimeout(focusTimer)
+  if (openTimer) clearTimeout(openTimer)
+})
 
 function handleOverlayTap() {
   // 如果不是点击 popup 内部，则关闭
-  if (!popupTapped) {
+  if (!popupTapped.value) {
     handleCancel()
   }
-  popupTapped = false
+  popupTapped.value = false
 }
 
 function handlePopupTap(e) {
   // 标记点击了 popup 内部，阻止 overlay 关闭
-  popupTapped = true
+  popupTapped.value = true
   // 延时重置标记
-  setTimeout(() => { popupTapped = false }, 100)
+  tapTimer = setTimeout(() => { popupTapped.value = false }, 100)
 }
 
 function handleInputTap() {
   // 手动触发聚焦：先重置再设置
   inputFocused.value = false
   nextTick(() => {
-    setTimeout(() => {
+    focusTimer = setTimeout(() => {
       inputFocused.value = true
     }, 50)
   })
@@ -220,7 +235,7 @@ function open(callback) {
   confirmCallback = callback
   // 延迟聚焦：确保 DOM 渲染完成
   nextTick(() => {
-    setTimeout(() => {
+    openTimer = setTimeout(() => {
       inputFocused.value = true
     }, 300)
   })
@@ -258,7 +273,7 @@ defineExpose({ open, close })
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1000;
+  z-index: 200;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;

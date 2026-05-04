@@ -32,7 +32,7 @@ export const SPECIAL_POINTS = [
   { code: 'HT9', name: '少冲', meridian: '手少阴心经', categories: ['井穴'], wuxing: '木' },
   { code: 'HT8', name: '少府', meridian: '手少阴心经', categories: ['荥穴'], wuxing: '火' },
   { code: 'HT7', name: '神门', meridian: '手少阴心经', categories: ['输穴', '原穴'], wuxing: '土' },
-  { code: 'HT5', name: '灵道', meridian: '手少阴心经', categories: ['经穴'], wuxing: '金' },
+  { code: 'HT4', name: '灵道', meridian: '手少阴心经', categories: ['经穴'], wuxing: '金' },
   { code: 'HT3', name: '少海', meridian: '手少阴心经', categories: ['合穴'], wuxing: '水' },
   { code: 'HT5', name: '通里', meridian: '手少阴心经', categories: ['络穴'], wuxing: '' },
   { code: 'HT6', name: '阴郄', meridian: '手少阴心经', categories: ['郄穴'], wuxing: '' },

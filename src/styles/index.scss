@@ -2,6 +2,15 @@
    子午流注取穴 - 全局样式
    ============================================ */
 
+/* === 楷体字体（打包内置，解决 Android 无楷体问题） === */
+@font-face {
+  font-family: 'KaitiGB2312';
+  src: url('@/static/fonts/kaiti-gb2312.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* === 基础重置 === */
 page {
   background-color: $tcm-bg;
@@ -98,7 +107,7 @@ text {
   color: $tcm-primary;
   font-size: $font-size-sm;
   font-weight: 600;
-  font-family: 'KaiTi', 'STKaiti', serif;
+  font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', serif;
 }
 
 /* === 五行标签 === */
@@ -130,7 +139,7 @@ text {
   }
   
   &__name {
-    font-family: 'KaiTi', 'STKaiti', serif;
+    font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', serif;
     font-weight: 600;
     font-size: $font-size-base;
   }

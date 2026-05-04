@@ -3,18 +3,20 @@
  * 
  * 理论基础：
  * - 基于徐凤《子午流注逐日按时定穴歌》
- * - 核心逻辑：阳进阴退开井穴 → 经生经穴生穴 → 返本还原 → 气纳三焦/血归包络
+ * - 核心逻辑：阳进阴退开井穴 → 经生经穴生穴 → 返本还原/遇输过原 → 气纳三焦/血归包络
  * 
  * 计算规则：
- * 1. 阳日（甲、丙、戊、庚、壬）：阳进阴退开井穴 → 按时辰顺序开井荥输经合 → 遇输过原 → 气纳三焦
- * 2. 阴日（乙、丁、己、辛、癸）：阳进阴退开井穴 → 按时辰顺序开井荥输经合 → 遇输过原 → 血归包络
+ * 1. 阳日（甲、丙、戊、庚、壬）：阳进阴退开井穴 → 经生经穴生穴（跨6条阳经）→ 气纳三焦
+ * 2. 阴日（乙、丁、己、辛、癸）：阳进阴退开井穴 → 经生经穴生穴（跨6条阴经）→ 血归包络
+ * 
+ * "经生经、穴生穴"核心规则：
+ * - 每日从值日经的五行开始，按五行相生链（木→火→土→金→水）递进
+ * - 每步取对应经脉的第N个五输穴（井→荥→输→经→合）
+ * - 如甲日(胆经,木): 胆(木)窍阴→小肠(火)前谷→胃(土)陷谷→大肠(金)阳溪→膀胱(水)委中→三焦液门
  * 
  * 五鼠遁（日上起时法）：
- * - 甲己日起甲子时（索引0）
- * - 乙庚日起丙子时（索引2）
- * - 丙辛日起戊子时（索引4）
- * - 丁壬日起庚子时（索引6）
- * - 戊癸日起壬子时（索引8）
+ * - 甲己日起甲子时（索引0），乙庚日起丙子时（索引2），丙辛日起戊子时（索引4）
+ * - 丁壬日起庚子时（索引6），戊癸日起壬子时（索引8）
  * 
  * 合日互用：
  * - 天干逢五相合：甲己、乙庚、丙辛、丁壬、戊癸
@@ -24,55 +26,35 @@
 import { getStemIndex, getBranchIndex, HEAVENLY_STEMS, EARTHLY_BRANCHES } from './ganzhi.js'
 import { getWushuPointsFull, getYuanPointFull, getPointByCode } from './acupuncturePoints.js'
 import { getFankePoint } from '@/data/fanke-points.js'
+import { DAY_MERIDIAN_MAP, HOUR_NAMES, WUXING_SHENG, WU_SHU_DUN, WUXING_CHAIN } from '@/data/constants.js'
 
 /**
- * 日天干对应值日经络（教材表10-2）
+ * 根据值日经的五行和阴阳，构建当日的五行经脉链（5条经脉）
  * 
- * 规则：
- * - 甲日：胆经（阳木）
- * - 乙日：肝经（阴木）
- * - 丙日：小肠经（阳火）
- * - 丁日：心经（阴火）
- * - 戊日：胃经（阳土）
- * - 己日：脾经（阴土）
- * - 庚日：大肠经（阳金）
- * - 辛日：肺经（阴金）
- * - 壬日：膀胱经（阳水）
- * - 癸日：肾经（阴水）
+ * 规则：从值日经五行开始，按五行相生链递进，取同阴阳的经脉
+ * 
+ * @param {Object} dayMeridian - 值日经信息 { code, wuxing, yinYang, ... }
+ * @returns {Array} 5条经脉信息的数组
+ * 
+ * @example
+ * getDayMeridianChain({ code: 'GB', wuxing: '木', yinYang: '阳' })
+ * // → [GB(木), SI(火), ST(土), LI(金), BL(水)]
  */
-const DAY_MERIDIAN_MAP = {
-  '甲': { name: '胆经', code: 'GB', fullName: '足少阳胆经', yinYang: '阳', wuxing: '木' },
-  '乙': { name: '肝经', code: 'LR', fullName: '足厥阴肝经', yinYang: '阴', wuxing: '木' },
-  '丙': { name: '小肠经', code: 'SI', fullName: '手太阳小肠经', yinYang: '阳', wuxing: '火' },
-  '丁': { name: '心经', code: 'HT', fullName: '手少阴心经', yinYang: '阴', wuxing: '火' },
-  '戊': { name: '胃经', code: 'ST', fullName: '足阳明胃经', yinYang: '阳', wuxing: '土' },
-  '己': { name: '脾经', code: 'SP', fullName: '足太阴脾经', yinYang: '阴', wuxing: '土' },
-  '庚': { name: '大肠经', code: 'LI', fullName: '手阳明大肠经', yinYang: '阳', wuxing: '金' },
-  '辛': { name: '肺经', code: 'LU', fullName: '手太阴肺经', yinYang: '阴', wuxing: '金' },
-  '壬': { name: '膀胱经', code: 'BL', fullName: '足太阳膀胱经', yinYang: '阳', wuxing: '水' },
-  '癸': { name: '肾经', code: 'KI', fullName: '足少阴肾经', yinYang: '阴', wuxing: '水' }
-}
-
-/**
- * 时辰名称
- */
-const HOUR_NAMES = [
-  '子时', '丑时', '寅时', '卯时', '辰时', '巳时',
-  '午时', '未时', '申时', '酉时', '戌时', '亥时'
-]
-
-/**
- * 五行相生关系
- */
-const WUXING_SHENG = {
-  '木': '火', '火': '土', '土': '金', '金': '水', '水': '木'
-}
-
-/**
- * 五行相克关系
- */
-const WUXING_KE = {
-  '木': '土', '土': '水', '水': '火', '火': '金', '金': '木'
+function getDayMeridianChain(dayMeridian) {
+  const chain = []
+  const startIndex = WUXING_CHAIN.indexOf(dayMeridian.wuxing)
+  
+  for (let i = 0; i < 5; i++) {
+    const wuxing = WUXING_CHAIN[(startIndex + i) % 5]
+    // 找到同阴阳、同五行的经脉
+    const stem = Object.keys(DAY_MERIDIAN_MAP).find(
+      s => DAY_MERIDIAN_MAP[s].wuxing === wuxing && DAY_MERIDIAN_MAP[s].yinYang === dayMeridian.yinYang
+    )
+    if (stem) {
+      chain.push(DAY_MERIDIAN_MAP[stem])
+    }
+  }
+  return chain
 }
 
 /**
@@ -81,11 +63,6 @@ const WUXING_KE = {
  * @param {Object} ganzhi - 干支信息（包含年、月、日、时的天干地支）
  * @param {number} hourIndex - 时辰索引 (0-11)
  * @returns {Object} 取穴结果
- * 
- * @example
- * // 计算壬日未时的纳甲法取穴
- * calculateNajia(ganzhi, 7)
- * // 返回：{ method: 'najia', openPoints: [...], isClosed: true/false, ... }
  */
 export function calculateNajia(ganzhi, hourIndex) {
   const dayStem = ganzhi.day.heavenlyStem
@@ -137,55 +114,45 @@ export function calculateNajia(ganzhi, hourIndex) {
 }
 
 /**
- * 五鼠遁（日上起时法）- 时辰天干起始索引
- * 甲己日起甲子时（索引0）
- * 乙庚日起丙子时（索引2）
- * 丙辛日起戊子时（索引4）
- * 丁壬日起庚子时（索引6）
- * 戊癸日起壬子时（索引8）
- */
-const WU_SHU_DUN = {
-  '甲': 0, '己': 0,
-  '乙': 2, '庚': 2,
-  '丙': 4, '辛': 4,
-  '丁': 6, '壬': 6,
-  '戊': 8, '癸': 8
-}
-
-/**
  * 计算当日完整流注顺序（基于徐凤歌诀）
+ * 
  * 核心逻辑：
- * 1. 阳日：阳进阴退开井穴 → 按时辰顺序开井荥输经合 → 遇输过原 → 气纳三焦
- * 2. 阴日：阳进阴退开井穴 → 按时辰顺序开井荥输经合 → 遇输过原 → 血归包络
+ * 1. 阳日阳时开阳经穴，阴日阴时开阴经穴
+ * 2. 每日6个有效时辰，前5步"经生经、穴生穴"，第6步气纳三焦/血归包络
  */
 function calculateDailySequence(dayStem, dayMeridian, openedPoints = new Set()) {
   const sequence = []
   const yinYang = dayMeridian.yinYang
   const jingHour = calculateJingHour(dayStem)
   const startStemIndex = WU_SHU_DUN[dayStem] || 0
-  
-  // 徐凤歌诀的流注顺序：按时辰天干顺序，而不是简单的hourIndex
-  // 阳日：甲→丙→戊→庚→壬（阳时）
-  // 阴日：乙→丁→己→辛→癸（阴时）
-  
+
+  // 预缓存：同一天内经脉链和五输穴不变，避免每时辰重复计算
+  const meridianChain = getDayMeridianChain(dayMeridian)
+  const cachedWushuPoints = {}
+  meridianChain.forEach(m => {
+    if (m && !cachedWushuPoints[m.code]) {
+      cachedWushuPoints[m.code] = getWushuPointsFull(m.code)
+    }
+  })
+
   for (let hour = 0; hour < 12; hour++) {
     const hourStemIndex = (startStemIndex + hour) % 10
     const hourBranchIndex = hour
-    
+
     const hourStem = HEAVENLY_STEMS[hourStemIndex]
     const hourBranch = EARTHLY_BRANCHES[hourBranchIndex]
-    
+
     const isYangHour = hourBranchIndex % 2 === 0
     const isYinHour = hourBranchIndex % 2 === 1
-    
+
     let points = []
-    
+
     if (yinYang === '阳' && isYangHour) {
-      points = calculateYangDayPoints(dayStem, dayMeridian, hourStem, hourBranch, hour, openedPoints, jingHour)
+      points = calculateDayPoints('阳', dayStem, dayMeridian, hour, openedPoints, jingHour, meridianChain, cachedWushuPoints)
     } else if (yinYang === '阴' && isYinHour) {
-      points = calculateYinDayPoints(dayStem, dayMeridian, hourStem, hourBranch, hour, openedPoints, jingHour)
+      points = calculateDayPoints('阴', dayStem, dayMeridian, hour, openedPoints, jingHour, meridianChain, cachedWushuPoints)
     }
-    
+
     sequence.push({
       hour,
       hourName: HOUR_NAMES[hour],
@@ -195,7 +162,7 @@ function calculateDailySequence(dayStem, dayMeridian, openedPoints = new Set()) 
       isOpen: points.length > 0
     })
   }
-  
+
   return sequence
 }
 
@@ -203,8 +170,6 @@ function calculateDailySequence(dayStem, dayMeridian, openedPoints = new Set()) 
  * 计算开井穴的时辰（阳进阴退）
  * 甲日戌时(10)，乙日酉时(9)，丙日申时(8)，丁日未时(7)，戊日午时(6)，
  * 己日巳时(5)，庚日辰时(4)，辛日卯时(3)，壬日寅时(2)，癸日亥时(11)
- * 
- * 注意：这里返回的是时辰索引（0-11），对应十二地支的顺序
  */
 function calculateJingHour(dayStem) {
   const jingHours = [10, 9, 8, 7, 6, 5, 4, 3, 2, 11]
@@ -213,326 +178,133 @@ function calculateJingHour(dayStem) {
 }
 
 /**
- * 计算阳日开穴（基于徐凤歌诀）
- * 歌诀示例（甲日）：
- * 甲日戌时胆窍阴，丙子时中前谷荥，戊寅陷谷阳明输，返本丘墟木在寅，
- * 庚辰经注阳溪穴，壬午膀胱委中寻，甲申时纳三焦水，荥合天干取液门。
+ * 计算当日开穴（阳日/阴日统一处理）
+ *
+ * 核心逻辑：经生经、穴生穴
+ * - 根据值日经五行构建经脉链（如甲日: GB→SI→ST→LI→BL）
+ * - 每步从经脉链中取对应经脉的对应五输穴
+ * - 第3步（输穴）额外开值日经原穴（返本还原/遇输过原）
+ * - 第6步开三焦/心包经穴位（气纳三焦/血归包络）
+ *
+ * @param {string} dayType - '阳' 或 '阴'
+ * @param {string} dayStem - 日天干
+ * @param {Object} dayMeridian - 值日经信息
+ * @param {number} hour - 时辰索引 (0-11)
+ * @param {Set} openedPoints - 已开穴位集合（用于去重）
+ * @param {number} jingHour - 开井穴时辰索引
+ * @param {Array} meridianChain - 预计算的经脉链（由调用方缓存传入）
+ * @param {Object} cachedWushuPoints - 预缓存的五输穴 { meridianCode: points[] }
+ * @returns {Array} 开穴列表
  */
-function calculateYangDayPoints(dayStem, dayMeridian, hourStem, hourBranch, hour, openedPoints, jingHour) {
+function calculateDayPoints(dayType, dayStem, dayMeridian, hour, openedPoints, jingHour, meridianChain, cachedWushuPoints) {
   const points = []
-  const meridianCode = dayMeridian.code
-  
-  const wushuPoints = getWushuPointsFull(meridianCode)
-  if (!wushuPoints || wushuPoints.length === 0) return points
-  
-  // 使用传入的 jingHour 参数，避免重复计算
+
   if (jingHour === undefined) {
     jingHour = calculateJingHour(dayStem)
   }
-  
-  // 1. 开井穴（第一个阳时）
-  if (hour === jingHour) {
-    const jingPoint = wushuPoints[0]
-    if (jingPoint && !openedPoints.has(jingPoint.id)) {
+
+  // 计算当前时辰是第几步（0-5）
+  // 阳日只在阳时（偶数时辰索引）开穴，阴日只在阴时（奇数时辰索引）开穴
+  // 每步间隔2个时辰索引
+  const stepIndex = ((hour - jingHour + 12) % 12) / 2
+
+  if (stepIndex >= 0 && stepIndex <= 4) {
+    // 步骤 0-4：经生经、穴生穴
+    const stepMeridian = meridianChain[stepIndex]
+    if (!stepMeridian) return points
+
+    const wushuPoints = cachedWushuPoints[stepMeridian.code]
+    if (!wushuPoints || wushuPoints.length === 0) return points
+    
+    const point = wushuPoints[stepIndex]
+    if (point && !openedPoints.has(point.id)) {
+      const typeNames = ['井穴', '荥穴', '输穴', '经穴', '合穴']
       points.push({
-        ...jingPoint,
+        ...point,
         isOpen: true,
         isNa: false,
         isGu: false,
-        type: '井穴'
+        type: typeNames[stepIndex]
       })
-      openedPoints.add(jingPoint.id)
-    }
-  }
-  
-  // 2. 开荥穴（第二个阳时）
-  // 经生经（木→火），穴生穴（井→荥）
-  const yingHour = (jingHour + 2) % 12
-  if (hour === yingHour) {
-    const yingPoint = wushuPoints[1]
-    if (yingPoint && !openedPoints.has(yingPoint.id)) {
-      points.push({
-        ...yingPoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '荥穴'
-      })
-      openedPoints.add(yingPoint.id)
-    }
-  }
-  
-  // 3. 开输穴 + 返本还原（第三个阳时）
-  const shuHour = (jingHour + 4) % 12
-  if (hour === shuHour) {
-    // 开输穴
-    const shuPoint = wushuPoints[2]
-    if (shuPoint && !openedPoints.has(shuPoint.id)) {
-      points.push({
-        ...shuPoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '输穴'
-      })
-      openedPoints.add(shuPoint.id)
+      openedPoints.add(point.id)
     }
     
-    // 返本还原：开值日经的原穴
-    const yuanPoint = getYuanPointFull(meridianCode)
-    if (yuanPoint && !openedPoints.has(yuanPoint.id)) {
-      points.push({
-        ...yuanPoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '原穴（返本还原）'
-      })
-      openedPoints.add(yuanPoint.id)
-    }
-    
-    // 特殊处理：壬日同时开三焦经原穴（阳池 TE4）
-    if (dayStem === '壬') {
-      const sanziaoYuanPoint = getYuanPointFull('TE')
-      if (sanziaoYuanPoint && !openedPoints.has(sanziaoYuanPoint.id)) {
+    // 步骤 2（输穴）：返本还原（阳日）/ 遇输过原（阴日）
+    // 开值日经的原穴
+    if (stepIndex === 2) {
+      const yuanLabel = dayType === '阳' ? '返本还原' : '遇输过原'
+      const yuanPoint = getYuanPointFull(dayMeridian.code)
+      if (yuanPoint && !openedPoints.has(yuanPoint.id)) {
         points.push({
-          ...sanziaoYuanPoint,
-          meridian: '手少阳三焦经',
+          ...yuanPoint,
           isOpen: true,
           isNa: false,
           isGu: false,
-          type: '原穴（三焦寄穴）'
+          type: `原穴（${yuanLabel}）`
         })
-        openedPoints.add(sanziaoYuanPoint.id)
+        openedPoints.add(yuanPoint.id)
+      }
+      
+      // 特殊处理：阳日壬日同时开三焦经原穴（阳池 TE4）
+      if (dayType === '阳' && dayStem === '壬') {
+        const sanziaoYuanPoint = getYuanPointFull('TE')
+        if (sanziaoYuanPoint && !openedPoints.has(sanziaoYuanPoint.id)) {
+          points.push({
+            ...sanziaoYuanPoint,
+            meridian: '手少阳三焦经',
+            isOpen: true,
+            isNa: false,
+            isGu: false,
+            type: '原穴（三焦寄穴）'
+          })
+          openedPoints.add(sanziaoYuanPoint.id)
+        }
+      }
+      
+      // 特殊处理：阴日癸日同时开心包经原穴（大陵 PC7）
+      if (dayType === '阴' && dayStem === '癸') {
+        const baoluoYuanPoint = getYuanPointFull('PC')
+        if (baoluoYuanPoint && !openedPoints.has(baoluoYuanPoint.id)) {
+          points.push({
+            ...baoluoYuanPoint,
+            meridian: '手厥阴心包经',
+            isOpen: true,
+            isNa: false,
+            isGu: false,
+            type: '原穴（包络寄穴）'
+          })
+          openedPoints.add(baoluoYuanPoint.id)
+        }
+      }
+    }
+  } else if (stepIndex === 5) {
+    // 步骤 5：气纳三焦（阳日）/ 血归包络（阴日）
+    if (dayType === '阳') {
+      const sanziaoPoint = getSanziaoPoint(dayMeridian.wuxing)
+      if (sanziaoPoint) {
+        points.push({
+          ...sanziaoPoint,
+          isOpen: true,
+          isNa: true,
+          isGu: false,
+          type: '气纳三焦（他生我）'
+        })
+      }
+    } else {
+      const baoluoPoint = getBaoluoPoint(dayMeridian.wuxing)
+      if (baoluoPoint) {
+        points.push({
+          ...baoluoPoint,
+          isOpen: true,
+          isNa: true,
+          isGu: false,
+          type: '血归包络（我生他）'
+        })
       }
     }
   }
   
-  // 4. 开经穴（第四个阳时）
-  const jingXueHour = (jingHour + 6) % 12
-  if (hour === jingXueHour) {
-    const jingXuePoint = wushuPoints[3]
-    if (jingXuePoint && !openedPoints.has(jingXuePoint.id)) {
-      points.push({
-        ...jingXuePoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '经穴'
-      })
-      openedPoints.add(jingXuePoint.id)
-    }
-  }
-  
-  // 5. 开合穴（第五个阳时）
-  const heHour = (jingHour + 8) % 12
-  if (hour === heHour) {
-    const hePoint = wushuPoints[4]
-    if (hePoint && !openedPoints.has(hePoint.id)) {
-      points.push({
-        ...hePoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '合穴'
-      })
-      openedPoints.add(hePoint.id)
-    }
-  }
-  
-  // 6. 气纳三焦（第六个阳时，最后一个）
-  const lastYangHour = (jingHour + 10) % 12
-  if (hour === lastYangHour) {
-    const sanziaoPoint = getSanziaoPoint(dayMeridian.wuxing)
-    if (sanziaoPoint) {
-      points.push({
-        ...sanziaoPoint,
-        isOpen: true,
-        isNa: true,
-        isGu: false,
-        type: '气纳三焦（他生我）'
-      })
-    }
-  }
-  
   return points
-}
-
-/**
- * 计算阴日开穴（基于徐凤歌诀）
- * 歌诀示例（乙日）：
- * 乙日酉时肝大敦，丁亥时荥少府心，己丑太白太冲穴，辛卯经渠是肺经，
- * 癸已肾宫阴谷合，乙未劳宫火穴荥。
- */
-function calculateYinDayPoints(dayStem, dayMeridian, hourStem, hourBranch, hour, openedPoints) {
-  const points = []
-  const meridianCode = dayMeridian.code
-  
-  const wushuPoints = getWushuPointsFull(meridianCode)
-  if (!wushuPoints || wushuPoints.length === 0) return points
-  
-  // 1. 开井穴（第一个阴时）
-  if (hour === calculateJingHour(dayStem)) {
-    const jingPoint = wushuPoints[0]
-    if (jingPoint && !openedPoints.has(jingPoint.id)) {
-      points.push({
-        ...jingPoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '井穴'
-      })
-      openedPoints.add(jingPoint.id)
-    }
-  }
-  
-  // 2. 开荥穴（第二个阴时）
-  const jingHour = calculateJingHour(dayStem)
-  const yingHour = (jingHour + 2) % 12
-  if (hour === yingHour) {
-    const yingPoint = wushuPoints[1]
-    if (yingPoint && !openedPoints.has(yingPoint.id)) {
-      points.push({
-        ...yingPoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '荥穴'
-      })
-      openedPoints.add(yingPoint.id)
-    }
-  }
-  
-  // 3. 开输穴 + 遇输过原（第三个阴时）
-  const shuHour = (jingHour + 4) % 12
-  if (hour === shuHour) {
-    // 开输穴
-    const shuPoint = wushuPoints[2]
-    if (shuPoint && !openedPoints.has(shuPoint.id)) {
-      points.push({
-        ...shuPoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '输穴'
-      })
-      openedPoints.add(shuPoint.id)
-    }
-    
-    // 遇输过原：开值日经的原穴
-    const yuanPoint = getYuanPointFull(meridianCode)
-    if (yuanPoint && !openedPoints.has(yuanPoint.id)) {
-      points.push({
-        ...yuanPoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '原穴（遇输过原）'
-      })
-      openedPoints.add(yuanPoint.id)
-    }
-    
-    // 特殊处理：癸日同时开心包经原穴（大陵 PC7）
-    if (dayStem === '癸') {
-      const baoluoYuanPoint = getYuanPointFull('PC')
-      if (baoluoYuanPoint && !openedPoints.has(baoluoYuanPoint.id)) {
-        points.push({
-          ...baoluoYuanPoint,
-          meridian: '手厥阴心包经',
-          isOpen: true,
-          isNa: false,
-          isGu: false,
-          type: '原穴（包络寄穴）'
-        })
-        openedPoints.add(baoluoYuanPoint.id)
-      }
-    }
-  }
-  
-  // 4. 开经穴（第四个阴时）
-  const jingXueHour = (jingHour + 6) % 12
-  if (hour === jingXueHour) {
-    const jingXuePoint = wushuPoints[3]
-    if (jingXuePoint && !openedPoints.has(jingXuePoint.id)) {
-      points.push({
-        ...jingXuePoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '经穴'
-      })
-      openedPoints.add(jingXuePoint.id)
-    }
-  }
-  
-  // 5. 开合穴（第五个阴时）
-  const heHour = (jingHour + 8) % 12
-  if (hour === heHour) {
-    const hePoint = wushuPoints[4]
-    if (hePoint && !openedPoints.has(hePoint.id)) {
-      points.push({
-        ...hePoint,
-        isOpen: true,
-        isNa: false,
-        isGu: false,
-        type: '合穴'
-      })
-      openedPoints.add(hePoint.id)
-    }
-  }
-  
-  // 6. 血归包络（第六个阴时，最后一个）
-  const lastYinHour = (jingHour + 10) % 12
-  if (hour === lastYinHour) {
-    const baoluoPoint = getBaoluoPoint(dayMeridian.wuxing)
-    if (baoluoPoint) {
-      points.push({
-        ...baoluoPoint,
-        isOpen: true,
-        isNa: true,
-        isGu: false,
-        type: '血归包络（我生他）'
-      })
-    }
-  }
-  
-  return points
-}
-
-/**
- * 获取下一个经络（五行相生顺序）
- * 木→火→土→金→水→木
- * 
- * @param {string} meridianCode - 当前经络代码
- * @returns {Object} 下一个经络信息 { code, fullName }
- */
-function getNextMeridian(meridianCode) {
-  const meridianWuxingMap = {
-    'GB': '木', 'LR': '木',
-    'SI': '火', 'HT': '火', 'TE': '火', 'PC': '火',
-    'ST': '土', 'SP': '土',
-    'LI': '金', 'LU': '金',
-    'BL': '水', 'KI': '水'
-  }
-  
-  const wuxingMap = {
-    '木': ['SI', 'HT'],
-    '火': ['ST', 'SP'],
-    '土': ['LI', 'LU'],
-    '金': ['BL', 'KI'],
-    '水': ['GB', 'LR']
-  }
-  
-  const currentWuxing = meridianWuxingMap[meridianCode]
-  const nextMeridians = wuxingMap[currentWuxing]
-  
-  // 返回第一个匹配的经络
-  const nextCode = nextMeridians[0]
-  const nextEntry = DAY_MERIDIAN_MAP[Object.keys(DAY_MERIDIAN_MAP).find(key => DAY_MERIDIAN_MAP[key].code === nextCode)]
-  return {
-    code: nextCode,
-    fullName: nextEntry?.fullName || ''
-  }
 }
 
 /**
@@ -548,7 +320,7 @@ function getSanziaoPoint(dayWuxing) {
   const sanziaoPoints = getWushuPointsFull('TE')
   if (!sanziaoPoints || sanziaoPoints.length === 0) return null
   
-  // 按五行相生顺序查找：他生我
+  // 按五行相生顺序查找：他生我（WUXING_SHENG[point.wuxing] === dayWuxing）
   for (const point of sanziaoPoints) {
     if (WUXING_SHENG[point.wuxing] === dayWuxing) {
       return {
@@ -560,6 +332,7 @@ function getSanziaoPoint(dayWuxing) {
   }
   
   // 默认返回荥穴（徐凤歌诀中多取荥穴）
+  console.warn(`三焦经未找到匹配 ${dayWuxing} 的穴位，使用默认荥穴`)
   const defaultPoint = sanziaoPoints[1]
   return defaultPoint ? {
     ...defaultPoint,
@@ -581,7 +354,7 @@ function getBaoluoPoint(dayWuxing) {
   const baoluoPoints = getWushuPointsFull('PC')
   if (!baoluoPoints || baoluoPoints.length === 0) return null
   
-  // 按五行相生顺序查找：我生他
+  // 按五行相生顺序查找：我生他（WUXING_SHENG[dayWuxing] === point.wuxing）
   for (const point of baoluoPoints) {
     if (WUXING_SHENG[dayWuxing] === point.wuxing) {
       return {
@@ -593,6 +366,7 @@ function getBaoluoPoint(dayWuxing) {
   }
   
   // 默认返回荥穴（徐凤歌诀中多取荥穴）
+  console.warn(`心包经未找到匹配 ${dayWuxing} 的穴位，使用默认荥穴`)
   const defaultPoint = baoluoPoints[1]
   return defaultPoint ? {
     ...defaultPoint,
@@ -612,7 +386,7 @@ function getBaoluoPoint(dayWuxing) {
  * @param {string} dayStem - 日天干
  * @param {Object} ganzhi - 干支信息
  * @param {number} hourIndex - 时辰索引
- * @returns {Object|null} 合日互用信息，包含reason、meridian、dayStem、openPoints
+ * @returns {Object|null} 合日互用信息
  */
 function getHeRiHuYong(dayStem, ganzhi, hourIndex) {
   const heMap = {

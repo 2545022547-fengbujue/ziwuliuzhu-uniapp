@@ -1,29 +1,19 @@
 import { getStemIndex } from './ganzhi.js'
 import { getEightPointFull } from './acupuncturePoints.js'
-
-/**
- * 时辰名称
- */
-const HOUR_NAMES = [
-  '子时', '丑时', '寅时', '卯时', '辰时', '巳时',
-  '午时', '未时', '申时', '酉时', '戌时', '亥时'
-]
+import { HOUR_NAMES } from '@/data/constants.js'
+import { STEM_POINT_MAP, EIGHT_POINTS_MAP } from '@/data/eight-points.js'
 
 /**
  * 天干八卦对应（飞腾八法）
+ * 从八脉八穴共享数据的宫位信息构建
  */
-const STEM_GUA_MAP = {
-  '壬': { gua: '乾', number: 9 },
-  '甲': { gua: '乾', number: 9 },
-  '丙': { gua: '艮', number: 8 },
-  '戊': { gua: '坎', number: 1 },
-  '庚': { gua: '坤', number: 2 },
-  '辛': { gua: '震', number: 3 },
-  '丁': { gua: '离', number: 9 },
-  '乙': { gua: '离', number: 9 },
-  '己': { gua: '兑', number: 7 },
-  '癸': { gua: '巽', number: 4 }
-}
+const STEM_GUA_MAP = {}
+Object.entries(STEM_POINT_MAP).forEach(([stem, code]) => {
+  const point = EIGHT_POINTS_MAP[code]
+  if (point) {
+    STEM_GUA_MAP[stem] = { gua: point.gua, number: point.palace }
+  }
+})
 
 /**
  * 飞腾八法计算
@@ -32,6 +22,15 @@ const STEM_GUA_MAP = {
  * @returns {Object} 取穴结果
  */
 export function calculateFeiteng(ganzhi, hourIndex) {
+  if (hourIndex < 0 || hourIndex > 11) {
+    console.warn(`飞腾八法：无效的时辰索引 ${hourIndex}`)
+    return { method: 'feiteng', methodName: '飞腾八法', openPoints: [] }
+  }
+  if (!ganzhi?.day?.heavenlyStem || !ganzhi?.hour?.heavenlyStem) {
+    console.warn('飞腾八法：干支信息不完整')
+    return { method: 'feiteng', methodName: '飞腾八法', openPoints: [] }
+  }
+
   const dayStem = ganzhi.day.heavenlyStem
   const hourStem = ganzhi.hour.heavenlyStem
   
@@ -41,24 +40,10 @@ export function calculateFeiteng(ganzhi, hourIndex) {
   
   // 获取开穴
   let openPoints = []
-  
-  // 飞腾八法天干穴位对应（基于歌诀）
-  // 壬甲公孙即是乾，丙居艮上内关然，戊为临泣生坎水，庚属外关震相连，
-  // 辛上后溪装巽卦，乙癸申脉到坤传，己土列缺南离上，丁居照海兑金全。
-  const stemPointMap = {
-    '壬': 'SP4', '甲': 'SP4',   // 公孙 → 乾
-    '丙': 'PC6',                // 内关 → 艮
-    '戊': 'GB41',               // 足临泣 → 坎
-    '庚': 'TE5',                // 外关 → 震
-    '辛': 'SI3',                // 后溪 → 巽
-    '乙': 'BL62', '癸': 'BL62', // 申脉 → 坤
-    '己': 'LU7',                // 列缺 → 离
-    '丁': 'KI6'                 // 照海 → 兑
-  }
-  
+
   // 根据日天干确定开穴
-  const dayCode = stemPointMap[dayStem]
-  if (dayCode && dayCode !== '？') {
+  const dayCode = STEM_POINT_MAP[dayStem]
+  if (dayCode) {
     const dayPoint = getEightPointFull(dayCode)
     if (dayPoint) {
       openPoints.push({
@@ -71,10 +56,10 @@ export function calculateFeiteng(ganzhi, hourIndex) {
       })
     }
   }
-  
+
   // 根据时天干确定配穴
-  const hourCode = stemPointMap[hourStem]
-  if (hourCode && hourCode !== '？' && hourCode !== dayCode) {
+  const hourCode = STEM_POINT_MAP[hourStem]
+  if (hourCode && hourCode !== dayCode) {
     const hourPoint = getEightPointFull(hourCode)
     if (hourPoint) {
       openPoints.push({

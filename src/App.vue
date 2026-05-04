@@ -1,11 +1,5 @@
-<script>
-export default {
-  onLaunch() {},
-  onShow() {},
-  onHide() {}
-}
-</script>
+<template></template>
 
 <style lang="scss">
-@import '@/styles/index.scss';
+@use '@/styles/index.scss';
 </style>
