@@ -89,7 +89,7 @@ npm run build:h5
 ## 作者
 
 - **疯不觉**
-- GitHub: [@2545022547-lang](https://github.com/2545022547-lang)
+- GitHub: [@2545022547-lang](https://github.com/2545022547-fengbujue)
 
 ## 许可
 
