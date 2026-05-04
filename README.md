@@ -86,24 +86,9 @@ npm run build:h5
 
 > **注意**：由于 `@dcloudio/vite-plugin-uni` 精确锁定 Vite 5.2.8，请不要手动升级 Vite 版本，否则可能导致构建失败。
 
-## 打包发布
-
-### Android / iOS
-
-使用 HBuilderX 云打包功能，包名：`com.ziwuliuzhu.acupuncture`。
-
-> **图标设置**：App 图标必须在 HBuilderX 中手动配置（manifest.json → App图标配置），CLI 打包方式无法正确写入图标资源。
-
-### 微信小程序
-
-编译完成后，将 `dist/build/mp-weixin` 目录导入微信开发者工具上传。
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request。请在提交前确保代码通过本地测试。
-
 ## 作者
 
+- **疯不觉**
 - GitHub: [@2545022547-lang](https://github.com/2545022547-lang)
 
 ## 许可
