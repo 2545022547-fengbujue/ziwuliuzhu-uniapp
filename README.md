@@ -19,12 +19,12 @@
 
 | 类别 | 技术 | 版本/说明 |
 |------|------|-----------|
-| 框架 | uni-app (Vue 3 + Vite) | Vue 3.4 Composition API |
-| 状态管理 | Pinia + pinia-plugin-persist-uni | ^2.1.7 |
-| UI 组件 | uview-plus | ^3.0.0 |
-| 样式 | SCSS | — |
-| 日期计算 | lunar-javascript | ^1.7.0 |
-| 构建工具 | Vite | 5.2.8（由 @dcloudio/vite-plugin-uni 精确锁定） |
+| 框架 | uni-app (Vue 3 + Vite) | 3.0.0-alpha-5000820260430001 |
+| 状态管理 | Pinia + pinia-plugin-persist-uni | ^2.1.0 / ^1.2.0 |
+| UI 组件 | uview-plus | ^3.3.0 |
+| 样式 | SCSS (sass) | ^1.70.0 |
+| 日期计算 | lunar-javascript | ^1.6.0 |
+| 构建工具 | Vite | ^5.0.0（实际锁定 5.2.8） |
 
 ## 系统要求
 
@@ -61,7 +61,7 @@
 npm install
 ```
 
-### 启动 H5 开发服务器（端口 5174）
+### 启动 H5 开发服务器
 
 ```bash
 npm run dev:h5
