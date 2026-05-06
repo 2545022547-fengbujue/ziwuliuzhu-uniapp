@@ -8,8 +8,8 @@
  *   4. 管理真太阳时设置（城市、经度）
  *   5. 管理穴位详情弹窗状态
  *
- * 数据流：
- *   用户操作 → 修改状态 → 触发计算 → 更新 results → ResultPanel 响应式更新
+ * 数据流（声明式，computed 自动推导）：
+ *   用户操作 → 修改状态 → currentGanZhi 自动重算 → results 自动重算 → ResultPanel 响应式更新
  *
  * 持久化：
  *   使用 pinia-plugin-persist-uni 将部分状态持久化到 uni.storage
@@ -45,15 +45,6 @@ export const useAppStore = defineStore('app', () => {
   // === 取穴方法 ===
   const activeMethod = ref('najia')
 
-  // === 计算结果 ===
-  const results = ref({
-    najia: null,
-    nazi: null,
-    lingui: null,
-    feiteng: null,
-    fanke: null
-  })
-
   // === UI 状态 ===
   const showDetail = ref(false)
   const selectedPoint = ref(null)
@@ -65,117 +56,110 @@ export const useAppStore = defineStore('app', () => {
   const selectedCity = ref('北京')
 
   // === 计算属性 ===
-  const currentResults = computed(() => results.value[activeMethod.value])
-  const currentGanZhi = ref(null)
 
-  // === 构建干支信息 ===
-  function buildGanZhi(date, hourIndex) {
-    const baseGanZhi = getGanZhi(date, longitude.value, useTrueSolarTime.value)
-    const dayStem = baseGanZhi.day.heavenlyStem
-    const hourBranchIndex = hourIndex
-    const hourBranch = EARTHLY_BRANCHES[hourBranchIndex]
-    const startStemIndex = WU_SHU_DUN[dayStem] || 0
-    const hourStemIndex = (startStemIndex + hourBranchIndex) % 10
-    const hourStem = HEAVENLY_STEMS[hourStemIndex]
+  /** 当前干支信息（自动/手动模式自动切换数据源） */
+  const currentGanZhi = computed(() => {
+    const date = isManualMode.value ? selectedDate.value : currentTime.value
+    const hourIndex = isManualMode.value ? selectedHour.value : currentHour.value
+    try {
+      // 手动模式禁用真太阳时校正：用户选的是概念日期+时辰，不是具体时刻，校正无意义
+      const baseGanZhi = isManualMode.value
+        ? getGanZhi(date, 116.407, false)
+        : getGanZhi(date, longitude.value, useTrueSolarTime.value)
+      const dayStem = baseGanZhi.day.heavenlyStem
+      const hourBranch = EARTHLY_BRANCHES[hourIndex]
+      const startStemIndex = WU_SHU_DUN[dayStem] || 0
+      const hourStemIndex = (startStemIndex + hourIndex) % 10
+      const hourStem = HEAVENLY_STEMS[hourStemIndex]
 
-    return {
-      year: baseGanZhi.year,
-      month: baseGanZhi.month,
-      day: baseGanZhi.day,
-      hour: {
-        heavenlyStem: hourStem,
-        earthlyBranch: hourBranch,
-        ganZhi: hourStem + hourBranch
+      return {
+        year: baseGanZhi.year,
+        month: baseGanZhi.month,
+        day: baseGanZhi.day,
+        hour: {
+          heavenlyStem: hourStem,
+          earthlyBranch: hourBranch,
+          ganZhi: hourStem + hourBranch
+        }
       }
+    } catch (e) {
+      console.error('[干支计算错误]', e)
+      return null
     }
-  }
+  })
 
-  // === 计算取穴结果 ===
-  function calculateResults(ganzhi, hourIndex) {
-    return {
-      najia: calculateNajia(ganzhi, hourIndex),
-      nazi: calculateNazi(ganzhi, hourIndex),
-      lingui: calculateLingui(ganzhi, hourIndex),
-      feiteng: calculateFeiteng(ganzhi, hourIndex),
-      fanke: calculateFanke(ganzhi, hourIndex)
+  /** 全部取穴结果（从 currentGanZhi 自动推导，含错误边界） */
+  const results = computed(() => {
+    const ganzhi = currentGanZhi.value
+    const hourIndex = isManualMode.value ? selectedHour.value : currentHour.value
+    if (!ganzhi) {
+      return { najia: null, nazi: null, lingui: null, feiteng: null, fanke: null, _error: '干支计算失败' }
     }
-  }
+    try {
+      return {
+        najia: calculateNajia(ganzhi, hourIndex),
+        nazi: calculateNazi(ganzhi, hourIndex),
+        lingui: calculateLingui(ganzhi, hourIndex),
+        feiteng: calculateFeiteng(ganzhi, hourIndex),
+        fanke: calculateFanke(ganzhi, hourIndex)
+      }
+    } catch (e) {
+      console.error('[取穴计算错误]', e)
+      return { najia: null, nazi: null, lingui: null, feiteng: null, fanke: null, _error: e.message }
+    }
+  })
 
-  // === 内部：重新计算干支和取穴结果 ===
-  function _recalculate(date, hourIndex) {
-    const ganzhi = buildGanZhi(date, hourIndex)
-    currentGanZhi.value = ganzhi
-    results.value = calculateResults(ganzhi, hourIndex)
-  }
+  // 当前激活方法的取穴结果（从 results 中按 activeMethod 索引）
+  const currentResults = computed(() => results.value[activeMethod.value])
 
-  // === 更新当前系统时间（自动模式）===
+  // === Actions（只改状态，不触计算）===
+
   function updateCurrentTime() {
-    const now = new Date()
-    currentTime.value = now
-    currentHour.value = getHourIndexFromDate(now)
-    _recalculate(now, currentHour.value)
+    currentTime.value = new Date()
+    currentHour.value = getHourIndexFromDate(currentTime.value)
   }
 
-  // === 用户选择时间查询（手动模式）===
   function queryTime(date, hour) {
     selectedDate.value = date
     selectedHour.value = hour
     isManualMode.value = true
-    _recalculate(date, hour)
   }
 
-  // === 切换回自动模式 ===
   function switchToAutoMode() {
     isManualMode.value = false
     updateCurrentTime()
   }
 
-  // === 切换到手动模式 ===
   function switchToManualMode(date, hour) {
     isManualMode.value = true
     selectedDate.value = date
     selectedHour.value = hour
-    _recalculate(date, hour)
   }
 
-  // === 更新经度 ===
+  // 经度变化时，自动模式同时刷新 currentTime/currentHour（以防真太阳时校正导致跨时辰）
+  // 手动模式下 computed 自动追踪 longitude 变化，无需额外操作
   function updateLongitude(newLongitude, city) {
     longitude.value = newLongitude
     useTrueSolarTime.value = true
     if (city) selectedCity.value = city
-
-    if (isManualMode.value) {
-      _recalculate(selectedDate.value, selectedHour.value)
-    } else {
-      updateCurrentTime()
-    }
+    if (!isManualMode.value) updateCurrentTime()
   }
 
-  // === 切换真太阳时开关 ===
+  // 真太阳时开关变化同理：自动模式刷新时间，手动模式 computed 自动追踪 longitude/useTrueSolarTime 变化
   function toggleTrueSolarTime(enabled) {
     useTrueSolarTime.value = enabled
-    if (!enabled) {
-      longitude.value = APP_CONFIG.defaultLongitude
-    }
-
-    if (isManualMode.value) {
-      _recalculate(selectedDate.value, selectedHour.value)
-    } else {
-      updateCurrentTime()
-    }
+    if (!enabled) longitude.value = APP_CONFIG.defaultLongitude
+    if (!isManualMode.value) updateCurrentTime()
   }
 
-  // === 设置当前方法 ===
   function setActiveMethod(method) {
     activeMethod.value = method
   }
 
-  // === 纳子法模式切换 ===
   function setNaziMode(mode) {
     naziMode.value = mode
   }
 
-  // === 穴位详情 ===
   function selectPoint(point) {
     selectedPoint.value = point
     showDetail.value = true
@@ -191,7 +175,6 @@ export const useAppStore = defineStore('app', () => {
 
   return {
     // State
-    currentTime,
     currentHour,
     selectedDate,
     selectedHour,

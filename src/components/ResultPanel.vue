@@ -44,7 +44,7 @@
             <text class="point-name">{{ point.name }}</text>
             <text class="point-code">{{ point.code }}</text>
             <view v-if="point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
-              <text class="wuxing-text" :style="{ color: getWuxingStyle(point.wuxing).color }">{{ point.wuxing }}</text>
+              <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
             </view>
           </view>
         </view>
@@ -87,7 +87,7 @@
             <text class="point-name">{{ bp.point.name }}</text>
             <text class="point-code">{{ bp.point.code }}</text>
             <view v-if="bp.point.wuxing" class="wuxing-tag" :style="getWuxingStyle(bp.point.wuxing)">
-              <text class="wuxing-text" :style="{ color: getWuxingStyle(bp.point.wuxing).color }">{{ bp.point.wuxing }}</text>
+              <text class="wuxing-text" :style="{ color: getWuxingColor(bp.point.wuxing) }">{{ bp.point.wuxing }}</text>
             </view>
           </view>
         </view>
@@ -111,7 +111,7 @@
             <text class="point-name">{{ point.name }}</text>
             <text class="point-code">{{ point.code }}</text>
             <view v-if="point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
-              <text class="wuxing-text" :style="{ color: getWuxingStyle(point.wuxing).color }">{{ point.wuxing }}</text>
+              <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
             </view>
           </view>
         </view>
@@ -151,8 +151,8 @@
 
       <!-- 无结果 -->
       <view v-if="!result" class="empty-state">
-        <text class="empty-icon">⏳</text>
-        <text class="empty-text">等待计算...</text>
+        <text class="empty-icon">⚠️</text>
+        <text class="empty-text">暂无开穴信息</text>
       </view>
     </view>
   </view>
@@ -180,7 +180,8 @@
  */
 import { computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
-import { getWuxingStyle } from '@/utils/wuxing.js'
+import { getWuxingStyle, getWuxingColor } from '@/utils/wuxing.js'
+import { METHOD_NAMES } from '@/data/constants.js'
 
 // Props 定义
 const props = defineProps({
@@ -191,7 +192,7 @@ const props = defineProps({
 const store = useAppStore()
 
 // 从 store 中获取当前方法的计算结果（响应式）
-const result = computed(() => store.results[props.method])
+const result = computed(() => store.results?.[props.method] || null)
 
 // 是否纳子法
 const isNazi = computed(() => props.method === 'nazi')
@@ -223,10 +224,7 @@ const gridStyle = computed(() => {
 })
 
 // 方法中文名映射
-const methodName = computed(() => {
-  const names = { najia: '纳甲法', nazi: '纳子法', lingui: '灵龟八法', feiteng: '飞腾八法', fanke: '反克法' }
-  return names[props.method] || props.method
-})
+const methodName = computed(() => METHOD_NAMES[props.method] || props.method)
 
 // 方法图标映射
 const methodIcon = computed(() => {

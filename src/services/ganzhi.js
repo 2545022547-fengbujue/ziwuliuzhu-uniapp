@@ -39,7 +39,7 @@ function calculateEquationOfTime(date) {
  * @param {boolean} useTrueSolarTime - 是否使用真太阳时校正
  * @returns {Object} 干支信息
  */
-export function getGanZhi(date, longitude = 116.407, useTrueSolarTime = true) {
+export function getGanZhi(date, longitude = 116.407, useTrueSolarTime = false) {
   // 真太阳时校正：经度偏移 + 时差方程(EoT)
   let adjustedDate = date
   if (useTrueSolarTime && longitude) {
@@ -49,12 +49,25 @@ export function getGanZhi(date, longitude = 116.407, useTrueSolarTime = true) {
     adjustedDate = new Date(date.getTime() + totalMs)
   }
 
-  // 子时翻转：23:00 进入子时即为新的一天，日干支应翻转
-  // lunar-javascript 默认按公历日期计算，不处理子时翻转
+  // 子时翻转修正：传统历法中 23:00-01:00 为次日子时，日干支应从23:00起算次日
+  // lunar-javascript 将 23:00-23:59 视为"当天的子时"，与传统历法不符
+  // 修正方法：将 23:00-23:59 映射到次日 00:00 再计算，确保日干支和时干支都正确
+  // 同时处理真太阳时校正后往前跨日的情况（经度>120°时，校正后日期可能已进入次日）
   let lunarDate = adjustedDate
-  if (adjustedDate.getHours() >= 23) {
-    // 23:00 后算作次日子时，日期加一天
-    lunarDate = new Date(adjustedDate.getTime() + 24 * 60 * 60 * 1000)
+  const adjustedHour = adjustedDate.getHours()
+  const isCrossDay = date.getDate() !== adjustedDate.getDate()
+
+  if (adjustedHour >= 23) {
+    // 情况1：23:00-23:59 → 次日 00:00（用年月日构造避免 +24h 语义歧义）
+    lunarDate = new Date(
+      adjustedDate.getFullYear(),
+      adjustedDate.getMonth(),
+      adjustedDate.getDate() + 1,
+      0, 0, 0
+    )
+  } else if (isCrossDay) {
+    // 情况2：真太阳时校正导致跨日（往东偏，经度>120°），直接使用校正后的日期
+    lunarDate = adjustedDate
   }
 
   // 使用lunar-javascript获取干支

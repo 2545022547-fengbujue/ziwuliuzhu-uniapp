@@ -175,11 +175,13 @@ const popupTapped = ref(false)
 let tapTimer = null
 let focusTimer = null
 let openTimer = null
+let debounceTimer = null
 
 onUnmounted(() => {
   if (tapTimer) clearTimeout(tapTimer)
   if (focusTimer) clearTimeout(focusTimer)
   if (openTimer) clearTimeout(openTimer)
+  if (debounceTimer) clearTimeout(debounceTimer)
 })
 
 function handleOverlayTap() {
@@ -208,7 +210,11 @@ function handleInputTap() {
 }
 
 function onSearchInput(e) {
-  searchText.value = e.detail.value
+  const value = e.detail.value
+  if (debounceTimer) clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    searchText.value = value
+  }, 300)
 }
 
 function onInputBlur() {
@@ -242,6 +248,7 @@ function open(callback) {
 }
 
 function close() {
+  if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null }
   inputFocused.value = false
   show.value = false
   selectedCity.value = ''

@@ -1,6 +1,12 @@
 /**
  * 穴位数据服务
- * 关联国家标准穴位数据（GB/T 12346-2021）与特定穴数据库、经外奇穴数据库
+ *
+ * 整合三个数据源，提供统一的穴位查询接口：
+ *   1. 国家标准穴位数据（GB/T 12346-2021）— 362个经穴的基础信息（名称、拼音、定位等）
+ *   2. 特定穴数据库（special-points.js）— 五输穴、原穴、络穴、郄穴等分类信息
+ *   3. 经外奇穴数据库（extra-points.js）— 十四经穴之外的穴位
+ *
+ * 被算法层（najia/nazi/lingui/feiteng）调用，获取穴位完整信息用于取穴计算和结果展示
  */
 
 import acupuncturePointsData from '@/data/acupuncture-points-gb2021.json'
@@ -98,14 +104,23 @@ export function getWushuPointsFull(meridianCode) {
   // 从特定穴数据库中筛选五输穴
   const wuxingCategories = ['井穴', '荥穴', '输穴', '经穴', '合穴']
   
+  // 五输穴类别排序表（消除对数据文件隐式顺序的依赖）
+  const categoryOrder = { '井穴': 0, '荥穴': 1, '输穴': 2, '经穴': 3, '合穴': 4 }
+
   const wushuPoints = SPECIAL_POINTS.filter(point => {
-    // 检查是否属于该经络
     if (point.meridian !== MERIDIAN_CODE_TO_NAME[meridianCode]) return false
-    
-    // 检查是否是五输穴
     return point.categories.some(cat => wuxingCategories.includes(cat))
+  }).sort((a, b) => {
+    // 按井→荥→输→经→合顺序排列，确保算法取穴正确
+    const aCat = a.categories.find(c => categoryOrder[c] !== undefined)
+    const bCat = b.categories.find(c => categoryOrder[c] !== undefined)
+    return (categoryOrder[aCat] ?? 99) - (categoryOrder[bCat] ?? 99)
   })
   
+  if (wushuPoints.length !== 5) {
+    console.warn(`[五输穴] ${meridianCode} 经脉五输穴数量异常: ${wushuPoints.length}，期望 5 个`)
+  }
+
   return wushuPoints.map(point => {
     const fullData = getPointByCode(point.code)
     
