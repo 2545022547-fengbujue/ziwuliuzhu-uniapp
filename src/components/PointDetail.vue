@@ -1,5 +1,17 @@
 <template>
-  <view class="overlay" @tap="handleClose">
+  <view v-if="!point" class="overlay" @tap="handleClose">
+    <view class="popup" @tap.stop>
+      <view class="popup-header">
+        <view class="close-btn" @tap="handleClose">
+          <text class="close-icon">✕</text>
+        </view>
+      </view>
+      <view class="empty-state">
+        <text class="empty-text">穴位信息加载失败</text>
+      </view>
+    </view>
+  </view>
+  <view v-else class="overlay" @tap="handleClose">
     <view class="popup" @tap.stop>
       <!-- 头部 -->
       <view class="popup-header">
@@ -189,6 +201,18 @@ function handleClose() {
   flex-direction: column;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
   overflow: hidden;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.empty-text {
+  font-size: 14px;
+  color: $tcm-text-hint;
 }
 
 .popup-header {

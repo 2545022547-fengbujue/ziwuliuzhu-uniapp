@@ -13,17 +13,21 @@ function initSystemInfo() {
   if (initialized) return
   initialized = true
 
-  const info = uni.getSystemInfoSync()
-  statusBarHeight.value = info.statusBarHeight || 20
-  screenWidth.value = info.screenWidth || 375
-  screenHeight.value = info.screenHeight || 667
-  platform.value = info.platform || ''
+  try {
+    const info = uni.getSystemInfoSync()
+    statusBarHeight.value = info.statusBarHeight || 20
+    screenWidth.value = info.screenWidth || 375
+    screenHeight.value = info.screenHeight || 667
+    platform.value = info.platform || ''
 
-  // 安全区域：兼容不同平台的获取方式
-  if (info.safeAreaInsets && info.safeAreaInsets.bottom !== undefined) {
-    safeAreaBottom.value = info.safeAreaInsets.bottom
-  } else if (info.safeArea && info.safeArea.bottom !== undefined) {
-    safeAreaBottom.value = info.screenHeight - info.safeArea.bottom
+    // 安全区域：兼容不同平台的获取方式
+    if (info.safeAreaInsets && info.safeAreaInsets.bottom !== undefined) {
+      safeAreaBottom.value = info.safeAreaInsets.bottom
+    } else if (info.safeArea && info.safeArea.bottom !== undefined) {
+      safeAreaBottom.value = info.screenHeight - info.safeArea.bottom
+    }
+  } catch (e) {
+    console.error('[系统信息获取失败]', e)
   }
 
   // 微信小程序：获取胶囊按钮位置信息（运行时检测，跨平台安全）

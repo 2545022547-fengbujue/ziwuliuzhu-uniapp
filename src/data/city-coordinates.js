@@ -1,22 +1,25 @@
 /**
  * 中国主要城市经纬度数据
- * 
+ *
+ * 用于真太阳时校正：用户选择城市后，系统使用该城市的经度计算经度偏移，
+ * 结合时差方程(EoT)完成真太阳时校正。
+ *
  * 数据来源：
- * - 基础数据：互联网
+ * - 基础数据：互联网公开地理数据
  * - 地级市列表：国家标准行政区划
  * - 覆盖范围：34个省/自治区/直辖市/特别行政区，共348个地级市
- * 
+ *
  * 数据结构：
- * - name: 城市名称（去除"市"后缀）
- * - province: 所属省份
- * - longitude: 经度（用于真太阳时计算）
- * - pinyin: 城市拼音
- * - abbr: 拼音首字母缩写
- * 
- * 搜索功能：
- * - 支持城市名称搜索
- * - 支持拼音搜索
- * - 支持首字母缩写搜索（1-2个字母时精确匹配abbr）
+ * - name: 城市名称（去除"市"后缀，如"北京"而非"北京市"）
+ * - province: 所属省份/直辖市/特别行政区
+ * - longitude: 经度（°E，用于真太阳时计算）
+ * - pinyin: 城市拼音（用于搜索）
+ * - abbr: 拼音首字母缩写（用于首字母搜索，如"bj"匹配"北京"）
+ *
+ * 搜索功能（searchCities 函数）：
+ * - 支持城市名称搜索（中文）
+ * - 支持拼音搜索（全拼）
+ * - 支持首字母缩写搜索（1-2个字母时精确匹配abbr，3个以上模糊匹配）
  * - 支持省份名称搜索
  */
 
@@ -430,11 +433,11 @@ const cityData = [
 ]
 
 // 转换为标准格式（按拼音排序）
-// 处理城市名称：去除"市"后缀，保留"州"、"盟"等行政区划后缀
+// 处理城市名称：去除"市"/"地区"后缀，保留"州"/"盟"等行政区划后缀
 export const CITIES = cityData
   .map(([province, name, longitude, pinyin, abbr]) => {
     return {
-      name: name.replace(/市$/, '').replace(/地区$/, '').replace(/州$/, '州').replace(/盟$/, '盟'),
+      name: name.replace(/市$/, '').replace(/地区$/, ''),
       province,
       longitude,
       pinyin,
@@ -460,7 +463,8 @@ export const CITIES = cityData
  */
 export function searchCities(keyword) {
   if (!keyword) return CITIES
-  const kw = keyword.toLowerCase()
+  // 用户可能输入"贵阳市"，但存储名是"贵阳"，搜索时去除"市"后缀
+  const kw = keyword.replace(/市$/, '').toLowerCase()
 
   // 输入1-2个字母时，只匹配拼音首字母缩写（abbr）
   // 例如：'bj' → 北京、宝鸡

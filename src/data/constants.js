@@ -1,20 +1,32 @@
 /**
  * 应用常量定义
+ *
+ * 本模块是子午流注取穴系统的核心常量库，被算法层（najia/nazi/lingui/feiteng）
+ * 和数据层（acupuncturePoints）共同引用。
+ *
+ * 模块结构：
+ *   1. 基础常量：天干、地支、时辰名称、五行
+ *   2. 五行关系：相生、相克、相生链、反向查找
+ *   3. 经络映射：经络代码↔名称、经络五行属性
+ *   4. 纳甲法常量：日天干→值日经络、五鼠遁
+ *   5. 纳子法常量：十二经脉本穴/原穴/母穴/子穴
  */
 
-// 时辰名称
+// === 1. 基础常量 ===
+
+// 十二时辰名称（索引0=子时，索引11=亥时）
 export const HOUR_NAMES = [
   '子时', '丑时', '寅时', '卯时', '辰时', '巳时',
   '午时', '未时', '申时', '酉时', '戌时', '亥时'
 ]
 
-// 天干
+// 十天干（索引0=甲，索引9=癸）
 export const HEAVENLY_STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
 
-// 地支
+// 十二地支（索引0=子，索引11=亥）
 export const EARTHLY_BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
 
-// 方法名称映射
+// 取穴方法标识 → 中文名映射
 export const METHOD_NAMES = {
   najia: '纳甲法',
   nazi: '纳子法',
@@ -23,10 +35,12 @@ export const METHOD_NAMES = {
   fanke: '反克法'
 }
 
-// 五行
+// 五行（按相生顺序排列）
 export const WUXING = ['木', '火', '土', '金', '水']
 
-// 五行相生
+// === 2. 五行关系 ===
+
+// 五行相生：木→火→土→金→水→木
 export const WUXING_SHENG = {
   '木': '火',
   '火': '土',
@@ -35,7 +49,7 @@ export const WUXING_SHENG = {
   '水': '木'
 }
 
-// 五行相克
+// 五行相克：木→土→水→火→金→木
 export const WUXING_KE = {
   '木': '土',
   '土': '水',
@@ -44,7 +58,9 @@ export const WUXING_KE = {
   '金': '木'
 }
 
-// 经络五行属性
+// === 3. 经络映射 ===
+
+// 十二经脉五行属性（阴经阳经同属一行）
 export const MERIDIAN_WUXING = {
   'LU': '金', 'LI': '金',
   'ST': '土', 'SP': '土',
@@ -54,7 +70,9 @@ export const MERIDIAN_WUXING = {
   'GB': '木', 'LR': '木'
 }
 
-// 日天干对应值日经络
+// === 4. 纳甲法常量 ===
+
+// 日天干 → 值日经络（纳甲法核心：甲日胆经值日，乙日肝经值日...）
 export const DAY_MERIDIAN_MAP = {
   '甲': { name: '胆经', code: 'GB', fullName: '足少阳胆经', yinYang: '阳', wuxing: '木' },
   '乙': { name: '肝经', code: 'LR', fullName: '足厥阴肝经', yinYang: '阴', wuxing: '木' },
@@ -68,8 +86,10 @@ export const DAY_MERIDIAN_MAP = {
   '癸': { name: '肾经', code: 'KI', fullName: '足少阴肾经', yinYang: '阴', wuxing: '水' }
 }
 
-// 五鼠遁（日上起时法）- 时辰天干起始索引
-// 甲己日起甲子时（索引0），乙庚日起丙子时（索引2），丙辛日起戊子时（索引4），丁壬日起庚子时（索引6），戊癸日起壬子时（索引8）
+// 五鼠遁（日上起时法）— 根据日天干确定子时天干的起始索引
+// 甲己日起甲子时(索引0)，乙庚日起丙子时(索引2)，丙辛日起戊子时(索引4)
+// 丁壬日起庚子时(索引6)，戊癸日起壬子时(索引8)
+// 用途：store.currentGanZhi 中计算时辰天干 = (startStemIndex + hourIndex) % 10
 export const WU_SHU_DUN = {
   '甲': 0, '己': 0,
   '乙': 2, '庚': 2,
@@ -78,10 +98,10 @@ export const WU_SHU_DUN = {
   '戊': 8, '癸': 8
 }
 
-// 五行相生链（纳甲法核心：经生经穴生穴）
+// 五行相生链（纳甲法"经生经、穴生穴"的核心：从此五行开始，按相生顺序取5条经脉）
 export const WUXING_CHAIN = ['木', '火', '土', '金', '水']
 
-// 五行相生反向查找：找到"生我"的五行（纳子法母穴用）
+// 五行相生反向查找：找到"生我"的五行（纳子法补母穴用，如木→水，即水生木）
 export const WUXING_SHENG_REVERSE = {
   '木': '水',  // 水生木
   '火': '木',  // 木生火
@@ -90,7 +110,10 @@ export const WUXING_SHENG_REVERSE = {
   '水': '金'   // 金生水
 }
 
+// === 5. 纳子法常量 ===
+
 // 纳子法专用穴位表：本穴、原穴、母穴（补穴）、子穴（泻穴）
+// ben: 五行与本经相同的穴位；yuan: 原穴；mu: 生我者（补）；zi: 我生者（泻）
 export const NAZI_SPECIAL_POINTS = {
   'GB': { ben: 'GB41', yuan: 'GB40', mu: 'GB43', zi: 'GB38' },  // 胆经(木)
   'LR': { ben: 'LR1',  yuan: 'LR3',  mu: 'LR8',  zi: 'LR2' },  // 肝经(木)
@@ -106,7 +129,7 @@ export const NAZI_SPECIAL_POINTS = {
   'TE': { ben: 'TE6',  yuan: 'TE4',  mu: 'TE3',  zi: 'TE10' }  // 三焦经(火)
 }
 
-// 经络代码 → 经络全称
+// 经络代码 → 经络全称（含任督二脉，acupuncturePoints.js 用此映射构建反向索引）
 export const MERIDIAN_CODE_TO_NAME = {
   'LU': '手太阴肺经', 'LI': '手阳明大肠经',
   'ST': '足阳明胃经', 'SP': '足太阴脾经',

@@ -72,8 +72,16 @@ export function calculateNajia(ganzhi, hourIndex) {
   
   // 1. 确定值日经络
   const dayMeridian = DAY_MERIDIAN_MAP[dayStem]
+  // 异常输入保护：本层返回空结果避免异常传播，配合 store 层 try-catch 形成双重防御
   if (!dayMeridian) {
-    throw new Error(`未知的日天干：${dayStem}`)
+    console.error(`[纳甲法] 未知的日天干：${dayStem}，返回空结果`)
+    return {
+      method: 'najia', methodName: '纳甲法', date: '', hourIndex,
+      hourName: HOUR_NAMES[hourIndex], hourGanZhi: '',
+      dayMeridian: null, openPoints: [], isClosed: true,
+      alternativePoints: null, dailySequence: [],
+      dayStem, dayBranch, hourStem, hourBranch
+    }
   }
   
   // 2. 计算当日所有开穴（完整流注顺序）
@@ -206,6 +214,8 @@ function calculateDayPoints(dayType, dayStem, dayMeridian, hour, openedPoints, j
   // 计算当前时辰是第几步（0-5）
   // 阳日只在阳时（偶数时辰索引）开穴，阴日只在阴时（奇数时辰索引）开穴
   // 每步间隔2个时辰索引
+  // stepIndex 为整数时（hour 与 jingHour 同奇偶），当前时辰有开穴
+  // stepIndex 为小数时（hour 与 jingHour 异奇偶），当前时辰闭穴
   const stepIndex = ((hour - jingHour + 12) % 12) / 2
 
   if (stepIndex >= 0 && stepIndex <= 4) {

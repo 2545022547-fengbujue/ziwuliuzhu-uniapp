@@ -46,6 +46,10 @@ const HOUR_MERIDIAN_MAP = {
  * @returns {Object} 取穴结果
  */
 export function calculateNazi(ganzhi, hourIndex) {
+  if (!ganzhi?.day) {
+    console.warn('[纳子法] 干支信息不完整')
+    return { method: 'nazi', methodName: '纳子法', openPoints: [], isClosed: true }
+  }
   // 确定值时经络
   const hourMeridian = HOUR_MERIDIAN_MAP[hourIndex]
   const meridianWuxing = MERIDIAN_WUXING[hourMeridian.code]

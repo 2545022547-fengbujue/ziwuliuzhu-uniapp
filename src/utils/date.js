@@ -1,9 +1,14 @@
 /**
- * 日期工具函数
+ * 日期工具模块
+ *
+ * 提供日期格式化、时辰索引计算等基础工具函数
+ * 被 index.vue（定时器）、app.js（时间状态）、setting.vue 等模块引用
  */
 
 /**
  * 格式化日期为 YYYY-MM-DD
+ * @param {Date} date - 日期对象
+ * @returns {string} 格式化后的日期字符串
  */
 export function formatDate(date) {
   const y = date.getFullYear()
@@ -32,6 +37,12 @@ export function getHourIndexFromDate(date) {
   if (hour >= 21 && hour < 23) return 11
   return 0
 }
+
+/**
+ * 时辰起始小时数
+ * 子时23点、丑时1点、寅时3点...亥时21点
+ */
+export const SHICHEN_START_HOURS = [23, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21]
 
 /**
  * 时辰选项列表

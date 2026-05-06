@@ -12,7 +12,7 @@
       <view class="logo-area">
         <text class="logo-icon">☯</text>
         <text class="app-name">子午流注取穴</text>
-        <text class="app-version">v1.0.0</text>
+        <text class="app-version">v{{ version }}</text>
       </view>
       <view class="desc-card">
         <text class="desc-text">
@@ -55,6 +55,10 @@
 import { computed } from 'vue'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
+import manifest from '@/manifest.json'
+
+// 从 manifest.json 动态读取版本号，避免硬编码不同步
+const version = manifest.versionName || '1.0.0'
 
 const { statusBarHeight } = useSystemInfo()
 const navHeight = computed(() => statusBarHeight.value + 44)

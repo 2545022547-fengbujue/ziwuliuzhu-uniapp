@@ -8,3 +8,9 @@ unpackage/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# AI 辅助文档
+国内镜像源使用教程.md
+子午流注uniapp-AI快速入手指南.md
+子午流注uniapp-全量打包.md
+子午流注uniapp-核心逻辑.md

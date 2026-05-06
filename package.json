@@ -19,7 +19,6 @@
     "lunar-javascript": "^1.6.0",
     "pinia": "^2.1.0",
     "pinia-plugin-persist-uni": "^1.2.0",
-    "uview-plus": "^3.3.0",
     "vue": "^3.4.0"
   },
   "devDependencies": {
