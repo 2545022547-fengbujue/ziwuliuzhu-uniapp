@@ -55,6 +55,9 @@ export const useAppStore = defineStore('app', () => {
   const longitude = ref(APP_CONFIG.defaultLongitude) // 默认北京经度
   const selectedCity = ref('北京')
 
+  // === 反克法显示模式 ===
+  const fankeDisplayMode = ref('merged') // 默认合并到纳甲法 | 'separate'=单独显示
+
   // === 计算属性 ===
 
   /** 当前干支信息（自动/手动模式自动切换数据源） */
@@ -187,6 +190,7 @@ export const useAppStore = defineStore('app', () => {
     useTrueSolarTime,
     longitude,
     selectedCity,
+    fankeDisplayMode,
     // Getters
     currentResults,
     currentGanZhi,
@@ -223,7 +227,7 @@ export const useAppStore = defineStore('app', () => {
             }
           }
         },
-        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod']
+        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'fankeDisplayMode']
       }
     ]
   }

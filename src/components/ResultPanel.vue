@@ -27,6 +27,31 @@
         <text class="warning-text">当前时辰为闭穴</text>
       </view>
 
+      <!-- 反克法合并显示（仅在纳甲法闭穴且合并模式下） -->
+      <template v-if="isNajia && result?.isClosed && store.fankeDisplayMode === 'merged'">
+        <view v-if="fankeResult" class="section fanke-merged">
+          <view class="section-title">
+            <view class="dot fanke"></view>
+            <text>反克法开穴（纳甲法闭穴时的特殊方案）</text>
+          </view>
+          <view class="points-grid">
+            <view
+              v-for="point in fankeResult.openPoints"
+              :key="point.id"
+              class="point-btn"
+              :class="{ open: point.isOpen }"
+              @tap="handlePointClick(point)"
+            >
+              <text class="point-name">{{ point.name }}</text>
+              <text class="point-code">{{ point.code }}</text>
+              <view v-if="point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
+                <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </template>
+
       <!-- 合日互用穴位（闭穴时） -->
       <view v-if="result?.isClosed && result?.alternativePoints?.openPoints?.length" class="section">
         <view class="section-title">
@@ -196,6 +221,12 @@ const result = computed(() => store.results?.[props.method] || null)
 
 // 是否纳子法
 const isNazi = computed(() => props.method === 'nazi')
+
+// 是否纳甲法
+const isNajia = computed(() => props.method === 'najia')
+
+// 反克法结果（纳甲法合并模式使用）
+const fankeResult = computed(() => store.results?.fanke || null)
 
 // 补母泻子法4个穴位的渲染数据（与六十六穴统一用 points-grid 展示）
 const bumuPoints = computed(() => {
@@ -383,6 +414,16 @@ function handlePointClick(point) {
 
   &.primary { background: $tcm-secondary; }
   &.secondary { background: $tcm-secondary; }
+  &.fanke { background: $tcm-red; }
+}
+
+// 反克法合并显示区域
+.fanke-merged {
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  background: rgba($tcm-red, 0.03);
+  border: 1rpx dashed rgba($tcm-red, 0.2);
+  border-radius: $radius-md;
 }
 
 /* === 穴位网格 === */

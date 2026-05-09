@@ -260,9 +260,9 @@ const confirmedHourIdx = ref(-1)
 // 分钟时间戳（自动模式下每分钟递增一次，驱动 currentDateTimeStr 时间字符串刷新，节省电量）
 const minuteTick = ref(0)
 
-// 是否显示反克法补充（仅纳甲法闭穴时显示）
+// 是否显示反克法补充（独立模式下纳甲法闭穴时显示）
 const showFankeSupplement = computed(() => {
-  return store.activeMethod === 'najia' && store.results.najia?.isClosed
+  return store.activeMethod === 'najia' && store.results.najia?.isClosed && store.fankeDisplayMode === 'separate'
 })
 
 // 其他方法对比列表（排除当前选中的方法）
