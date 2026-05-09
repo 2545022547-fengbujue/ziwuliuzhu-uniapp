@@ -13,7 +13,9 @@
    ============================================ */
 @use 'variables' as *;
 
-/* === 楷体字体（打包内置，解决 Android 无楷体问题） === */
+/* === 楷体字体 === */
+/* App端（Android）：打包内置字体，解决系统无楷体问题 */
+/* #ifdef APP-PLUS */
 @font-face {
   font-family: 'KaitiGB2312';
   src: url('@/static/fonts/kaiti-gb2312.ttf') format('truetype');
@@ -21,6 +23,8 @@
   font-style: normal;
   font-display: swap;
 }
+/* #endif */
+/* 微信小程序：在 App.vue onLaunch 中用 uni.loadFontFace 动态加载 */
 
 /* === 基础重置 === */
 page {
