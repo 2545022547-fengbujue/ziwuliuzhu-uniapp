@@ -31,18 +31,23 @@
           </view>
         </view>
 
-        <!-- 计算方法说明 -->
+        <!-- 反克法显示模式 -->
         <view class="setting-card">
-          <view class="card-title">
-            <text class="card-icon">📖</text>
-            <text>取穴方法说明</text>
+          <view class="setting-row">
+            <text class="setting-label">单独显示反克法</text>
+            <switch
+              :checked="store.fankeDisplayMode === 'separate'"
+              @change="onFankeModeChange"
+              color="#8B4513"
+            />
           </view>
-          <view class="method-desc" v-for="m in methodDescs" :key="m.id">
-            <view class="method-header">
-              <text class="method-icon">{{ m.icon }}</text>
-              <text class="method-name">{{ m.name }}</text>
-            </view>
-            <text class="method-detail">{{ m.desc }}</text>
+        </view>
+
+        <!-- 取穴方法说明 -->
+        <view class="setting-card" @tap="goMethods">
+          <view class="setting-row">
+            <text class="setting-label">取穴方法说明</text>
+            <text class="picker-arrow">▶</text>
           </view>
         </view>
 
@@ -91,14 +96,6 @@ const safeBottom = computed(() => safeAreaBottom.value)
 const scrollHeight = computed(() => screenHeight.value - navHeight.value - safeAreaBottom.value - 50)
 const cityPickerRef = ref(null)
 
-// 取穴方法说明列表
-const methodDescs = [
-  { id: 'najia', icon: '☰', name: '纳甲法', desc: '以天干配脏腑，按时取穴。根据日干支推算开穴，是最经典的子午流注取穴方法。' },
-  { id: 'nazi', icon: '☷', name: '纳子法', desc: '以地支配脏腑，按时辰取穴。十二经脉气血流注，按子午流注规律取本经子母穴。' },
-  { id: 'lingui', icon: '☯', name: '灵龟八法', desc: '取奇经八脉交会穴，按时辰推算九宫数，取相应穴位。' },
-  { id: 'feiteng', icon: '⚡', name: '飞腾八法', desc: '取奇经八脉交会穴，以天干推算，按时取穴，方法更为简便。' }
-]
-
 /** 真太阳时开关变化回调，开启时自动弹出城市选择 */
 function onSolarTimeToggle(e) {
   store.toggleTrueSolarTime(e.detail.value)
@@ -110,12 +107,21 @@ function onSolarTimeToggle(e) {
   }
 }
 
+/** 反克法显示模式切换 */
+function onFankeModeChange(e) {
+  store.fankeDisplayMode = e.detail.value ? 'separate' : 'merged'
+}
+
 /** 打开城市选择弹窗（复用 CityPicker 组件） */
 function openCityPicker() {
   cityPickerRef.value.open((cityData) => {
     // 回调：用户选择城市后，更新经度和城市名
     store.updateLongitude(cityData.longitude, cityData.name)
   })
+}
+
+function goMethods() {
+  uni.navigateTo({ url: '/pages/methods/methods' })
 }
 
 function goAbout() {
@@ -172,6 +178,13 @@ function goAbout() {
 .setting-value {
   font-size: $font-size-sm;
   color: $tcm-text-secondary;
+}
+
+.setting-tip {
+  padding: $spacing-sm 0 0;
+  font-size: $font-size-xs;
+  color: $tcm-text-hint;
+  line-height: 1.6;
 }
 
 .picker-display {
