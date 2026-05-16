@@ -1,5 +1,5 @@
 <template>
-  <view class="page">
+  <view class="page" :class="`theme-${store.activeTheme}`">
     <AppNavbar title="设置" />
     <view :style="{ height: navHeight + 'px' }"></view>
     <scroll-view scroll-y class="page-scroll" :style="{ height: scrollHeight + 'px' }">
@@ -15,7 +15,7 @@
             <switch
               :checked="store.useTrueSolarTime"
               @change="onSolarTimeToggle"
-              color="#8B4513"
+              :color="store.themeSwitchColor"
             />
           </view>
           <view v-if="store.useTrueSolarTime" class="setting-row">
@@ -31,6 +31,44 @@
           </view>
         </view>
 
+        <!-- 外观主题 -->
+        <!-- #ifndef MP-WEIXIN -->
+        <view class="setting-card">
+          <view class="card-title">
+            <text class="card-icon">◐</text>
+            <text>外观主题</text>
+          </view>
+          <!-- #ifdef APP-PLUS -->
+          <view class="setting-row">
+            <view class="setting-copy">
+              <text class="setting-label">跟随系统深色模式</text>
+              <text class="setting-tip inline">系统为深色时自动使用玄黑金篆</text>
+            </view>
+            <switch
+              :checked="store.followsSystemTheme"
+              @change="onFollowSystemThemeChange"
+              :color="store.themeSwitchColor"
+            />
+          </view>
+          <!-- #endif -->
+          <view class="theme-options">
+            <view
+              v-for="theme in store.themes"
+              :key="theme.id"
+              class="theme-option"
+              :class="{ active: store.activeTheme === theme.id }"
+              @tap="store.setTheme(theme.id)"
+            >
+              <view class="theme-swatch" :class="theme.id"></view>
+              <view class="theme-copy">
+                <text class="theme-name">{{ theme.name }}</text>
+                <text class="theme-desc">{{ theme.desc }}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <!-- #endif -->
+
         <!-- 反克法显示模式 -->
         <view class="setting-card">
           <view class="setting-row">
@@ -38,7 +76,7 @@
             <switch
               :checked="store.fankeDisplayMode === 'separate'"
               @change="onFankeModeChange"
-              color="#8B4513"
+              :color="store.themeSwitchColor"
             />
           </view>
         </view>
@@ -84,6 +122,7 @@
  *   复用 CityPicker 弹窗组件，选择后更新 store 的经度和城市名
  */
 import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
@@ -95,6 +134,10 @@ const navHeight = computed(() => statusBarHeight.value + 44)
 const safeBottom = computed(() => safeAreaBottom.value)
 const scrollHeight = computed(() => screenHeight.value - navHeight.value - safeAreaBottom.value - 50)
 const cityPickerRef = ref(null)
+
+onShow(() => {
+  store.applyThemeChrome()
+})
 
 /** 真太阳时开关变化回调，开启时自动弹出城市选择 */
 function onSolarTimeToggle(e) {
@@ -110,6 +153,11 @@ function onSolarTimeToggle(e) {
 /** 反克法显示模式切换 */
 function onFankeModeChange(e) {
   store.fankeDisplayMode = e.detail.value ? 'separate' : 'merged'
+}
+
+/** App 端跟随系统深色模式 */
+function onFollowSystemThemeChange(e) {
+  store.toggleFollowSystemTheme(e.detail.value)
 }
 
 /** 打开城市选择弹窗（复用 CityPicker 组件） */
@@ -170,6 +218,12 @@ function goAbout() {
   border-bottom: 1rpx solid rgba($tcm-primary, 0.06);
 }
 
+.setting-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
 .setting-label {
   font-size: $font-size-sm;
   color: $tcm-text;
@@ -185,6 +239,10 @@ function goAbout() {
   font-size: $font-size-xs;
   color: $tcm-text-hint;
   line-height: 1.6;
+
+  &.inline {
+    padding: 0;
+  }
 }
 
 .picker-display {
@@ -213,6 +271,67 @@ function goAbout() {
 
 .picker-arrow {
   font-size: 18rpx;
+  color: $tcm-text-hint;
+}
+
+.theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: #fff;
+  border: 1rpx solid rgba($tcm-primary, 0.12);
+  border-radius: 18rpx;
+
+  &.active {
+    border-color: $tcm-primary;
+    background: rgba($tcm-primary, 0.06);
+  }
+}
+
+.theme-swatch {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.classic {
+    background: linear-gradient(135deg, #8B4513 0%, #FFFDF5 100%);
+  }
+
+  &.ink {
+    background: linear-gradient(135deg, #17140F 0%, #D6A85A 100%);
+  }
+
+  &.celadon {
+    background: linear-gradient(135deg, #2F7D73 0%, #F7FBF8 100%);
+  }
+
+  &.vermilion {
+    background: linear-gradient(135deg, #B83A2E 0%, #FFF1E5 100%);
+  }
+}
+
+.theme-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.theme-name {
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $tcm-text;
+}
+
+.theme-desc {
+  font-size: $font-size-xs;
   color: $tcm-text-hint;
 }
 

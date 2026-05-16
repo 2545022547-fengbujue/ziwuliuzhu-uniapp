@@ -6,6 +6,7 @@
     "versionCode" : "100",
     "transformPx" : false,
     "app-plus" : {
+        "darkmode" : true,
         "usingComponents" : true,
         "modules" : {},
         "splashscreen" : {

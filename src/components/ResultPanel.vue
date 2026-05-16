@@ -22,14 +22,14 @@
       </view>
 
       <!-- 闭穴提示 -->
-      <view v-if="result?.isClosed" class="warning-box">
+      <view v-if="showClosedWarning" class="warning-box">
         <text class="warning-icon">⚠️</text>
         <text class="warning-text">当前时辰为闭穴</text>
       </view>
 
       <!-- 反克法合并显示（仅在纳甲法闭穴且合并模式下） -->
       <template v-if="isNajia && result?.isClosed && store.fankeDisplayMode === 'merged'">
-        <view v-if="fankeResult" class="section fanke-merged">
+        <view v-if="fankeHasOpenPoints" class="section fanke-merged">
           <view class="section-title">
             <view class="dot fanke"></view>
             <text>反克法开穴（纳甲法闭穴时的特殊方案）</text>
@@ -227,6 +227,20 @@ const isNajia = computed(() => props.method === 'najia')
 
 // 反克法结果（纳甲法合并模式使用）
 const fankeResult = computed(() => store.results?.fanke || null)
+
+const fankeHasOpenPoints = computed(() => {
+  return Boolean(fankeResult.value?.openPoints?.length)
+})
+
+const alternativeHasOpenPoints = computed(() => {
+  return Boolean(result.value?.alternativePoints?.openPoints?.length)
+})
+
+const showClosedWarning = computed(() => {
+  if (!result.value?.isClosed) return false
+  if (isNajia.value && (fankeHasOpenPoints.value || alternativeHasOpenPoints.value)) return false
+  return true
+})
 
 // 补母泻子法4个穴位的渲染数据（与六十六穴统一用 points-grid 展示）
 const bumuPoints = computed(() => {

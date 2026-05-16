@@ -7,7 +7,7 @@
     - 中间：可滚动区域（干支卡片、方法切换、结果面板）
     - 底部：弹窗（PointDetail）
   -->
-  <view class="page">
+  <view class="page" :class="`theme-${store.activeTheme}`">
     <!-- 导航栏 -->
     <AppNavbar title="子午流注取穴" />
     <view :style="{ height: navHeight + 'px' }"></view>
@@ -238,9 +238,9 @@ const currentDateTimeStr = computed(() => {
     const h = String(SHICHEN_START_HOURS[confirmedHourIdx.value]).padStart(2, '0')
     return `${y}年${m}月${day}日 ${h}:00`
   }
-  // 依赖 minuteTick 触发重新计算，直接读手机本地时间
+  // 依赖 minuteTick 触发重新计算；开启真太阳时时显示校正后的有效时间。
   void minuteTick.value
-  const d = new Date()
+  const d = store.effectiveCurrentTime
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
@@ -262,7 +262,10 @@ const minuteTick = ref(0)
 
 // 是否显示反克法补充（独立模式下纳甲法闭穴时显示）
 const showFankeSupplement = computed(() => {
-  return store.activeMethod === 'najia' && store.results.najia?.isClosed && store.fankeDisplayMode === 'separate'
+  return store.activeMethod === 'najia' &&
+    store.results.najia?.isClosed &&
+    store.results.fanke?.openPoints?.length &&
+    store.fankeDisplayMode === 'separate'
 })
 
 // 其他方法对比列表（排除当前选中的方法）
@@ -332,14 +335,11 @@ onHide(() => {
 
 // 页面显示时（回到前台）恢复定时器，并立即刷新时间
 onShow(() => {
+  store.applyThemeChrome()
   startTimer()
   if (!store.isManualMode) {
     minuteTick.value++
-    const now = new Date()
-    const newHour = getHourIndexFromDate(now)
-    if (newHour !== store.currentHour) {
-      store.updateCurrentTime()
-    }
+    store.updateCurrentTime()
   }
 })
 
@@ -352,12 +352,8 @@ function startTimer() {
   timer = setInterval(() => {
     if (!store.isManualMode) {
       minuteTick.value++
-      const now = new Date()
-      const newHour = getHourIndexFromDate(now)
-      // 仅在时辰变化时才重新计算取穴结果
-      if (newHour !== store.currentHour) {
-        store.updateCurrentTime()
-      }
+      // store 内部会按真太阳时设置计算当前时辰，避免页面使用未校正时辰。
+      store.updateCurrentTime()
     }
   }, APP_CONFIG.timerInterval)
 }

@@ -1,0 +1,284 @@
+/* ============================================
+   运行时主题
+
+   classic 保留现有编译期 SCSS 主题；额外主题用页面根节点 class 覆盖高频色彩。
+   ============================================ */
+
+.theme-classic {
+  --theme-primary: #8B4513;
+  --theme-primary-dark: #6B3410;
+  --theme-secondary: #5B8C3E;
+  --theme-bg: #F8F4EF;
+  --theme-surface: #FFFDF5;
+  --theme-surface-muted: #F8F4EF;
+  --theme-text: #2C2C2C;
+  --theme-text-secondary: #666666;
+  --theme-text-hint: #999999;
+  --theme-border: rgba(139, 69, 19, 0.12);
+  --theme-shadow: rgba(139, 69, 19, 0.08);
+}
+
+/* #ifndef MP-WEIXIN */
+.theme-ink {
+  --theme-primary: #D6A85A;
+  --theme-primary-dark: #A8772D;
+  --theme-secondary: #8FBF9F;
+  --theme-bg: #11100D;
+  --theme-surface: #1B1914;
+  --theme-surface-muted: #242117;
+  --theme-text: #F6EEDC;
+  --theme-text-secondary: #C8BFAE;
+  --theme-text-hint: #9B927F;
+  --theme-border: rgba(214, 168, 90, 0.20);
+  --theme-shadow: rgba(0, 0, 0, 0.30);
+}
+
+.theme-celadon {
+  --theme-primary: #2F7D73;
+  --theme-primary-dark: #225E58;
+  --theme-secondary: #7A9B63;
+  --theme-bg: #EEF7F2;
+  --theme-surface: #FDFEFA;
+  --theme-surface-muted: #E3F0EA;
+  --theme-text: #17332F;
+  --theme-text-secondary: #526861;
+  --theme-text-hint: #71827B;
+  --theme-border: rgba(47, 125, 115, 0.14);
+  --theme-shadow: rgba(47, 125, 115, 0.10);
+}
+
+.theme-vermilion {
+  --theme-primary: #B83A2E;
+  --theme-primary-dark: #8F2A22;
+  --theme-secondary: #C8893D;
+  --theme-bg: #FFF7F1;
+  --theme-surface: #FFFDF8;
+  --theme-surface-muted: #FFEDE3;
+  --theme-text: #35221E;
+  --theme-text-secondary: #6F5B53;
+  --theme-text-hint: #8A756B;
+  --theme-border: rgba(184, 58, 46, 0.14);
+  --theme-shadow: rgba(184, 58, 46, 0.10);
+}
+
+.theme-ink,
+.theme-celadon,
+.theme-vermilion {
+  background-color: var(--theme-bg) !important;
+  color: var(--theme-text) !important;
+
+  .navbar,
+  .panel-header,
+  .query-btn,
+  .confirm-ok,
+  .btn-confirm,
+  .btn-primary,
+  .method-tab.active,
+  .toggle-btn.active {
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%) !important;
+  }
+
+  .ganzhi-card,
+  .method-tabs,
+  .result-panel,
+  .setting-card,
+  .method-card,
+  .desc-card,
+  .info-card,
+  .popup,
+  .confirm-popup {
+    background: var(--theme-surface) !important;
+    box-shadow: 0 8rpx 28rpx var(--theme-shadow) !important;
+  }
+
+  .manual-controls,
+  .picker-btn,
+  .city-picker-btn,
+  .tag-primary,
+  .ganzhi-tag,
+  .ganzhi-tag-item,
+  .point-btn,
+  .result-ganzhi-hour-tag,
+  .province-cities,
+  .method-item,
+  .location-box,
+  .bumu-tip,
+  .confirm-cancel {
+    background: var(--theme-surface-muted) !important;
+  }
+
+  .search-input,
+  .province-header,
+  .theme-option {
+    background: var(--theme-surface) !important;
+    border-color: var(--theme-border) !important;
+  }
+
+  .nazi-mode-switch {
+    border-color: var(--theme-border) !important;
+  }
+
+  .switch-option {
+    background: var(--theme-surface-muted) !important;
+    color: var(--theme-text-secondary) !important;
+
+    &.active {
+      background: var(--theme-primary) !important;
+      color: var(--theme-surface) !important;
+    }
+  }
+
+  .method-tab.active {
+    .method-icon,
+    .method-name {
+      color: var(--theme-surface) !important;
+    }
+  }
+
+  .toggle-btn.active {
+    .toggle-text {
+      color: var(--theme-surface) !important;
+    }
+  }
+
+  .setting-row,
+  .info-row,
+  .popup-header,
+  .popup-footer,
+  .province-group,
+  .city-item {
+    border-color: var(--theme-border) !important;
+  }
+
+  .card-title,
+  .setting-label,
+  .method-name,
+  .info-label,
+  .popup-title,
+  .city-name-text,
+  .point-name,
+  .location-text,
+  .method-value {
+    color: var(--theme-text) !important;
+  }
+
+  .app-name,
+  .ganzhi-tag-text,
+  .result-ganzhi-hour-text,
+  .theme-name,
+  .fanke-title,
+  .palace-icon,
+  .suggestion-title,
+  .city-name-text {
+    color: var(--theme-primary) !important;
+  }
+
+  .datetime-value,
+  .desc-text,
+  .setting-value,
+  .method-detail,
+  .info-value,
+  .toggle-text,
+  .method-name,
+  .palace-text,
+  .principle-text,
+  .section-title {
+    color: var(--theme-text-secondary) !important;
+  }
+
+  .datetime-text,
+  .app-version,
+  .setting-tip,
+  .picker-arrow,
+  .divider-text,
+  .result-ganzhi-date,
+  .result-ganzhi-hour-label,
+  .point-code,
+  .theme-desc,
+  .disclaimer-text,
+  .empty-text {
+    color: var(--theme-text-hint) !important;
+  }
+
+  .divider-line {
+    background: linear-gradient(to right, transparent, var(--theme-border), transparent) !important;
+  }
+
+  .dot.primary,
+  .dot.secondary,
+  .title-dot {
+    background: var(--theme-secondary) !important;
+  }
+}
+
+.theme-ink {
+  .warning-box,
+  .caution-box {
+    background: rgba(211, 47, 47, 0.12) !important;
+  }
+
+  .navbar {
+    background: linear-gradient(180deg, #17140F 0%, #11100D 100%) !important;
+  }
+
+  .panel-header,
+  .query-btn,
+  .confirm-ok,
+  .btn-confirm,
+  .btn-primary,
+  .method-tab.active,
+  .toggle-btn.active {
+    background: #2A2419 !important;
+    box-shadow: inset 0 0 0 1rpx rgba(214, 168, 90, 0.34) !important;
+  }
+
+  .panel-header {
+    border-bottom: 1rpx solid rgba(214, 168, 90, 0.18);
+  }
+
+  .ganzhi-toggle,
+  .nazi-mode-switch {
+    background: #17140F !important;
+    border: 1rpx solid rgba(214, 168, 90, 0.24) !important;
+  }
+
+  .toggle-btn,
+  .switch-option {
+    background: transparent !important;
+  }
+
+  .method-tab.active {
+    .method-icon,
+    .method-name {
+      color: var(--theme-primary) !important;
+    }
+  }
+
+  .toggle-btn.active {
+    .toggle-text {
+      color: var(--theme-primary) !important;
+    }
+  }
+
+  .theme-option.active {
+    background: rgba(214, 168, 90, 0.12) !important;
+  }
+
+  switch .uni-switch-input,
+  .uni-switch-input {
+    background-color: #17140F !important;
+    border-color: rgba(214, 168, 90, 0.34) !important;
+  }
+
+  switch .uni-switch-input::before,
+  .uni-switch-input::before {
+    background-color: #17140F !important;
+  }
+
+  switch .uni-switch-input::after,
+  .uni-switch-input::after {
+    background-color: #D6A85A !important;
+    box-shadow: 0 0 0 1rpx rgba(214, 168, 90, 0.18) !important;
+  }
+}
+/* #endif */

@@ -12,19 +12,20 @@ let initialized = false
 function initSystemInfo() {
   if (initialized) return
   initialized = true
+  let systemInfo = null
 
   try {
-    const info = uni.getSystemInfoSync()
-    statusBarHeight.value = info.statusBarHeight || 20
-    screenWidth.value = info.screenWidth || 375
-    screenHeight.value = info.screenHeight || 667
-    platform.value = info.platform || ''
+    systemInfo = uni.getSystemInfoSync()
+    statusBarHeight.value = systemInfo.statusBarHeight || 20
+    screenWidth.value = systemInfo.screenWidth || 375
+    screenHeight.value = systemInfo.screenHeight || 667
+    platform.value = systemInfo.platform || ''
 
     // 安全区域：兼容不同平台的获取方式
-    if (info.safeAreaInsets && info.safeAreaInsets.bottom !== undefined) {
-      safeAreaBottom.value = info.safeAreaInsets.bottom
-    } else if (info.safeArea && info.safeArea.bottom !== undefined) {
-      safeAreaBottom.value = info.screenHeight - info.safeArea.bottom
+    if (systemInfo.safeAreaInsets && systemInfo.safeAreaInsets.bottom !== undefined) {
+      safeAreaBottom.value = systemInfo.safeAreaInsets.bottom
+    } else if (systemInfo.safeArea && systemInfo.safeArea.bottom !== undefined) {
+      safeAreaBottom.value = systemInfo.screenHeight - systemInfo.safeArea.bottom
     }
   } catch (e) {
     console.error('[系统信息获取失败]', e)
@@ -36,7 +37,7 @@ function initSystemInfo() {
       const menuButton = wx.getMenuButtonBoundingClientRect()
       menuButtonInfo.value = {
         ...menuButton,
-        screenWidth: info.screenWidth
+        screenWidth: systemInfo?.screenWidth || screenWidth.value
       }
     }
   } catch (e) {

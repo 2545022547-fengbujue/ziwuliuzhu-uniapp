@@ -33,6 +33,22 @@ function calculateEquationOfTime(date) {
 }
 
 /**
+ * 获取真太阳时校正后的日期时间
+ * @param {Date} date - 原始本地时间
+ * @param {number} longitude - 当地经度（默认北京经度 116.407°E）
+ * @param {boolean} useTrueSolarTime - 是否启用真太阳时校正
+ * @returns {Date} 校正后的时间；未启用时返回原始时间
+ */
+export function getTrueSolarDate(date, longitude = 116.407, useTrueSolarTime = false) {
+  if (!useTrueSolarTime || !longitude) return date
+
+  const offsetMinutes = (longitude - 120) * 4
+  const eotMinutes = calculateEquationOfTime(date)
+  const totalMs = (offsetMinutes + eotMinutes) * 60 * 1000
+  return new Date(date.getTime() + totalMs)
+}
+
+/**
  * 获取指定日期的完整干支信息
  * @param {Date} date - 公历日期
  * @param {number} longitude - 当地经度（默认北京经度 116.407°E）
@@ -41,13 +57,7 @@ function calculateEquationOfTime(date) {
  */
 export function getGanZhi(date, longitude = 116.407, useTrueSolarTime = false) {
   // 真太阳时校正：经度偏移 + 时差方程(EoT)
-  let adjustedDate = date
-  if (useTrueSolarTime && longitude) {
-    const offsetMinutes = (longitude - 120) * 4
-    const eotMinutes = calculateEquationOfTime(date)
-    const totalMs = (offsetMinutes + eotMinutes) * 60 * 1000
-    adjustedDate = new Date(date.getTime() + totalMs)
-  }
+  const adjustedDate = getTrueSolarDate(date, longitude, useTrueSolarTime)
 
   // 子时翻转修正：传统历法中 23:00-01:00 为次日子时，日干支应从23:00起算次日
   // lunar-javascript 将 23:00-23:59 视为"当天的子时"，与传统历法不符
