@@ -1,5 +1,5 @@
 <template>
-  <view class="page">
+  <view class="page" :class="`theme-${store.activeTheme}`">
     <AppNavbar title="取穴方法说明">
       <template #left>
         <view class="back-btn" @tap="goBack">
@@ -26,9 +26,11 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 
+const store = useAppStore()
 const { statusBarHeight } = useSystemInfo()
 const navHeight = computed(() => statusBarHeight.value + 44)
 

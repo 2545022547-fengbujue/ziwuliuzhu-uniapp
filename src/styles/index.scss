@@ -12,6 +12,7 @@
    注意：本文件需显式 @use 'variables'，因为 additionalData 仅注入 .vue 文件
    ============================================ */
 @use 'variables' as *;
+@use 'themes';
 
 /* === 楷体字体 === */
 /* App端（Android）：打包内置字体，解决系统无楷体问题 */

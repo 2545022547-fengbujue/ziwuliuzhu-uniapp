@@ -1,5 +1,5 @@
 <template>
-  <view class="page">
+  <view class="page" :class="`theme-${store.activeTheme}`">
     <AppNavbar title="关于">
       <template #left>
         <view class="back-btn" @tap="goBack">
@@ -53,6 +53,7 @@
  *   软件取穴结果仅供参考，不作为临床诊疗依据，需结合三因制宜辨证施治
  */
 import { computed } from 'vue'
+import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import manifest from '@/manifest.json'
@@ -60,6 +61,7 @@ import manifest from '@/manifest.json'
 // 从 manifest.json 动态读取版本号，避免硬编码不同步
 const version = manifest.versionName || '1.0.0'
 
+const store = useAppStore()
 const { statusBarHeight } = useSystemInfo()
 const navHeight = computed(() => statusBarHeight.value + 44)
 

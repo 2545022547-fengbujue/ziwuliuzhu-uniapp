@@ -36,7 +36,7 @@ const { statusBarHeight, menuButtonInfo } = useSystemInfo()
 // 导航栏样式
 const navbarStyle = computed(() => ({
   paddingTop: `${statusBarHeight.value}px`,
-  background: props.bgColor || 'linear-gradient(135deg, #8B4513 0%, #6B3410 100%)'
+  background: props.bgColor || 'linear-gradient(135deg, var(--theme-primary, #8B4513) 0%, var(--theme-primary-dark, #6B3410) 100%)'
 }))
 
 // 右侧区域样式：小程序中预留胶囊按钮空间

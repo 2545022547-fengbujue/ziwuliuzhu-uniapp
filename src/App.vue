@@ -7,6 +7,8 @@
 <template></template>
 
 <script>
+import { useAppStore } from '@/stores/app.js'
+
 export default {
   onLaunch() {
     // #ifdef MP-WEIXIN
@@ -26,8 +28,24 @@ export default {
     // #ifndef MP-WEIXIN
     // App端 / H5：@font-face 在 styles/index.scss 中已配置（APP-PLUS）
     // #endif
+
+    // #ifdef APP-PLUS
+    const store = useAppStore()
+    store.syncSystemThemeFromDevice()
+    try {
+      uni.onThemeChange((res) => {
+        store.syncSystemTheme(res.theme)
+      })
+    } catch {
+      // 部分运行环境不支持主题变化监听，onShow 时会再同步一次。
+    }
+    // #endif
   },
-  onShow() {},
+  onShow() {
+    // #ifdef APP-PLUS
+    useAppStore().syncSystemThemeFromDevice()
+    // #endif
+  },
   onHide() {}
 }
 </script>
