@@ -2,6 +2,8 @@
 
 [![License](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
+[English](README_EN.md) | 简体中文
+
 基于中医时间医学的智能化取穴辅助工具，跨平台支持 Android、iOS、微信小程序及 H5。
 
 > ⚠️ **免责声明**：本软件仅供中医学习与研究参考，不构成医疗建议。针灸治疗请在专业医师指导下进行，切勿自行施针。
@@ -96,45 +98,6 @@ src/
 └── static/          # 静态资源
     ├── fonts/              # 字体文件（子集化TTF）
     └ tabbar/               # TabBar图标（4组主题图标）
-```
-
-## 开发
-
-### 安装依赖
-
-```bash
-npm install
-```
-
-### 启动开发服务器
-
-```bash
-# H5
-npm run dev:h5
-
-# 微信小程序
-npm run dev:mp-weixin
-
-# App
-npm run dev:app
-```
-
-> **Windows PowerShell 提示**：如果 `npm` 命令无法直接执行，可使用：
-> ```powershell
-> node.exe "node_modules/@dcloudio/vite-plugin-uni/bin/uni.js"
-> ```
-
-### 构建
-
-```bash
-# H5
-npm run build:h5
-
-# 微信小程序
-npm run build:mp-weixin
-
-# App
-npm run build:app
 ```
 
 ## 作者
