@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
-简体中文 | [English](README_EN.md)
+[简体中文](README.md) | English
 
 An intelligent acupuncture point selection assistant based on Traditional Chinese Medicine (TCM) time-based theories. Cross-platform support for Android, iOS, WeChat Mini Program, and H5.
 

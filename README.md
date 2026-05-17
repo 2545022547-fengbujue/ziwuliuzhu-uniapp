@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
-[English](README_EN.md) | 简体中文
+简体中文 | [English](README_EN.md)
 
 基于中医时间医学的智能化取穴辅助工具，跨平台支持 Android、iOS、微信小程序及 H5。
 
