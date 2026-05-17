@@ -1,0 +1,26 @@
+#!/bin/bash
+# 自动更新Repomix打包文件
+# 触发时机：每次git commit后
+
+OUTPUT_DIR="项目目录/20260426183326"
+PROJECT_DIR="项目目录/ziwuliuzhu-uniapp"
+
+echo "🔄 Updating Repomix packed files..."
+
+# 核心逻辑（排除大数据文件）
+npx repomix --include "src/**" \
+  --ignore "**/*.ttf,**/*.png,**/*.jpg,**/*.jpeg,**/acupuncture-points-gb2021.json,**/city-coordinates.js,**/extra-points.js,**/special-points.js,node_modules/**,dist/**,.git/**" \
+  --output "$OUTPUT_DIR/子午流注uniapp-核心逻辑.md" \
+  --style markdown \
+  --no-security-check \
+  2>/dev/null
+
+# 全量打包（包含数据文件）
+npx repomix --include "src/**" \
+  --ignore "**/*.ttf,**/*.png,**/*.jpg,**/*.jpeg,node_modules/**,dist/**,.git/**" \
+  --output "$OUTPUT_DIR/子午流注uniapp-全量打包.md" \
+  --style markdown \
+  --no-security-check \
+  2>/dev/null
+
+echo "✅ Repomix packed files updated"
