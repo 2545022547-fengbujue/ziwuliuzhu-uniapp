@@ -93,8 +93,14 @@ const PALACE_DIRECTION = {
  * @returns {Object} 取穴结果
  */
 export function calculateLingui(ganzhi, hourIndex) {
-  if (!ganzhi?.day) {
+  // 参数验证：确保 day 和 hour 结构完整
+  if (!ganzhi?.day || !ganzhi?.hour) {
     console.warn('[灵龟八法] 干支信息不完整')
+    return { method: 'lingui', methodName: '灵龟八法', openPoints: [], isClosed: true }
+  }
+  // hourIndex 范围验证
+  if (hourIndex < 0 || hourIndex > 11) {
+    console.warn(`[灵龟八法] 无效时辰索引 ${hourIndex}`)
     return { method: 'lingui', methodName: '灵龟八法', openPoints: [], isClosed: true }
   }
   const dayStem = ganzhi.day.heavenlyStem
@@ -103,10 +109,17 @@ export function calculateLingui(ganzhi, hourIndex) {
   const hourBranch = ganzhi.hour.earthlyBranch
 
   // 1. 计算干支代数（逐日用表10-15，临时用表10-16，两表不同）
-  const dayStemValue = DAY_STEM_VALUES[dayStem] || 0
-  const dayBranchValue = DAY_BRANCH_VALUES[dayBranch] || 0
-  const hourStemValue = HOUR_STEM_VALUES[hourStem] || 0
-  const hourBranchValue = HOUR_BRANCH_VALUES[hourBranch] || 0
+  // 未知干支不应默认为0，应返回错误
+  const dayStemValue = DAY_STEM_VALUES[dayStem]
+  const dayBranchValue = DAY_BRANCH_VALUES[dayBranch]
+  const hourStemValue = HOUR_STEM_VALUES[hourStem]
+  const hourBranchValue = HOUR_BRANCH_VALUES[hourBranch]
+
+  if (dayStemValue === undefined || dayBranchValue === undefined ||
+      hourStemValue === undefined || hourBranchValue === undefined) {
+    console.warn(`[灵龟八法] 未知的干支：日${dayStem}${dayBranch} 时${hourStem}${hourBranch}`)
+    return { method: 'lingui', methodName: '灵龟八法', openPoints: [], isClosed: true }
+  }
   
   const daySum = dayStemValue + dayBranchValue
   const hourSum = hourStemValue + hourBranchValue

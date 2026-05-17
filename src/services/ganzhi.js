@@ -40,6 +40,11 @@ function calculateEquationOfTime(date) {
  * @returns {Date} 校正后的时间；未启用时返回原始时间
  */
 export function getTrueSolarDate(date, longitude = 116.407, useTrueSolarTime = false) {
+  // 参数验证：date 必须是有效的 Date 对象
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    console.warn('[真太阳时] 无效的日期参数，返回原始值')
+    return date
+  }
   if (!useTrueSolarTime || longitude == null || typeof longitude !== 'number') return date
 
   const offsetMinutes = (longitude - 120) * 4
@@ -56,6 +61,11 @@ export function getTrueSolarDate(date, longitude = 116.407, useTrueSolarTime = f
  * @returns {Object} 干支信息
  */
 export function getGanZhi(date, longitude = 116.407, useTrueSolarTime = false) {
+  // 参数验证：longitude 应在有效范围内
+  if (typeof longitude === 'number' && (longitude < -180 || longitude > 180)) {
+    console.warn(`[干支] 经度超出范围 ${longitude}，应为 -180 到 180`)
+    longitude = 116.407  // 回退默认值
+  }
   // 真太阳时校正：经度偏移 + 时差方程(EoT)
   const adjustedDate = getTrueSolarDate(date, longitude, useTrueSolarTime)
 
@@ -81,9 +91,10 @@ export function getGanZhi(date, longitude = 116.407, useTrueSolarTime = false) {
   }
 
   // 使用lunar-javascript获取干支
-  const lunar = Lunar.fromDate(lunarDate)
+  try {
+    const lunar = Lunar.fromDate(lunarDate)
 
-  return {
+    return {
     year: {
       heavenlyStem: lunar.getYearGan(),
       earthlyBranch: lunar.getYearZhi(),
@@ -118,6 +129,10 @@ export function getGanZhi(date, longitude = 116.407, useTrueSolarTime = false) {
       longitude,
       useTrueSolarTime
     }
+  }
+  } catch (e) {
+    console.error('[干支] lunar-javascript 计算失败:', e)
+    return null
   }
 }
 

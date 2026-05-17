@@ -73,7 +73,7 @@ function initSystemInfo() {
       const menuButton = wx.getMenuButtonBoundingClientRect()
       menuButtonInfo.value = {
         ...menuButton,
-        screenWidth: systemInfo?.screenWidth || screenWidth.value
+        screenWidth: screenWidth.value  // 使用模块级变量，两个分支都可用
       }
     }
   } catch (e) {

@@ -49,20 +49,6 @@ export default {
       uni.onThemeChange((res) => {
         store.syncSystemTheme(res.theme)
       })
-
-    // 微信小程序：动态加载文源宋体Bold（穴位弹窗正文加粗用）
-    uni.loadFontFace({
-      global: true,
-      family: 'WenYuanSerifSC-Bold',
-      source: 'url("data:font/ttf;charset=utf-8;base64,' + bold_b64 + '")',
-      success() {
-        console.log('WenYuanSerifSC-Bold font loaded')
-      },
-      fail(err) {
-        console.warn('WenYuanSerifSC-Bold font load failed:', err)
-      }
-    })
-    
     } catch {
       // 部分运行环境不支持主题变化监听，onShow 时会再同步一次。
     }

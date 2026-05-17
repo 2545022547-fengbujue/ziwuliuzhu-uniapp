@@ -65,6 +65,26 @@ function getDayMeridianChain(dayMeridian) {
  * @returns {Object} 取穴结果
  */
 export function calculateNajia(ganzhi, hourIndex) {
+  // 参数验证：防止 null/undefined 导致运行时错误
+  if (!ganzhi || !ganzhi.day || !ganzhi.hour) {
+    console.warn('[纳甲法] 无效的干支参数')
+    return {
+      method: 'najia', methodName: '纳甲法', date: '', hourIndex,
+      hourName: HOUR_NAMES[hourIndex] || '', hourGanZhi: '',
+      dayMeridian: null, openPoints: [], isClosed: true,
+      alternativePoints: null, dailySequence: []
+    }
+  }
+  // hourIndex 范围验证
+  if (hourIndex < 0 || hourIndex > 11) {
+    console.warn(`[纳甲法] 无效的时辰索引 ${hourIndex}`)
+    return {
+      method: 'najia', methodName: '纳甲法', date: '', hourIndex,
+      hourName: '', hourGanZhi: '', dayMeridian: null, openPoints: [], isClosed: true,
+      alternativePoints: null, dailySequence: []
+    }
+  }
+
   const dayStem = ganzhi.day.heavenlyStem
   const dayBranch = ganzhi.day.earthlyBranch
   const hourStem = ganzhi.hour.heavenlyStem
@@ -88,9 +108,9 @@ export function calculateNajia(ganzhi, hourIndex) {
   const openedPoints = new Set()
   const dailySequence = calculateDailySequence(dayStem, dayMeridian, openedPoints)
   
-  // 3. 获取当前时辰的开穴
+  // 3. 获取当前时辰的开穴（hourIndex 已在函数开头验证）
   const currentHourData = dailySequence[hourIndex]
-  const openPoints = currentHourData ? currentHourData.points : []
+  const openPoints = currentHourData?.points || []
   
   // 4. 检查是否闭穴
   const isClosed = openPoints.length === 0
@@ -439,9 +459,18 @@ function getHeRiHuYong(dayStem, ganzhi, hourIndex) {
  * @returns {Object} 反克法取穴结果
  */
 export function calculateFanke(ganzhi, hourIndex) {
+  // 参数验证
+  if (!ganzhi || !ganzhi.day || !ganzhi.hour) {
+    console.warn('[反克法] 无效的干支参数')
+    return {
+      method: 'fanke', methodName: '反克法', date: '', hourIndex,
+      hourName: HOUR_NAMES[hourIndex] || '', openPoints: [], isClosed: true
+    }
+  }
+
   const dayStem = ganzhi.day.heavenlyStem
   const hourGanZhi = ganzhi.hour.ganZhi
-  
+
   // 直接查表
   const fankePointData = getFankePoint(dayStem, hourGanZhi)
   
