@@ -50,6 +50,10 @@ export function calculateNazi(ganzhi, hourIndex) {
     console.warn('[纳子法] 干支信息不完整')
     return { method: 'nazi', methodName: '纳子法', openPoints: [], isClosed: true }
   }
+  if (hourIndex < 0 || hourIndex > 11 || !Number.isInteger(hourIndex)) {
+    console.warn(`[纳子法] 无效的时辰索引 ${hourIndex}`)
+    return { method: 'nazi', methodName: '纳子法', openPoints: [], isClosed: true }
+  }
   // 确定值时经络
   const hourMeridian = HOUR_MERIDIAN_MAP[hourIndex]
   const meridianWuxing = MERIDIAN_WUXING[hourMeridian.code]

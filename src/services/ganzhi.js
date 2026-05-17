@@ -40,7 +40,7 @@ function calculateEquationOfTime(date) {
  * @returns {Date} 校正后的时间；未启用时返回原始时间
  */
 export function getTrueSolarDate(date, longitude = 116.407, useTrueSolarTime = false) {
-  if (!useTrueSolarTime || !longitude) return date
+  if (!useTrueSolarTime || longitude == null || typeof longitude !== 'number') return date
 
   const offsetMinutes = (longitude - 120) * 4
   const eotMinutes = calculateEquationOfTime(date)
