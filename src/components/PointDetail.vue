@@ -42,7 +42,7 @@
             </view>
             <view class="info-item">
               <text class="info-label">穴位类别</text>
-              <text class="info-value info-value-center">{{ formatCategory(point?.category) || '-' }}</text>
+              <text class="info-value info-value-center">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
             </view>
             <view v-if="point?.wuxing" class="info-item">
               <text class="info-label">五行属性</text>
@@ -152,12 +152,13 @@ const naziBumuTip = computed(() => {
 })
 
 /**
- * 格式化穴位类别，去掉顿号
- * "井穴、输穴" → "井穴 输穴"
+ * 格式化穴位类别
+ * 有五行属性时：顿号改空格（"井穴、输穴" → "井穴 输穴"，配合横向布局）
+ * 无五行属性时：顿号改逗号（"络穴、八脉交会穴" → "络穴，八脉交会穴"）
  */
-function formatCategory(category) {
+function formatCategory(category, wuxing) {
   if (!category) return ''
-  return category.replace(/、/g, ' ')
+  return category.replace(/、/g, wuxing ? ' ' : '，')
 }
 
 function handleClose() {
@@ -180,6 +181,9 @@ function handleClose() {
    ============================================ */
 
 /* CSS 必须用 px 单位（不用 rpx），否则在部分设备上弹窗布局异常（与 CityPicker 同理） */
+
+/* 宋体字体族：正文区域使用，与标题楷体形成"楷题宋文"传统排版 */
+$font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 /* === 遮罩层 === */
 .overlay {
@@ -307,6 +311,7 @@ function handleClose() {
   font-size: 15px;
   font-weight: 600;
   color: rgba(44, 44, 44, 0.7);
+  font-family: $font-songti;
 }
 
 .title-dot {
@@ -345,6 +350,7 @@ function handleClose() {
   font-size: 12px;
   color: #999;
   margin-bottom: 4px;
+  font-family: $font-songti;
 }
 
 .info-value {
@@ -353,6 +359,7 @@ function handleClose() {
   font-weight: 500;
   color: #2C2C2C;
   word-break: keep-all;
+  font-family: 'WenYuanSerifSC-Bold', 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 .info-value-center {
@@ -398,6 +405,7 @@ function handleClose() {
   background: rgba(46, 139, 87, 0.08);
   font-size: 12px;
   color: #2E8B57;
+  font-family: $font-songti;
 }
 
 .indication-tag {
@@ -406,6 +414,7 @@ function handleClose() {
   background: rgba(21, 101, 192, 0.08);
   font-size: 12px;
   color: #1565C0;
+  font-family: $font-songti;
 }
 
 /* === 操作方法 === */
@@ -429,6 +438,7 @@ function handleClose() {
   font-size: 12px;
   color: #999;
   margin-bottom: 6px;
+  font-family: $font-songti;
 }
 
 .method-value {
@@ -438,6 +448,7 @@ function handleClose() {
   line-height: 1.7;
   word-break: break-all;
   text-align: justify;
+  font-family: $font-songti;
 }
 
 /* === 注意事项 === */
@@ -465,6 +476,7 @@ function handleClose() {
   font-size: 14px;
   font-weight: 600;
   color: #D32F2F;
+  font-family: $font-songti;
 }
 
 .caution-text {
@@ -473,6 +485,7 @@ function handleClose() {
   line-height: 1.7;
   word-break: break-all;
   text-align: justify;
+  font-family: $font-songti;
 }
 
 /* === 纳子法补母泻子说明 === */
@@ -488,5 +501,6 @@ function handleClose() {
   font-size: 12px;
   color: rgba(46, 139, 87, 0.6);
   line-height: 1.6;
+  font-family: $font-songti;
 }
 </style>

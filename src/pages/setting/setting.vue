@@ -116,10 +116,10 @@
     <view v-if="showMethods" class="fullscreen-overlay" @tap="showMethods = false">
       <view class="fullscreen-panel" @tap.stop>
         <view class="fullscreen-header" :style="{ paddingTop: statusBarHeight + 'px' }">
-          <text class="fullscreen-title">取穴方法说明</text>
           <view class="close-btn" @tap="showMethods = false">
             <text class="close-icon">✕</text>
           </view>
+          <text class="fullscreen-title">取穴方法说明</text>
         </view>
         <scroll-view scroll-y class="fullscreen-body" :show-scrollbar="false">
           <view
@@ -142,10 +142,10 @@
     <view v-if="showAbout" class="fullscreen-overlay" @tap="showAbout = false">
       <view class="fullscreen-panel" @tap.stop>
         <view class="fullscreen-header" :style="{ paddingTop: statusBarHeight + 'px' }">
-          <text class="fullscreen-title">关于</text>
           <view class="close-btn" @tap="showAbout = false">
             <text class="close-icon">✕</text>
           </view>
+          <text class="fullscreen-title">关于</text>
         </view>
         <scroll-view scroll-y class="fullscreen-body" :show-scrollbar="false">
           <view class="about-content-inner">
@@ -200,7 +200,7 @@
  *   复用 CityPicker 弹窗组件，选择后更新 store 的经度和城市名
  */
 import { ref, computed } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onBackPress } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
@@ -274,6 +274,26 @@ function goMethods() {
 function goAbout() {
   showAbout.value = true
 }
+
+/** 返回键拦截：弹窗打开时关闭弹窗，否则跳转取穴页 */
+onBackPress(() => {
+  // 优先级：CityPicker > 方法说明 > 关于
+  if (cityPickerRef.value?.isOpen) {
+    cityPickerRef.value.close()
+    return true // 拦截返回键
+  }
+  if (showMethods.value) {
+    showMethods.value = false
+    return true // 拦截返回键
+  }
+  if (showAbout.value) {
+    showAbout.value = false
+    return true // 拦截返回键
+  }
+  // 弹窗都关闭时，跳转取穴页
+  uni.switchTab({ url: '/pages/index/index' })
+  return true // 拦截默认返回行为
+})
 </script>
 
 <style lang="scss" scoped>
@@ -524,15 +544,18 @@ function goAbout() {
 }
 
 .fullscreen-header {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 12px 20px 12px;
   border-bottom: 1px solid rgba($tcm-primary, 0.08);
   flex-shrink: 0;
 }
 
 .fullscreen-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 18px;
   font-weight: 600;
   color: $tcm-primary;
@@ -547,6 +570,9 @@ function goAbout() {
   justify-content: center;
   border-radius: 50%;
   background: rgba($tcm-primary, 0.06);
+  /* #ifndef MP-WEIXIN */
+  margin-left: auto;  /* H5/App：推到右侧 */
+  /* #endif */
 }
 
 .close-icon {

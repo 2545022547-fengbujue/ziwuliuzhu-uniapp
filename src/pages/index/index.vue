@@ -197,7 +197,7 @@
  */
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 // onShow/onHide 是 uni-app 页面生命周期，用于暂停/恢复定时器节省电量
-import { onShow, onHide } from '@dcloudio/uni-app'
+import { onShow, onHide, onBackPress } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import { APP_CONFIG } from '@/config/index.js'
@@ -363,6 +363,15 @@ function stopTimer() {
     timer = null
   }
 }
+
+/** 返回键拦截：穴位弹窗打开时关闭弹窗，否则不拦截 */
+onBackPress(() => {
+  if (store.selectedPoint) {
+    store.closeDetail()
+    return true // 拦截返回键
+  }
+  return false // 不拦截，系统默认行为（退出应用或不做处理）
+})
 </script>
 
 <style lang="scss" scoped>
@@ -531,7 +540,7 @@ function stopTimer() {
   font-size: $font-size-sm;
   color: $tcm-primary;
   font-weight: 600;
-  font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', serif;
+  font-family: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 /* === 方法切换 === */

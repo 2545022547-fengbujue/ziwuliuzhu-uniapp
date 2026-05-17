@@ -1,13 +1,13 @@
 <template>
   <view class="navbar" :style="navbarStyle">
     <view class="navbar-content">
-      <view class="navbar-left">
-        <slot name="left"></slot>
-      </view>
       <view class="navbar-title">
         <text>{{ title }}</text>
       </view>
-      <view class="navbar-right" :style="rightStyle">
+      <view class="navbar-left">
+        <slot name="left"></slot>
+      </view>
+      <view class="navbar-right">
         <slot name="right"></slot>
       </view>
     </view>
@@ -21,7 +21,6 @@
  * 功能：
  *   - 固定在页面顶部，支持自定义标题和背景色
  *   - 自动适配状态栏高度
- *   - 微信小程序中自动预留胶囊按钮空间
  */
 import { computed } from 'vue'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
@@ -31,22 +30,13 @@ const props = defineProps({
   bgColor: { type: String, default: '' }
 })
 
-const { statusBarHeight, menuButtonInfo } = useSystemInfo()
+const { statusBarHeight } = useSystemInfo()
 
 // 导航栏样式
 const navbarStyle = computed(() => ({
   paddingTop: `${statusBarHeight.value}px`,
   background: props.bgColor || 'linear-gradient(135deg, var(--theme-primary, #8B4513) 0%, var(--theme-primary-dark, #6B3410) 100%)'
 }))
-
-// 右侧区域样式：小程序中预留胶囊按钮空间
-const rightStyle = computed(() => {
-  if (menuButtonInfo.value) {
-    const capsuleWidth = menuButtonInfo.value.width || 87
-    return { minWidth: `${capsuleWidth + 20}px` }
-  }
-  return {}
-})
 </script>
 
 <style lang="scss" scoped>
@@ -58,6 +48,7 @@ const rightStyle = computed(() => {
   z-index: 100;
 
   &-content {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -66,22 +57,18 @@ const rightStyle = computed(() => {
   }
 
   &-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 34rpx;
     font-weight: 600;
     color: #fff;
-    flex: 1;
-    text-align: center;
   }
 
   &-left,
   &-right {
-    width: 80rpx;
     display: flex;
     align-items: center;
-  }
-
-  &-right {
-    justify-content: flex-end;
   }
 }
 </style>

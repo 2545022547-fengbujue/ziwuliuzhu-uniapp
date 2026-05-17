@@ -393,7 +393,7 @@ export const useAppStore = defineStore('app', () => {
             }
           }
         },
-        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'fankeDisplayMode', 'theme', 'themeMode']
+        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'theme', 'themeMode']
       }
     ]
   }

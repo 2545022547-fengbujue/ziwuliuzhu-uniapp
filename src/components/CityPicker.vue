@@ -270,7 +270,9 @@ function handleCancel() {
   close()
 }
 
-defineExpose({ open, close })
+const isOpen = computed(() => show.value)
+
+defineExpose({ open, close, isOpen })
 </script>
 
 <style lang="scss" scoped>

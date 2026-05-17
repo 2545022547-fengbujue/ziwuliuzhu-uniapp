@@ -238,7 +238,14 @@ const alternativeHasOpenPoints = computed(() => {
 
 const showClosedWarning = computed(() => {
   if (!result.value?.isClosed) return false
-  if (isNajia.value && (fankeHasOpenPoints.value || alternativeHasOpenPoints.value)) return false
+  if (isNajia.value) {
+    // 单独显示反克法时，只看纳甲法本身和合日互用，不看反克法
+    if (store.fankeDisplayMode === 'separate') {
+      return !alternativeHasOpenPoints.value
+    }
+    // 合并模式时，看反克法+合日互用
+    return !(fankeHasOpenPoints.value || alternativeHasOpenPoints.value)
+  }
   return true
 })
 

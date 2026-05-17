@@ -1,6 +1,6 @@
 # 子午流注取穴 uni-app 移动端 — 开发文档
 
-> 最后更新：2026-05-01（新增：查询确认弹窗、真太阳时自动弹窗、免责声明、应用图标、代码注释更新）
+> 最后更新：2026-05-17（新增：文源宋体子集化、主题系统4主题、naziMode持久化、字体更新铁律）
 > 项目路径：`项目目录\ziwuliuzhu-uniapp`
 > 桌面版（Vue3 + Electron）路径：`项目目录\子午流注取穴`
 
@@ -15,8 +15,8 @@
 | 框架 | uni-app Vue 3 + Vite |
 | @dcloudio 版本 | `3.0.0-alpha-5000820260430001`（2026-04-30 最新） |
 | 状态管理 | Pinia + pinia-plugin-persist-uni（本地持久化） |
-| 样式 | SCSS，全局变量在 `src/styles/variables.scss` |
-| 目标平台 | H5（浏览器预览）→ 后续打包 App（Android/iOS） |
+| 样式 | SCSS，全局变量在 `src/styles/variables.scss`，运行时主题在 `src/styles/themes.scss` |
+| 目标平台 | H5（浏览器预览）→ 微信小程序 → App（Android/iOS） |
 | 开发语言 | JavaScript（非 TypeScript） |
 
 ### 1.2 项目结构
@@ -36,25 +36,26 @@ ziwuliuzhu-uniapp/
 │   │
 │   ├── components/            # 公共组件
 │   │   ├── AppNavbar.vue      # 自定义导航栏（适配状态栏高度）
-│   │   ├── ResultPanel.vue    # 取穴结果面板 ★核心组件
-│   │   ├── PointDetail.vue    # 穴位详情弹窗
+│   │   ├── ResultPanel.vue    # 取穴结果面板 ★核心组件（含纳子法模式切换）
+│   │   ├── PointDetail.vue    # 穴位详情弹窗（楷题宋文排版）
 │   │   └── CityPicker.vue     # 城市选择弹窗 ★核心组件
 │   │
 │   ├── pages/
 │   │   ├── index/index.vue    # 首页 ★核心页面
-│   │   ├── setting/setting.vue # 设置页
-│   │   └── about/about.vue    # 关于页
+│   │   ├── setting/setting.vue # 设置页（真太阳时、主题切换等）
+│   │   ├── about/about.vue    # 关于页
+│   │   └── methods/methods.vue # 针法说明页（弹窗模式）
 │   │
 │   ├── stores/
 │   │   └── app.js             # Pinia 全局状态 ★核心文件
 │   │
 │   ├── services/              # 算法层（从桌面版直接复制，未修改）
 │   │   ├── najia.js           # 纳甲法 + 反克法（calculateNajia, calculateFanke）
-│   │   ├── nazi.js            # 纳子法（calculateNazi）
+│   │   ├── nazi.js            # 纳子法（calculateNazi，含补母泻子/六十六穴双模式）
 │   │   ├── lingui.js          # 灵龟八法（calculateLingui）
 │   │   ├── feiteng.js         # 飞腾八法（calculateFeiteng）
 │   │   ├── ganzhi.js          # 干支计算（getGanZhi，含真太阳时校正）
-│   │   ├── wushi.js           # 五输穴数据查询
+│   │   ├── acupuncturePoints.js # 穴位数据查询引擎
 │   │   └── lunar-javascript.js # 农历库（第三方）
 │   │
 │   ├── data/                  # 数据层（从桌面版直接复制，未修改）
@@ -64,13 +65,20 @@ ziwuliuzhu-uniapp/
 │   │
 │   ├── styles/
 │   │   ├── variables.scss     # 全局 SCSS 变量（颜色、字号、间距、圆角）
-│   │   └── index.scss         # 全局样式（卡片、按钮、标签等通用样式）
+│   │   ├── themes.scss        # 运行时主题 CSS 变量（4套主题 + 覆盖规则）
+│   │   └── index.scss         # 全局样式（卡片、按钮、标签等 + @font-face 字体声明）
 │   │
 │   ├── composables/
 │   │   └── useSystemInfo.js   # 获取系统信息（状态栏高度、屏幕高度、安全区）
 │   │
 │   └── utils/
-│       └── date.js            # 日期工具（formatDate、getHourIndexFromDate、HOUR_OPTIONS）
+│       ├── date.js            # 日期工具（formatDate、getHourIndexFromDate、HOUR_OPTIONS）
+│       └── wuxing.js          # 五行生克工具
+├── static/
+│   ├── fonts/                 # 字体文件
+│   │   ├── kaiti-gb2312.ttf              # 楷体（全量，标题用）
+│   │   └── wenjinmincho-subset-v2.ttf    # 文源宋体子集化439字（正文用）
+│   └── tabbar/                # TabBar图标（含各主题active图标）
 ```
 
 ---
@@ -231,20 +239,22 @@ store.closeDetail()       // 关闭弹窗
 
 **显示内容**：
 1. 头部：穴位名称（楷体）+ 穴位代码（右对齐，小字号），间距 gap: 0px
-2. 基本信息：所属经络、穴位类别（去除顿号显示）、五行属性（彩色，20px 加粗）
+2. 基本信息：所属经络、穴位类别（formatCategory处理顿号→空格/逗号）、五行属性（彩色，20px 加粗）
    - 三个信息栏的内容文字居中，标题（label）左对齐
-   - 穴位类别中的顿号在模板层通过 `formatCategory()` 去除，不修改原数据
-3. 定位：穴位位置描述
+   - 穴位类别格式化：有五行属性时顿号改空格（横排），无五行时顿号改逗号
+3. 定位：穴位位置描述（默认字体，非宋体）
 4. 功能主治：功能标签（绿色）+ 主治标签（蓝色）
 5. 操作方法：针刺、艾灸
 6. 注意事项（红色警告框）
+7. 纳子法补母泻子提示（仅补母泻子模式下母穴/子穴时显示）
 
 **已知坑**：
 - 定位文字换行不美观：用 `word-break: normal; overflow-wrap: break-word` 避免在文字中间断行
 - 穴位代码右对齐：用 `align-self: flex-end` + `margin-right: -28px`
 - 字体：安卓不支持 KaiTi，font-family 需加 `'KaiTi', '楷体', 'STKaiti', 'FangSong', 'SimSun', serif`
 - 五行属性加大加粗：`.wuxing-value { font-size: 20px; font-weight: 700; }`
-- 去顿号：`formatCategory(category) { return category.replace(/、/g, ' ') }`
+- 类别格式化：`formatCategory(category, wuxing)` — 有五行时顿号改空格，无五行时顿号改逗号
+- 定位文字用默认字体：`.location-text { font-family: inherit }`
 
 ### 3.4 AppNavbar.vue — 导航栏
 
@@ -297,7 +307,7 @@ store.closeDetail()       // 关闭弹窗
 ### 4.3 持久化
 
 使用 `pinia-plugin-persist-uni` 持久化到 uni.storage：
-- 持久化字段：`useTrueSolarTime`、`longitude`、`selectedCity`、`activeMethod`
+- 持久化字段：`useTrueSolarTime`、`longitude`、`selectedCity`、`activeMethod`、`naziMode`、`fankeDisplayMode`、`theme`、`themeMode`
 - 存储 key：`ziwuliuzhu-app`
 
 ### 4.4 关键方法
@@ -435,14 +445,21 @@ const showFankeSupplement = computed(() => {
 
 **解决方案**：在父组件用 `:deep(.result-panel) { margin: 0; }` 覆盖。
 
-### 6.4 字体在不同平台显示差异
+### 6.4 字体方案：楷题宋文
 
-**现象**：Android 和 iOS/PC 上字体渲染不同，楷体在 Android 上不可用。
+**设计**：标题用楷体（KaitiGB2312），正文用宋体（WenYuanSerifSC），传统排版风格。
 
-**解决方案**：font-family 加多个 fallback：
-```scss
-font-family: 'KaiTi', '楷体', 'STKaiti', 'FangSong', 'SimSun', serif;
-```
+| 字体 | 文件 | 大小 | 加载方式 |
+|------|------|------|----------|
+| KaitiGB2312 | `kaiti-gb2312.ttf`（全量） | - | H5/App: @font-face；小程序: base64内联loadFontFace |
+| WenYuanSerifSC | `wenjinmincho-subset-v2.ttf`（子集化439字） | 143KB | H5/App: @font-face；小程序: base64内联loadFontFace |
+
+**⚠️ 字体更新铁律**：子集化后必须同步 ①App.vue base64 ②@font-face文件名加版本号 ③删除旧版ttf
+
+**已知坑**：
+- 子集化遗漏字符会导致缺字回退系统字体，视觉上粗细不一
+- H5浏览器可能缓存旧字体文件，需改文件名强制刷新
+- `@dcloudio/vite-plugin-uni` 会在@font-face的url中剥离查询参数，不能靠`?v=xxx`防缓存
 
 ### 6.5 定位文字换行不美观
 
@@ -610,7 +627,7 @@ $radius-xl: 32rpx;
 - [x] 算法层/数据层迁移（从桌面版）
 - [x] 手机端 UI 适配（字号、间距、弹窗布局）
 - [x] 城市选择弹窗优化（input 聚焦、scroll-view、布局溢出）
-- [x] 穴位详情弹窗优化（背景截断、排版、五行加粗、去顿号）
+- [x] 穴位详情弹窗优化（背景截断、排版、五行加粗、类别格式化）
 - [x] 取穴界面移除真太阳时（仅保留设置页）
 - [x] 手动查询确认弹窗机制
 - [x] 设置页开启真太阳时自动弹出城市选择
@@ -619,13 +636,21 @@ $radius-xl: 32rpx;
 - [x] 代码注释完善
 - [x] Git 备份推送到 GitHub
 - [x] Android APK 云打包
+- [x] 微信小程序适配（字体base64内联、TabBar图标）
+- [x] 文源宋体子集化439字（WenYuanSerifSC-Medium → wenjinmincho-subset-v2.ttf）
+- [x] 主题系统（4主题：classic/ink/celadon/vermilion，CSS变量运行时切换）
+- [x] 主题平台规则（小程序仅classic，H5/App支持切换+跟随系统深色）
+- [x] CityPicker硬编码颜色替换为CSS变量（暗色主题适配）
+- [x] 设置页主题选项折叠/展开
+- [x] 针法说明和关于改为弹窗模式
+- [x] naziMode持久化（六十六穴/补母泻子选择保留）
+- [x] 纳子法穴位按名称长度排序（2字首行/3字次行）
+- [x] 穴位类别条件格式化（有五行→空格，无五行→逗号）
 
 ### 待完成
 
-- [ ] 微信小程序适配（待办 #22）
 - [ ] uview-plus 组件库集成（按需使用）
 - [ ] 页面切换动画
 - [ ] 性能优化（懒加载、分包）
-- [ ] 深色模式支持
 - [ ] 穴位搜索功能
 - [ ] 收藏穴位功能
