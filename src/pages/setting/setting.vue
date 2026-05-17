@@ -149,29 +149,23 @@
         </view>
         <scroll-view scroll-y class="fullscreen-body" :show-scrollbar="false">
           <view class="about-content-inner">
+            <!-- Logo区域 -->
             <view class="logo-area">
               <text class="logo-icon">☯</text>
               <text class="app-name">子午流注取穴</text>
               <text class="app-version">v{{ version }}</text>
             </view>
+            <!-- 应用简介 -->
             <view class="desc-card">
               <text class="desc-text">
                 子午流注取穴系统是一款基于中医时间医学的智能化取穴辅助工具。系统支持纳甲法、纳子法、灵龟八法、飞腾八法四种传统取穴方法，结合干支推算和真太阳时校正，为中医针灸师提供精准的取穴参考。
               </text>
             </view>
-            <view class="info-card">
-              <view class="info-row">
-                <text class="info-label">技术栈</text>
-                <text class="info-value">uni-app Vue3 + Vite</text>
-              </view>
-              <view class="info-row">
-                <text class="info-label">适用平台</text>
-                <text class="info-value">Android / iOS / 微信小程序</text>
-              </view>
-            </view>
+            <!-- 免责声明 -->
             <view class="disclaimer-card">
+              <text class="disclaimer-label">免责声明</text>
               <text class="disclaimer-text">
-                免责声明：软件所提供的取穴结果仅供参考，不作为任何临床诊疗依据。实际应用中应以临床实际为准，因时、因地、因人，结合患者具体情况进行辨证施治。
+                软件所提供的取穴结果仅供参考，不作为任何临床诊疗依据。实际应用中应以临床实际为准，因时、因地、因人，结合患者具体情况进行辨证施治。
               </text>
             </view>
           </view>
@@ -612,16 +606,16 @@ onBackPress(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40rpx 0 30rpx;
+  padding: 48rpx 0 36rpx;
 }
 
 .logo-icon {
-  font-size: 100rpx;
-  margin-bottom: $spacing-md;
+  font-size: 120rpx;
+  margin-bottom: $spacing-lg;
 }
 
 .app-name {
-  font-size: $font-size-xl;
+  font-size: 44rpx;
   font-weight: 700;
   color: $tcm-primary;
   font-family: 'KaitiGB2312', 'KaiTi', serif;
@@ -630,40 +624,43 @@ onBackPress(() => {
 .app-version {
   font-size: $font-size-sm;
   color: $tcm-text-hint;
-  margin-top: $spacing-xs;
+  margin-top: $spacing-sm;
 }
 
 .desc-card {
   background: $tcm-bg-light;
   border-radius: $radius-lg;
   box-shadow: $shadow-sm;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-md;
+  padding: $spacing-xl $spacing-lg;
+  margin-bottom: $spacing-lg;
 }
 
 .desc-text {
   font-size: $font-size-sm;
   color: $tcm-text-secondary;
-  line-height: 2;
-}
-
-.info-card {
-  background: $tcm-bg-light;
-  border-radius: $radius-lg;
-  box-shadow: $shadow-sm;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-md;
+  line-height: 2.2;
+  text-align: justify;
 }
 
 .disclaimer-card {
-  margin-top: $spacing-md;
-  padding: $spacing-md;
+  background: rgba($tcm-primary, 0.04);
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  border: 1rpx solid rgba($tcm-primary, 0.12);
+}
+
+.disclaimer-label {
+  font-size: $font-size-xs;
+  font-weight: 600;
+  color: $tcm-text-hint;
+  margin-bottom: $spacing-sm;
+  display: block;
 }
 
 .disclaimer-text {
   font-size: 22rpx;
   color: $tcm-text-hint;
-  line-height: 1.8;
+  line-height: 1.9;
   text-align: justify;
 }
 

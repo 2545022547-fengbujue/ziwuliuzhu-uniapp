@@ -279,8 +279,14 @@ export const useAppStore = defineStore('app', () => {
   function syncSystemThemeFromDevice() {
     if (!supportsSystemTheme) return
     try {
-      const info = uni.getSystemInfoSync()
-      syncSystemTheme(info.theme || info.osTheme)
+      // 微信小程序：使用新API避免弃用警告
+      if (typeof wx !== 'undefined' && wx.getAppBaseInfo) {
+        const appInfo = wx.getAppBaseInfo()
+        syncSystemTheme(appInfo.theme || 'light')
+      } else {
+        const info = uni.getSystemInfoSync()
+        syncSystemTheme(info.theme || info.osTheme || 'light')
+      }
     } catch {
       syncSystemTheme('light')
     }

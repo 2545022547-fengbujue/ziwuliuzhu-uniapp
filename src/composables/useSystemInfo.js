@@ -13,21 +13,39 @@ let initialized = false
 function initSystemInfo() {
   if (initialized) return
   initialized = true
-  let systemInfo = null
 
   try {
-    systemInfo = uni.getSystemInfoSync()
-    statusBarHeight.value = systemInfo.statusBarHeight || 20
-    screenWidth.value = systemInfo.screenWidth || 375
-    screenHeight.value = systemInfo.screenHeight || 667
-    windowHeight.value = systemInfo.windowHeight || systemInfo.screenHeight || 667
-    platform.value = systemInfo.platform || ''
+    // 微信小程序：使用新分离API（避免弃用警告）
+    if (typeof wx !== 'undefined') {
+      const windowInfo = wx.getWindowInfo()
+      const deviceInfo = wx.getDeviceInfo()
 
-    // 安全区域：兼容不同平台的获取方式
-    if (systemInfo.safeAreaInsets && systemInfo.safeAreaInsets.bottom !== undefined) {
-      safeAreaBottom.value = systemInfo.safeAreaInsets.bottom
-    } else if (systemInfo.safeArea && systemInfo.safeArea.bottom !== undefined) {
-      safeAreaBottom.value = systemInfo.screenHeight - systemInfo.safeArea.bottom
+      statusBarHeight.value = windowInfo.statusBarHeight || 20
+      screenWidth.value = windowInfo.screenWidth || 375
+      screenHeight.value = windowInfo.screenHeight || 667
+      windowHeight.value = windowInfo.windowHeight || windowInfo.screenHeight || 667
+      platform.value = deviceInfo.platform || ''
+
+      // 安全区域
+      if (windowInfo.safeAreaInsets && windowInfo.safeAreaInsets.bottom !== undefined) {
+        safeAreaBottom.value = windowInfo.safeAreaInsets.bottom
+      } else if (windowInfo.safeArea && windowInfo.safeArea.bottom !== undefined) {
+        safeAreaBottom.value = windowInfo.screenHeight - windowInfo.safeArea.bottom
+      }
+    } else {
+      // 其他平台：使用uni-app兼容API
+      const systemInfo = uni.getSystemInfoSync()
+      statusBarHeight.value = systemInfo.statusBarHeight || 20
+      screenWidth.value = systemInfo.screenWidth || 375
+      screenHeight.value = systemInfo.screenHeight || 667
+      windowHeight.value = systemInfo.windowHeight || systemInfo.screenHeight || 667
+      platform.value = systemInfo.platform || ''
+
+      if (systemInfo.safeAreaInsets && systemInfo.safeAreaInsets.bottom !== undefined) {
+        safeAreaBottom.value = systemInfo.safeAreaInsets.bottom
+      } else if (systemInfo.safeArea && systemInfo.safeArea.bottom !== undefined) {
+        safeAreaBottom.value = systemInfo.screenHeight - systemInfo.safeArea.bottom
+      }
     }
   } catch (e) {
     console.error('[系统信息获取失败]', e)
