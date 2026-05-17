@@ -10,6 +10,22 @@ const platform = ref('')
 const menuButtonInfo = ref(null)
 let initialized = false
 
+/**
+ * 初始化系统信息（单例模式）
+ *
+ * 首次调用时获取设备信息，后续调用直接返回缓存数据。
+ * 自动适配不同平台API：
+ * - 微信小程序：使用新分离API（getWindowInfo/getDeviceInfo/getAppBaseInfo）
+ *   避免弃用警告（wx.getSystemInfoSync已弃用）
+ * - 其他平台：使用uni-app兼容API（uni.getSystemInfoSync）
+ *
+ * @private 内部函数，由useSystemInfo调用
+ * @returns {void} 无返回值，数据写入模块级 ref 变量
+ *
+ * @example
+ * // 自动在useSystemInfo首次调用时执行
+ * const { statusBarHeight, safeAreaBottom } = useSystemInfo()
+ */
 function initSystemInfo() {
   if (initialized) return
   initialized = true

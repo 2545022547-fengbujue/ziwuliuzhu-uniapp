@@ -4,7 +4,7 @@
     <view :style="{ height: navHeight + 'px' }" class="nav-placeholder"></view>
     <scroll-view scroll-y class="page-scroll" :show-scrollbar="false">
       <view class="setting-content">
-        <!-- 真太阳时设置 -->
+        <!-- ========== 真太阳时设置区域 ========== -->
         <view class="setting-card">
           <view class="card-title">
             <text class="card-icon">🌍</text>
@@ -31,7 +31,7 @@
           </view>
         </view>
 
-        <!-- 外观主题 -->
+        <!-- ========== 外观主题区域 ========== -->
         <!-- #ifndef MP-WEIXIN -->
         <view class="setting-card">
           <view class="card-title">
@@ -79,7 +79,7 @@
         </view>
         <!-- #endif -->
 
-        <!-- 反克法显示模式 -->
+        <!-- ========== 反克法显示模式 ========== -->
         <view class="setting-card">
           <view class="setting-row">
             <text class="setting-label">单独显示反克法</text>
@@ -91,7 +91,7 @@
           </view>
         </view>
 
-        <!-- 取穴方法说明 -->
+        <!-- ========== 取穴方法说明入口 ========== -->
         <view class="setting-card" @tap="goMethods">
           <view class="setting-row">
             <text class="setting-label">取穴方法说明</text>
@@ -99,7 +99,7 @@
           </view>
         </view>
 
-        <!-- 关于 -->
+        <!-- ========== 关于入口 ========== -->
         <view class="setting-card" @tap="goAbout">
           <view class="setting-row">
             <text class="setting-label">关于</text>
@@ -211,14 +211,27 @@ const showMethods = ref(false)
 const showAbout = ref(false)
 const version = manifest.versionName || '1.0.0'
 
+/**
+ * 当前主题名称（用于折叠面板显示）
+ * 根据store.activeTheme返回中文主题名
+ */
 const activeThemeName = computed(() => {
   const t = store.themes.find(t => t.id === store.activeTheme)
   return t ? t.name : ''
 })
+
+/**
+ * 当前主题描述（用于折叠面板显示）
+ */
 const activeThemeDesc = computed(() => {
   const t = store.themes.find(t => t.id === store.activeTheme)
   return t ? t.desc : ''
 })
+
+/**
+ * 非当前主题列表（用于展开后显示其他可选主题）
+ * 过滤掉当前已选主题，避免重复显示
+ */
 const otherThemes = computed(() => store.themes.filter(t => t.id !== store.activeTheme))
 
 const methodDescs = [

@@ -26,7 +26,16 @@ import { computed } from 'vue'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 
 const props = defineProps({
+  /**
+   * 导航栏标题文本
+   * 显示在导航栏中央，默认为空字符串（由页面传入）
+   */
   title: { type: String, default: '' },
+  /**
+   * 导航栏背景色
+   * 支持主题CSS变量（如 var(--bg-navbar)）或固定颜色值
+   * 默认使用主题渐变色（primary → primary-dark）
+   */
   bgColor: { type: String, default: '' }
 })
 
