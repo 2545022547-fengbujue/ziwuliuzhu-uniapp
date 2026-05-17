@@ -70,7 +70,6 @@
         }
     },
     "mp-weixin" : {
-        "appid" : "",
         "setting" : {
             "urlCheck" : true,
             "es6" : true,
