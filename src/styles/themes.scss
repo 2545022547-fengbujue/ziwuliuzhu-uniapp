@@ -86,7 +86,8 @@
   .desc-card,
   .info-card,
   .popup,
-  .confirm-popup {
+  .confirm-popup,
+  .fullscreen-panel {
     background: var(--theme-surface) !important;
     box-shadow: 0 8rpx 28rpx var(--theme-shadow) !important;
   }
@@ -103,7 +104,8 @@
   .method-item,
   .location-box,
   .bumu-tip,
-  .confirm-cancel {
+  .confirm-cancel,
+  .theme-current {
     background: var(--theme-surface-muted) !important;
   }
 
@@ -145,6 +147,7 @@
   .info-row,
   .popup-header,
   .popup-footer,
+  .fullscreen-header,
   .province-group,
   .city-item {
     border-color: var(--theme-border) !important;
@@ -169,7 +172,8 @@
   .fanke-title,
   .palace-icon,
   .suggestion-title,
-  .city-name-text {
+  .city-name-text,
+  .fullscreen-title {
     color: var(--theme-primary) !important;
   }
 
@@ -190,6 +194,7 @@
   .app-version,
   .setting-tip,
   .picker-arrow,
+  .theme-expand-arrow,
   .divider-text,
   .result-ganzhi-date,
   .result-ganzhi-hour-label,

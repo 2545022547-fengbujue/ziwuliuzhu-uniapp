@@ -35,7 +35,7 @@
             <view class="title-dot"></view>
             <text>基本信息</text>
           </view>
-          <view class="info-grid">
+          <view class="info-grid" :class="{ 'info-grid-center': !point?.wuxing }">
             <view class="info-item">
               <text class="info-label">所属经络</text>
               <text class="info-value info-value-center">{{ point?.meridian || '-' }}</text>
@@ -44,10 +44,10 @@
               <text class="info-label">穴位类别</text>
               <text class="info-value info-value-center">{{ formatCategory(point?.category) || '-' }}</text>
             </view>
-            <view class="info-item">
+            <view v-if="point?.wuxing" class="info-item">
               <text class="info-label">五行属性</text>
               <text class="info-value info-value-center wuxing-value" :style="{ color: getWuxingColor(point?.wuxing) }">
-                {{ point?.wuxing || '-' }}
+                {{ point.wuxing }}
               </text>
             </view>
           </view>
@@ -320,6 +320,14 @@ function handleClose() {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.info-grid-center {
+  justify-content: center;
+}
+
+.info-grid-center .info-item {
+  max-width: 48%;
 }
 
 .info-item {

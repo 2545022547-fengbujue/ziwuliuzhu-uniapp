@@ -12,19 +12,22 @@
     {
       "path": "pages/setting/setting",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "backgroundColor": "#F8F4EF"
       }
     },
     {
       "path": "pages/about/about",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "backgroundColor": "#F8F4EF"
       }
     },
     {
       "path": "pages/methods/methods",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "backgroundColor": "#F8F4EF"
       }
     }
   ],

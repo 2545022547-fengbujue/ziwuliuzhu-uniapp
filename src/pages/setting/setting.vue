@@ -1,8 +1,8 @@
 <template>
   <view class="page" :class="`theme-${store.activeTheme}`">
     <AppNavbar title="设置" />
-    <view :style="{ height: navHeight + 'px' }"></view>
-    <scroll-view scroll-y class="page-scroll" :style="{ height: scrollHeight + 'px' }">
+    <view :style="{ height: navHeight + 'px' }" class="nav-placeholder"></view>
+    <scroll-view scroll-y class="page-scroll" :show-scrollbar="false">
       <view class="setting-content">
         <!-- 真太阳时设置 -->
         <view class="setting-card">
@@ -51,9 +51,19 @@
             />
           </view>
           <!-- #endif -->
-          <view class="theme-options">
+          <view class="theme-current" @tap="themeExpanded = !themeExpanded">
+            <view class="theme-current-left">
+              <view class="theme-swatch" :class="store.activeTheme"></view>
+              <view class="theme-copy">
+                <text class="theme-name">{{ activeThemeName }}</text>
+                <text class="theme-desc">{{ activeThemeDesc }}</text>
+              </view>
+            </view>
+            <text class="theme-expand-arrow" :class="{ expanded: themeExpanded }">▶</text>
+          </view>
+          <view v-if="themeExpanded" class="theme-options">
             <view
-              v-for="theme in store.themes"
+              v-for="theme in otherThemes"
               :key="theme.id"
               class="theme-option"
               :class="{ active: store.activeTheme === theme.id }"
@@ -101,6 +111,74 @@
       </view>
     </scroll-view>
     <CityPicker ref="cityPickerRef" />
+
+    <!-- 取穴方法说明弹窗 -->
+    <view v-if="showMethods" class="fullscreen-overlay" @tap="showMethods = false">
+      <view class="fullscreen-panel" @tap.stop>
+        <view class="fullscreen-header" :style="{ paddingTop: statusBarHeight + 'px' }">
+          <text class="fullscreen-title">取穴方法说明</text>
+          <view class="close-btn" @tap="showMethods = false">
+            <text class="close-icon">✕</text>
+          </view>
+        </view>
+        <scroll-view scroll-y class="fullscreen-body" :show-scrollbar="false">
+          <view
+            v-for="m in methodDescs"
+            :key="m.id"
+            class="method-card"
+          >
+            <view class="method-header">
+              <text class="method-icon">{{ m.icon }}</text>
+              <text class="method-name">{{ m.name }}</text>
+            </view>
+            <text class="method-detail">{{ m.desc }}</text>
+          </view>
+          <view :style="{ height: safeBottom + 20 + 'px' }"></view>
+        </scroll-view>
+      </view>
+    </view>
+
+    <!-- 关于弹窗 -->
+    <view v-if="showAbout" class="fullscreen-overlay" @tap="showAbout = false">
+      <view class="fullscreen-panel" @tap.stop>
+        <view class="fullscreen-header" :style="{ paddingTop: statusBarHeight + 'px' }">
+          <text class="fullscreen-title">关于</text>
+          <view class="close-btn" @tap="showAbout = false">
+            <text class="close-icon">✕</text>
+          </view>
+        </view>
+        <scroll-view scroll-y class="fullscreen-body" :show-scrollbar="false">
+          <view class="about-content-inner">
+            <view class="logo-area">
+              <text class="logo-icon">☯</text>
+              <text class="app-name">子午流注取穴</text>
+              <text class="app-version">v{{ version }}</text>
+            </view>
+            <view class="desc-card">
+              <text class="desc-text">
+                子午流注取穴系统是一款基于中医时间医学的智能化取穴辅助工具。系统支持纳甲法、纳子法、灵龟八法、飞腾八法四种传统取穴方法，结合干支推算和真太阳时校正，为中医针灸师提供精准的取穴参考。
+              </text>
+            </view>
+            <view class="info-card">
+              <view class="info-row">
+                <text class="info-label">技术栈</text>
+                <text class="info-value">uni-app Vue3 + Vite</text>
+              </view>
+              <view class="info-row">
+                <text class="info-label">适用平台</text>
+                <text class="info-value">Android / iOS / 微信小程序</text>
+              </view>
+            </view>
+            <view class="disclaimer-card">
+              <text class="disclaimer-text">
+                免责声明：软件所提供的取穴结果仅供参考，不作为任何临床诊疗依据。实际应用中应以临床实际为准，因时、因地、因人，结合患者具体情况进行辨证施治。
+              </text>
+            </view>
+          </view>
+          <view :style="{ height: safeBottom + 20 + 'px' }"></view>
+        </scroll-view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -127,13 +205,34 @@ import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import CityPicker from '@/components/CityPicker.vue'
+import manifest from '@/manifest.json'
 
 const store = useAppStore()
-const { statusBarHeight, safeAreaBottom, screenHeight } = useSystemInfo()
+const { statusBarHeight, safeAreaBottom } = useSystemInfo()
 const navHeight = computed(() => statusBarHeight.value + 44)
 const safeBottom = computed(() => safeAreaBottom.value)
-const scrollHeight = computed(() => screenHeight.value - navHeight.value - safeAreaBottom.value - 50)
 const cityPickerRef = ref(null)
+const themeExpanded = ref(false)
+const showMethods = ref(false)
+const showAbout = ref(false)
+const version = manifest.versionName || '1.0.0'
+
+const activeThemeName = computed(() => {
+  const t = store.themes.find(t => t.id === store.activeTheme)
+  return t ? t.name : ''
+})
+const activeThemeDesc = computed(() => {
+  const t = store.themes.find(t => t.id === store.activeTheme)
+  return t ? t.desc : ''
+})
+const otherThemes = computed(() => store.themes.filter(t => t.id !== store.activeTheme))
+
+const methodDescs = [
+  { id: 'najia', icon: '☰', name: '纳甲法', desc: '以天干配脏腑，按时取穴。根据日干支推算开穴，是最经典的子午流注取穴方法。' },
+  { id: 'nazi', icon: '☷', name: '纳子法', desc: '以地支配脏腑，按时辰取穴。十二经脉气血流注，按子午流注规律取本经子母穴。' },
+  { id: 'lingui', icon: '☯', name: '灵龟八法', desc: '取奇经八脉交会穴，按时辰推算九宫数，取相应穴位。' },
+  { id: 'feiteng', icon: '⚡', name: '飞腾八法', desc: '取奇经八脉交会穴，以天干推算，按时取穴，方法更为简便。' }
+]
 
 onShow(() => {
   store.applyThemeChrome()
@@ -169,20 +268,32 @@ function openCityPicker() {
 }
 
 function goMethods() {
-  uni.navigateTo({ url: '/pages/methods/methods' })
+  showMethods.value = true
 }
 
 function goAbout() {
-  uni.navigateTo({ url: '/pages/about/about' })
+  showAbout.value = true
 }
 </script>
 
 <style lang="scss" scoped>
 .page {
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background-color: $tcm-bg;
 }
-.page-scroll { width: 100%; }
+
+.nav-placeholder {
+  flex-shrink: 0;
+}
+
+.page-scroll {
+  flex: 1;
+  height: 0;        /* 关键：配合flex:1让scroll-view正确计算剩余高度 */
+  overflow: hidden;
+}
 
 .setting-content {
   padding: $spacing-md;
@@ -272,6 +383,34 @@ function goAbout() {
 .picker-arrow {
   font-size: 18rpx;
   color: $tcm-text-hint;
+}
+
+.theme-current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background: rgba($tcm-primary, 0.04);
+  border-radius: 18rpx;
+  border: 1rpx solid rgba($tcm-primary, 0.12);
+  margin-bottom: $spacing-sm;
+}
+
+.theme-current-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.theme-expand-arrow {
+  font-size: 20rpx;
+  color: $tcm-text-hint;
+  transition: transform 0.25s ease;
+  padding: 8rpx;
+}
+
+.theme-expand-arrow.expanded {
+  transform: rotate(90deg);
 }
 
 .theme-options {
@@ -365,5 +504,145 @@ function goAbout() {
   color: $tcm-text-secondary;
   line-height: 1.8;
   padding-left: 40rpx;
+}
+
+/* === 全屏弹窗（方法说明 / 关于） === */
+.fullscreen-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 999;
+  background: $tcm-bg;
+  animation: overlayFadeIn 0.2s ease-out;
+}
+
+.fullscreen-panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fullscreen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px 12px;
+  border-bottom: 1px solid rgba($tcm-primary, 0.08);
+  flex-shrink: 0;
+}
+
+.fullscreen-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: $tcm-primary;
+  font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', serif;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba($tcm-primary, 0.06);
+}
+
+.close-icon {
+  font-size: 14px;
+  color: $tcm-text-secondary;
+}
+
+.fullscreen-body {
+  flex: 1;
+  height: 0;        /* 关键：配合flex:1让scroll-view正确计算剩余高度 */
+  overflow: hidden;
+}
+
+/* 方法说明弹窗内容 */
+.method-card {
+  background: $tcm-bg-light;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-lg;
+  margin: $spacing-md $spacing-lg 0;
+}
+
+.method-card:first-child {
+  margin-top: $spacing-lg;
+}
+
+.method-card:last-child {
+  margin-bottom: 0;
+}
+
+/* 关于弹窗内容 */
+.about-content-inner {
+  padding: $spacing-lg;
+}
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0 30rpx;
+}
+
+.logo-icon {
+  font-size: 100rpx;
+  margin-bottom: $spacing-md;
+}
+
+.app-name {
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: $tcm-primary;
+  font-family: 'KaitiGB2312', 'KaiTi', serif;
+}
+
+.app-version {
+  font-size: $font-size-sm;
+  color: $tcm-text-hint;
+  margin-top: $spacing-xs;
+}
+
+.desc-card {
+  background: $tcm-bg-light;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.desc-text {
+  font-size: $font-size-sm;
+  color: $tcm-text-secondary;
+  line-height: 2;
+}
+
+.info-card {
+  background: $tcm-bg-light;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.disclaimer-card {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+}
+
+.disclaimer-text {
+  font-size: 22rpx;
+  color: $tcm-text-hint;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>

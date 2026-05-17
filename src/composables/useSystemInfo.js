@@ -4,6 +4,7 @@ import { ref } from 'vue'
 const statusBarHeight = ref(20)
 const screenWidth = ref(375)
 const screenHeight = ref(667)
+const windowHeight = ref(667)
 const safeAreaBottom = ref(0)
 const platform = ref('')
 const menuButtonInfo = ref(null)
@@ -19,6 +20,7 @@ function initSystemInfo() {
     statusBarHeight.value = systemInfo.statusBarHeight || 20
     screenWidth.value = systemInfo.screenWidth || 375
     screenHeight.value = systemInfo.screenHeight || 667
+    windowHeight.value = systemInfo.windowHeight || systemInfo.screenHeight || 667
     platform.value = systemInfo.platform || ''
 
     // 安全区域：兼容不同平台的获取方式
@@ -67,6 +69,7 @@ export function useSystemInfo() {
     statusBarHeight,
     screenWidth,
     screenHeight,
+    windowHeight,
     safeAreaBottom,
     platform,
     menuButtonInfo

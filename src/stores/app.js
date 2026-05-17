@@ -35,7 +35,7 @@ import { getHourIndexFromDate } from '@/utils/date.js'
 import { APP_CONFIG } from '@/config/index.js'
 
 const THEME_OPTIONS = [
-  { id: 'classic', name: '古典宣纸', desc: '温润沉稳，保留当前默认外观' },
+  { id: 'classic', name: '古典宣纸', desc: '温润沉稳，经典默认风格' },
   // #ifdef H5 || APP-PLUS
   { id: 'ink', name: '玄黑金篆', desc: '黑金低亮，适合夜间查看' },
   { id: 'celadon', name: '青瓷天青', desc: '清润舒展，适合白天使用' },

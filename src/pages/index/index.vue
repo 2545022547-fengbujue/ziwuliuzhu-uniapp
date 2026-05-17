@@ -10,9 +10,9 @@
   <view class="page" :class="`theme-${store.activeTheme}`">
     <!-- 导航栏 -->
     <AppNavbar title="子午流注取穴" />
-    <view :style="{ height: navHeight + 'px' }"></view>
+    <view :style="{ height: navHeight + 'px' }" class="nav-placeholder"></view>
 
-    <scroll-view scroll-y class="page-scroll" :style="{ height: scrollHeight + 'px' }">
+    <scroll-view scroll-y class="page-scroll" :show-scrollbar="false">
       <!-- 干支信息卡片：显示年/月/日/时干支标签 -->
       <view class="ganzhi-card">
         <view class="ganzhi-header">
@@ -208,11 +208,9 @@ import PointDetail from '@/components/PointDetail.vue'
 
 
 const store = useAppStore()
-const { statusBarHeight, screenHeight, safeAreaBottom } = useSystemInfo()
+const { statusBarHeight, safeAreaBottom } = useSystemInfo()
 // 导航栏高度 = 状态栏 + 44px
 const navHeight = computed(() => statusBarHeight.value + 44)
-// 可滚动区域高度 = 屏幕高度 - 导航栏 - 底部安全区 - tab栏
-const scrollHeight = computed(() => screenHeight.value - navHeight.value - safeAreaBottom.value - 50)
 const safeBottom = computed(() => safeAreaBottom.value)
 
 // 四种主取穴方法（不含反克法，反克法是闭穴时的补充）
@@ -369,12 +367,21 @@ function stopTimer() {
 
 <style lang="scss" scoped>
 .page {
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background-color: $tcm-bg;
 }
 
+.nav-placeholder {
+  flex-shrink: 0;
+}
+
 .page-scroll {
-  width: 100%;
+  flex: 1;
+  height: 0;        /* 关键：配合flex:1让scroll-view正确计算剩余高度 */
+  overflow: hidden;
 }
 
 /* === 干支卡片 === */

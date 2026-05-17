@@ -32,7 +32,7 @@
         </text>
       </view>
 
-      <scroll-view scroll-y class="popup-body">
+      <scroll-view scroll-y :show-scrollbar="false" class="popup-body">
         <!-- 提示信息 -->
         <view class="tip-box">
           <view class="tip-content">
@@ -281,7 +281,7 @@ defineExpose({ open, close })
   width: 100%;
   height: 100%;
   z-index: 200;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -290,11 +290,11 @@ defineExpose({ open, close })
 .popup {
   width: 88%;
   max-height: 85vh;
-  background: #FFFDF5;
+  background: var(--theme-surface);
   border-radius: 24px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 8px 30px var(--theme-shadow);
   overflow: hidden;
 }
 
@@ -303,21 +303,21 @@ defineExpose({ open, close })
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  border-bottom: 1px solid var(--theme-border);
   flex-shrink: 0;
 }
 
 .popup-title {
   font-size: 18px;
   font-weight: 700;
-  color: #2C2C2C;
+  color: var(--theme-text);
 }
 
 .close-btn {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(139, 69, 19, 0.06);
+  background: var(--theme-surface-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -325,7 +325,7 @@ defineExpose({ open, close })
 
 .close-icon {
   font-size: 16px;
-  color: #666;
+  color: var(--theme-text-secondary);
 }
 
 .search-section {
@@ -337,7 +337,7 @@ defineExpose({ open, close })
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #2C2C2C;
+  color: var(--theme-text);
   margin-bottom: 8px;
 }
 
@@ -349,11 +349,11 @@ defineExpose({ open, close })
   width: 100%;
   height: 44px;
   padding: 0 14px;
-  background: #fff;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
   border-radius: 12px;
   font-size: 15px;
-  color: #2C2C2C;
+  color: var(--theme-text);
   box-sizing: border-box;
   outline: none;
   -webkit-appearance: none;
@@ -368,7 +368,7 @@ defineExpose({ open, close })
 .city-list-label {
   font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: var(--theme-text-secondary);
 }
 
 .popup-body {
@@ -377,14 +377,21 @@ defineExpose({ open, close })
   max-height: 50vh;
   width: 100%;
   box-sizing: border-box;
-  overflow-y: auto;
+}
+
+/* 隐藏 scroll-view 滚动条 */
+.popup-body ::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  color: transparent;
 }
 
 .tip-box {
   padding: 14px;
   margin: 8px 0 12px;
-  background: rgba(91, 140, 62, 0.06);
-  border: 1px solid rgba(91, 140, 62, 0.12);
+  background: var(--theme-surface-muted);
+  border: 1px solid var(--theme-border);
   border-radius: 12px;
   box-sizing: border-box;
   width: 100%;
@@ -414,17 +421,17 @@ defineExpose({ open, close })
 .tip-title {
   font-size: 15px;
   font-weight: 600;
-  color: #2C2C2C;
+  color: var(--theme-text);
 }
 
 .tip-desc {
   font-size: 13px;
-  color: rgba(44, 44, 44, 0.55);
+  color: var(--theme-text-hint);
   line-height: 1.6;
 }
 
 .province-group {
-  border-bottom: 1px solid rgba(139, 69, 19, 0.05);
+  border-bottom: 1px solid var(--theme-border);
 }
 
 .province-group:last-child {
@@ -435,12 +442,12 @@ defineExpose({ open, close })
   padding: 14px 16px;
   display: flex;
   align-items: center;
-  background: #fff;
+  background: var(--theme-surface);
   border-radius: 8px;
 }
 
 .province-header:active {
-  background: rgba(139, 69, 19, 0.05);
+  background: var(--theme-surface-muted);
 }
 
 .province-left {
@@ -451,7 +458,7 @@ defineExpose({ open, close })
 
 .province-arrow {
   font-size: 10px;
-  color: #999;
+  color: var(--theme-text-hint);
   transition: transform 0.2s;
 }
 
@@ -462,16 +469,16 @@ defineExpose({ open, close })
 .province-name-text {
   font-size: 15px;
   font-weight: 500;
-  color: #2C2C2C;
+  color: var(--theme-text);
 }
 
 .province-count {
   font-size: 12px;
-  color: #999;
+  color: var(--theme-text-hint);
 }
 
 .province-cities {
-  background: rgba(139, 69, 19, 0.02);
+  background: var(--theme-surface-muted);
 }
 
 .city-item {
@@ -479,7 +486,7 @@ defineExpose({ open, close })
   align-items: center;
   justify-content: space-between;
   padding: 13px 16px;
-  border-bottom: 1px solid rgba(139, 69, 19, 0.04);
+  border-bottom: 1px solid var(--theme-border);
 }
 
 .city-item:last-child {
@@ -487,11 +494,11 @@ defineExpose({ open, close })
 }
 
 .city-item:active {
-  background: rgba(139, 69, 19, 0.08);
+  background: var(--theme-surface-muted);
 }
 
 .city-item.selected {
-  background: rgba(139, 69, 19, 0.12);
+  background: var(--theme-border);
 }
 
 .city-item-indented {
@@ -506,30 +513,30 @@ defineExpose({ open, close })
 
 .city-abbr {
   font-size: 11px;
-  color: #999;
+  color: var(--theme-text-hint);
   width: 30px;
 }
 
 .city-name-text {
   font-size: 15px;
-  color: #2C2C2C;
+  color: var(--theme-text);
 }
 
 .city-province {
   font-size: 11px;
-  color: #999;
+  color: var(--theme-text-hint);
 }
 
 .city-longitude {
   font-size: 11px;
-  color: #999;
+  color: var(--theme-text-hint);
 }
 
 .empty-tip {
   padding: 30px 0;
   text-align: center;
   font-size: 15px;
-  color: #999;
+  color: var(--theme-text-hint);
 }
 
 .popup-footer {
@@ -537,14 +544,14 @@ defineExpose({ open, close })
   justify-content: flex-end;
   gap: 12px;
   padding: 14px 20px;
-  border-top: 1px solid rgba(139, 69, 19, 0.1);
+  border-top: 1px solid var(--theme-border);
   flex-shrink: 0;
 }
 
 .btn-cancel {
   padding: 10px 24px;
   border-radius: 12px;
-  background: #F8F4EF;
+  background: var(--theme-surface-muted);
 }
 
 .btn-cancel:active {
@@ -554,7 +561,7 @@ defineExpose({ open, close })
 .btn-confirm {
   padding: 10px 24px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #8B4513 0%, #6B3410 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
 }
 
 .btn-confirm.disabled {
@@ -567,7 +574,7 @@ defineExpose({ open, close })
 
 .btn-text {
   font-size: 15px;
-  color: #666;
+  color: var(--theme-text-secondary);
   font-weight: 500;
 }
 

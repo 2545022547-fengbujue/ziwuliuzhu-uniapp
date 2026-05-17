@@ -71,7 +71,10 @@ function goBack() {
 </script>
 
 <style lang="scss" scoped>
-.page { min-height: 100vh; background-color: $tcm-bg; }
+.page {
+  min-height: 100vh;
+  background-color: $tcm-bg;
+}
 .back-btn { padding: 10rpx; }
 .back-icon { font-size: 40rpx; color: #fff; }
 
