@@ -139,3 +139,13 @@ export const MERIDIAN_CODE_TO_NAME = {
   'GB': '足少阳胆经', 'LR': '足厥阴肝经',
   'CV': '任脉', 'GV': '督脉'
 }
+
+// === 6. 取穴方法说明 ===
+
+// 取穴方法详细说明（用于 setting.vue 弹窗）
+export const METHOD_DESCS = [
+  { id: 'najia', icon: '☰', name: '纳甲法', desc: '以天干配脏腑，按时取穴。根据日干支推算开穴,是最经典的子午流注取穴方法。' },
+  { id: 'nazi', icon: '☷', name: '纳子法', desc: '以地支配脏腑，按时辰取穴。十二经脉气血流注，按子午流注规律取本经子母穴。' },
+  { id: 'lingui', icon: '☯', name: '灵龟八法', desc: '取奇经八脉交会穴，按时辰推算九宫数，取相应穴位。' },
+  { id: 'feiteng', icon: '⚡', name: '飞腾八法', desc: '取奇经八脉交会穴，以天干推算，按时取穴，方法更为简便。' }
+]

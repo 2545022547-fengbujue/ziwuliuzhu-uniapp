@@ -200,6 +200,7 @@ import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import CityPicker from '@/components/CityPicker.vue'
 import manifest from '@/manifest.json'
+import { METHOD_DESCS } from '@/data/constants.js'
 
 const store = useAppStore()
 const { statusBarHeight, safeAreaBottom } = useSystemInfo()
@@ -234,12 +235,7 @@ const activeThemeDesc = computed(() => {
  */
 const otherThemes = computed(() => store.themes.filter(t => t.id !== store.activeTheme))
 
-const methodDescs = [
-  { id: 'najia', icon: '☰', name: '纳甲法', desc: '以天干配脏腑，按时取穴。根据日干支推算开穴，是最经典的子午流注取穴方法。' },
-  { id: 'nazi', icon: '☷', name: '纳子法', desc: '以地支配脏腑，按时辰取穴。十二经脉气血流注，按子午流注规律取本经子母穴。' },
-  { id: 'lingui', icon: '☯', name: '灵龟八法', desc: '取奇经八脉交会穴，按时辰推算九宫数，取相应穴位。' },
-  { id: 'feiteng', icon: '⚡', name: '飞腾八法', desc: '取奇经八脉交会穴，以天干推算，按时取穴，方法更为简便。' }
-]
+const methodDescs = METHOD_DESCS
 
 onShow(() => {
   store.applyThemeChrome()
@@ -297,9 +293,9 @@ onBackPress(() => {
     showAbout.value = false
     return true // 拦截返回键
   }
-  // 弹窗都关闭时，跳转取穴页
+  // 弹窗都关闭时，跳转取穴页（有意设计：设置页非主功能页，返回时回到取穴主界面）
   uni.switchTab({ url: '/pages/index/index' })
-  return true // 拦截默认返回行为
+  return true // 拦截默认返回行为，避免直接退出应用
 })
 </script>
 

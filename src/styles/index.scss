@@ -16,23 +16,25 @@
 
 /* === 楷体字体 === */
 /* App端（Android）：打包内置字体，解决系统无楷体问题 */
+/* 字体文件移至assets目录，微信小程序编译时自动排除 */
 /* #ifdef APP-PLUS */
 @font-face {
   font-family: 'KaitiGB2312';
-  src: url('@/static/fonts/kaiti-gb2312.ttf') format('truetype');
+  src: url('@/assets/fonts/kaiti-gb2312.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 /* #endif */
-/* 微信小程序：在 App.vue onLaunch 中用 uni.loadFontFace 动态加载 */
+/* 微信小程序：在 App.vue onLaunch 中用 uni.loadFontFace + base64 动态加载 */
 
 /* === 文源宋体 === */
 /* App端 + H5端：打包内置字体，用于弹窗正文"楷题宋文"排版 */
+/* 字体文件移至assets目录，微信小程序编译时自动排除 */
 /* #ifndef MP-WEIXIN */
 @font-face {
   font-family: 'WenYuanSerifSC';
-  src: url('@/static/fonts/wenjinmincho-subset-v3.ttf') format('truetype');
+  src: url('@/assets/fonts/wenjinmincho-subset-v3.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -41,13 +43,13 @@
 /* 文源宋体Bold：穴位弹窗正文加粗（经络、穴位类别、五行） */
 @font-face {
   font-family: 'WenYuanSerifSC-Bold';
-  src: url('@/static/fonts/WenYuanSerifSC-Bold-subset.ttf') format('truetype');
+  src: url('@/assets/fonts/WenYuanSerifSC-Bold-subset.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 /* #endif */
-/* 微信小程序：在 App.vue onLaunch 中用 uni.loadFontFace 动态加载 */
+/* 微信小程序：在 App.vue onLaunch 中用 uni.loadFontFace + base64 动态加载 */
 
 /* === 基础重置 === */
 page {

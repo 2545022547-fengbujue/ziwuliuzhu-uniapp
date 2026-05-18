@@ -39,7 +39,6 @@
               v-for="point in fankeResult.openPoints"
               :key="point.id"
               class="point-btn"
-              :class="{ open: point.isOpen }"
               @tap="handlePointClick(point)"
             >
               <text class="point-name">{{ point.name }}</text>
@@ -63,7 +62,6 @@
             v-for="point in result.alternativePoints.openPoints"
             :key="point.id"
             class="point-btn"
-            :class="{ open: point.isOpen }"
             @tap="handlePointClick(point)"
           >
             <text class="point-name">{{ point.name }}</text>
@@ -105,7 +103,6 @@
             v-for="bp in bumuPoints"
             :key="bp.point.id"
             class="point-btn"
-            :class="{ open: bp.point.isOpen }"
             :style="getPointStyle(bp.point)"
             @tap="handlePointClick(bp.point)"
           >
@@ -129,7 +126,6 @@
             v-for="point in displayPoints"
             :key="point.id"
             class="point-btn"
-            :class="{ open: point.isOpen }"
             :style="getPointStyle(point)"
             @tap="handlePointClick(point)"
           >
@@ -298,7 +294,7 @@ function getPointStyle(point) {
 
 /**
  * 穴位点击处理：打开穴位详情弹窗
- * @param {Object} point - 穴位对象 { id, name, code, wuxing, isOpen, ... }
+ * @param {Object} point - 穴位对象 { id, name, code, wuxing, ... }
  */
 function handlePointClick(point) {
   store.selectPoint(point)
@@ -460,12 +456,8 @@ function handlePointClick(point) {
   gap: 10rpx;
   padding: 14rpx 28rpx;
   border-radius: 20rpx;
-  background: rgba($tcm-primary, 0.06);
+  background: rgba($tcm-primary, 0.1);
   transition: all 0.25s ease;
-
-  &.open {
-    background: rgba($tcm-primary, 0.1);
-  }
 
   &:active {
     transform: scale(0.96);

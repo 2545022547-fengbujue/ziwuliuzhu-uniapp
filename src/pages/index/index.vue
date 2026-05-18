@@ -312,6 +312,8 @@ function confirmQuery() {
   confirmedDateStr.value = selectedDateStr.value
   confirmedHourIdx.value = selectedHourIdx.value
   // 用本地时间构造 Date，避免 new Date("YYYY-MM-DD") 的 UTC 陷阱（会变成 08:00）
+  // hours 设为 0 仅为构造合法 Date 对象，时辰索引通过第二个参数单独传递
+  // 手动模式下不触发子时翻转：用户选的是"某日某时辰"的概念时间，日期由用户决定
   const parts = selectedDateStr.value.split('-')
   const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 0, 0, 0)
   store.queryTime(date, selectedHourIdx.value)
@@ -364,8 +366,14 @@ function stopTimer() {
   }
 }
 
-/** 返回键拦截：穴位弹窗打开时关闭弹窗，否则不拦截 */
+/** 返回键拦截：优先拦截确认弹窗，其次拦截穴位弹窗 */
 onBackPress(() => {
+  // 优先拦截确认弹窗的返回键
+  if (showQueryConfirm.value) {
+    showQueryConfirm.value = false
+    return true // 拦截返回键
+  }
+  // 其次拦截穴位详情弹窗
   if (store.selectedPoint) {
     store.closeDetail()
     return true // 拦截返回键

@@ -64,24 +64,6 @@
           </view>
         </view>
 
-        <!-- 功能主治 -->
-        <view class="info-section" v-if="point?.functions?.length || point?.indications?.length">
-          <view class="section-title">
-            <view class="title-dot"></view>
-            <text>功能主治</text>
-          </view>
-          <view class="tags-wrap" v-if="point?.functions?.length">
-            <view v-for="func in point.functions" :key="func" class="func-tag">
-              <text>{{ func }}</text>
-            </view>
-          </view>
-          <view class="tags-wrap" v-if="point?.indications?.length">
-            <view v-for="ind in point.indications" :key="ind" class="indication-tag">
-              <text>{{ ind }}</text>
-            </view>
-          </view>
-        </view>
-
         <!-- 操作方法 -->
         <view class="info-section" v-if="point?.needling || point?.moxibustion">
           <view class="section-title">
@@ -124,7 +106,7 @@
 /**
  * PointDetail - 穴位详情弹窗
  *
- * 功能：显示穴位完整信息（经络、五行、定位、功能主治、操作方法、注意事项）
+ * 功能：显示穴位完整信息（经络、五行、定位、操作方法、注意事项）
  *
  * 调用方式：通过 store 控制
  *   store.openDetail(point)  // point 是穴位对象
@@ -174,7 +156,7 @@ function handleClose() {
    - overlay：fixed 全屏遮罩
    - popup：居中弹窗容器，flex column
    - popup-header：顶部固定区域（名称+代码+关闭按钮）
-   - popup-body：可滚动内容区（基本信息、定位、功能主治等）
+   - popup-body：可滚动内容区（基本信息、定位、操作方法等）
    
    重要：所有卡片容器必须加 box-sizing: border-box; width: 100%; overflow: hidden
          否则在 uni-app H5 模式下会出现右边截断的问题
@@ -199,7 +181,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 .popup {
   width: 92%;
   max-height: 85vh;
-  background: #FFFDF5;
+  background: var(--theme-surface);
   border-radius: 24px;
   display: flex;
   flex-direction: column;
@@ -224,7 +206,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   align-items: center;
   justify-content: space-between;
   padding: 24px 20px;
-  border-bottom: 1px solid rgba(139, 69, 19, 0.08);
+  border-bottom: 1px solid var(--theme-border);
   flex-shrink: 0;
   position: relative;
   min-height: 72px;
@@ -234,7 +216,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(139, 69, 19, 0.1);
+  background: var(--theme-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -260,14 +242,14 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 .point-name {
   font-size: 38px;
   font-weight: 700;
-  color: #2C2C2C;
+  color: var(--theme-text);
   font-family: 'KaitiGB2312', 'KaiTi', '楷体', 'STKaiti', serif;
   line-height: 1.2;
 }
 
 .point-code {
   font-size: 10px;
-  color: #999;
+  color: var(--theme-text-hint);
   font-family: monospace;
   letter-spacing: 0.5px;
   transform: translateY(4px);
@@ -277,7 +259,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(139, 69, 19, 0.06);
+  background: var(--theme-surface-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -286,7 +268,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .close-icon {
   font-size: 18px;
-  color: #666;
+  color: var(--theme-text-secondary);
 }
 
 .popup-body {
@@ -310,7 +292,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   margin-bottom: 12px;
   font-size: 15px;
   font-weight: 600;
-  color: rgba(44, 44, 44, 0.7);
+  color: var(--theme-text-secondary);
   font-family: $font-songti;
 }
 
@@ -318,7 +300,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   width: 4px;
   height: 16px;
   border-radius: 2px;
-  background: #5B8C3E;
+  background: var(--theme-secondary);
 }
 
 .info-grid {
@@ -339,7 +321,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   flex: 1;
   min-width: 80px;
   padding: 12px;
-  background: rgba(139, 69, 19, 0.03);
+  background: var(--theme-surface-muted);
   border-radius: 12px;
   box-sizing: border-box;
   overflow: hidden;
@@ -348,7 +330,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 .info-label {
   display: block;
   font-size: 12px;
-  color: #999;
+  color: var(--theme-text-hint);
   margin-bottom: 4px;
   font-family: $font-songti;
 }
@@ -357,7 +339,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #2C2C2C;
+  color: var(--theme-text);
   word-break: keep-all;
   font-family: 'WenYuanSerifSC-Bold', 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
@@ -374,8 +356,8 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 /* === 定位 === */
 .location-box {
   padding: 14px;
-  background: #F8F4EF;
-  border: 1px solid rgba(139, 69, 19, 0.05);
+  background: var(--theme-surface-muted);
+  border: 1px solid var(--theme-border);
   border-radius: 12px;
   box-sizing: border-box;
   width: 100%;
@@ -384,37 +366,11 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .location-text {
   font-size: 15px;
-  color: rgba(44, 44, 44, 0.8);
+  color: var(--theme-text-secondary);
   line-height: 2;
   letter-spacing: 0.5px;
   word-break: normal;
   overflow-wrap: break-word;
-}
-
-/* === 标签 === */
-.tags-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.func-tag {
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: rgba(46, 139, 87, 0.08);
-  font-size: 12px;
-  color: #2E8B57;
-  font-family: $font-songti;
-}
-
-.indication-tag {
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: rgba(21, 101, 192, 0.08);
-  font-size: 12px;
-  color: #1565C0;
-  font-family: $font-songti;
 }
 
 /* === 操作方法 === */
@@ -426,8 +382,8 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .method-item {
   padding: 14px;
-  background: #F8F4EF;
-  border: 1px solid rgba(139, 69, 19, 0.05);
+  background: var(--theme-surface-muted);
+  border: 1px solid var(--theme-border);
   border-radius: 12px;
   box-sizing: border-box;
   width: 100%;
@@ -436,7 +392,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 .method-label {
   display: block;
   font-size: 12px;
-  color: #999;
+  color: var(--theme-text-hint);
   margin-bottom: 6px;
   font-family: $font-songti;
 }
@@ -444,7 +400,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 .method-value {
   display: block;
   font-size: 14px;
-  color: rgba(44, 44, 44, 0.8);
+  color: var(--theme-text-secondary);
   line-height: 1.7;
   word-break: break-all;
   text-align: justify;

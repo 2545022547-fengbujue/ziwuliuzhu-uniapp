@@ -43,6 +43,6 @@ export function getWuxingColor(wuxing) {
 export function getWuxingStyle(wuxing) {
   return {
     color: WUXING_COLORS[wuxing] || DEFAULT_COLOR,
-    bg: WUXING_BG[wuxing] || DEFAULT_BG
+    background: WUXING_BG[wuxing] || DEFAULT_BG
   }
 }
