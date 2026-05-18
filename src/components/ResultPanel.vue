@@ -37,7 +37,7 @@
           <view class="points-grid">
             <view
               v-for="point in fankeResult.openPoints"
-              :key="point.id"
+              :key="'fanke-' + point.code"
               class="point-btn"
               @tap="handlePointClick(point)"
             >
@@ -60,7 +60,7 @@
         <view class="points-grid">
           <view
             v-for="point in result.alternativePoints.openPoints"
-            :key="point.id"
+            :key="'alt-' + point.code"
             class="point-btn"
             @tap="handlePointClick(point)"
           >
@@ -101,7 +101,7 @@
         <view class="points-grid" :style="gridStyle">
           <view
             v-for="bp in bumuPoints"
-            :key="bp.point.id"
+            :key="'bumu-' + bp.point.code"
             class="point-btn"
             :style="getPointStyle(bp.point)"
             @tap="handlePointClick(bp.point)"
@@ -124,7 +124,7 @@
         <view class="points-grid" :style="gridStyle">
           <view
             v-for="point in displayPoints"
-            :key="point.id"
+            :key="'open-' + point.code"
             class="point-btn"
             :style="getPointStyle(point)"
             @tap="handlePointClick(point)"
