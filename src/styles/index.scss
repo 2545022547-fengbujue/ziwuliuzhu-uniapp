@@ -65,8 +65,10 @@ page {
   word-break: break-all;
 }
 
-/* === H5端全局隐藏滚动条 === */
+/* === H5端/App端全局隐藏滚动条 === */
 /* show-scrollbar 属性在H5端无效，必须用CSS隐藏 */
+/* 微信小程序不支持 ::-webkit-scrollbar 伪元素，用条件编译排除 */
+/* #ifdef H5 */
 ::-webkit-scrollbar {
   display: none;
   width: 0 !important;
@@ -77,6 +79,16 @@ html, body {
   scrollbar-width: none;       /* Firefox */
   -ms-overflow-style: none;    /* IE 10+ */
 }
+/* #endif */
+
+/* #ifdef APP-PLUS */
+::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent;
+}
+/* #endif */
 
 /* 统一 font-weight 在不同平台的表现 */
 text {

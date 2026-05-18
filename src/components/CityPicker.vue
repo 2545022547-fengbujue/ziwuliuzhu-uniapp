@@ -381,13 +381,24 @@ defineExpose({ open, close, isOpen })
   box-sizing: border-box;
 }
 
-/* 隐藏 scroll-view 滚动条 */
+/* 隐藏 scroll-view 滚动条（仅H5/App端，微信小程序不支持） */
+/* #ifdef H5 */
 .popup-body ::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
   color: transparent;
 }
+/* #endif */
+
+/* #ifdef APP-PLUS */
+.popup-body ::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  color: transparent;
+}
+/* #endif */
 
 .tip-box {
   padding: 14px;
