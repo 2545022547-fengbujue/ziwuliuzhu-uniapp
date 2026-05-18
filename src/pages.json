@@ -17,19 +17,6 @@
       }
     }
   ],
-  "subPackages": [
-    {
-      "root": "package-detail",
-      "name": "detail",
-      "pages": []
-    }
-  ],
-  "preloadRule": {
-    "pages/index/index": {
-      "network": "all",
-      "packages": ["detail"]
-    }
-  },
   "globalStyle": {
     "navigationBarTextStyle": "white",
     "navigationBarBackgroundColor": "#8B4513",
