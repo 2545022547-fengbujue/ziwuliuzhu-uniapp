@@ -12,36 +12,6 @@ import { useAppStore } from '@/stores/app.js'
 export default {
   onLaunch() {
     // #ifdef MP-WEIXIN
-    // 微信小程序 API polyfill：替换废弃的 getSystemInfoSync
-    // uni-app vendor.js 内部调用 wx.getSystemInfoSync，用新API组合替换
-    if (typeof wx !== 'undefined' && wx.getSystemInfoSync) {
-      const deviceInfo = wx.getDeviceInfo ? wx.getDeviceInfo() : {}
-      const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : {}
-      const appBaseInfo = wx.getAppBaseInfo ? wx.getAppBaseInfo() : {}
-
-      // 组合新API返回值，模拟 getSystemInfoSync 的完整返回
-      wx.getSystemInfoSync = function() {
-        return {
-          ...deviceInfo,
-          ...windowInfo,
-          ...appBaseInfo,
-          // 兼容旧字段名（部分字段在新API中改名）
-          model: deviceInfo.model || '',
-          brand: deviceInfo.brand || '',
-          system: deviceInfo.system || '',
-          platform: deviceInfo.platform || '',
-          SDKVersion: appBaseInfo.SDKVersion || '',
-          language: appBaseInfo.language || '',
-          version: appBaseInfo.version || '',
-          windowWidth: windowInfo.windowWidth || 0,
-          windowHeight: windowInfo.windowHeight || 0,
-          statusBarHeight: windowInfo.statusBarHeight || 0,
-          safeArea: windowInfo.safeArea || {},
-          pixelRatio: windowInfo.pixelRatio || 1
-        }
-      }
-    }
-
     // 微信小程序：动态加载楷体字体
     uni.loadFontFace({
       global: true,
