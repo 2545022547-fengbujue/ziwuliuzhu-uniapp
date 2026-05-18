@@ -1,0 +1,64 @@
+diff --git a/node_modules/@dcloudio/uni-mp-weixin/dist/uni.api.esm.js b/node_modules/@dcloudio/uni-mp-weixin/dist/uni.api.esm.js
+index f51b33c..ae6d059 100644
+--- a/node_modules/@dcloudio/uni-mp-weixin/dist/uni.api.esm.js
++++ b/node_modules/@dcloudio/uni-mp-weixin/dist/uni.api.esm.js
+@@ -7,7 +7,8 @@ function getLocaleLanguage() {
+     var _a;
+     let localeLanguage = '';
+     {
+-        const appBaseInfo = ((_a = wx.getAppBaseInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || wx.getSystemInfoSync();
++        // 直接使用新API，不调用废弃的getSystemInfoSync
++        const appBaseInfo = ((_a = wx.getAppBaseInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || { language: LOCALE_EN };
+         const language = appBaseInfo && appBaseInfo.language ? appBaseInfo.language : LOCALE_EN;
+         localeLanguage = normalizeLocale(language) || LOCALE_EN;
+     }
+@@ -460,8 +461,9 @@ function checkDeviceWidth() {
+     var _a, _b;
+     let windowWidth, pixelRatio, platform;
+     {
+-        const windowInfo = ((_a = wx.getWindowInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || wx.getSystemInfoSync();
+-        const deviceInfo = ((_b = wx.getDeviceInfo) === null || _b === void 0 ? void 0 : _b.call(wx)) || wx.getSystemInfoSync();
++        // 直接使用新API，不调用废弃的getSystemInfoSync
++        const windowInfo = ((_a = wx.getWindowInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || { windowWidth: 375, pixelRatio: 2 };
++        const deviceInfo = ((_b = wx.getDeviceInfo) === null || _b === void 0 ? void 0 : _b.call(wx)) || { platform: 'android' };
+         windowWidth = windowInfo.windowWidth;
+         pixelRatio = windowInfo.pixelRatio;
+         platform = deviceInfo.platform;
+@@ -1416,18 +1418,19 @@ function createSelectorQuery() {
+     return query;
+ }
+ const wx$2 = initWx();
++// 不使用废弃API作为fallback，直接返回空对象
+ if (!wx$2.getAppBaseInfo || !wx$2.getAppBaseInfo()) {
+-    wx$2.getAppBaseInfo = wx$2.getSystemInfoSync;
++    wx$2.getAppBaseInfo = () => ({});
+ }
+ if (!wx$2.getWindowInfo || !wx$2.getWindowInfo()) {
+-    wx$2.getWindowInfo = wx$2.getSystemInfoSync;
++    wx$2.getWindowInfo = () => ({});
+ }
+ if (!wx$2.getDeviceInfo || !wx$2.getDeviceInfo()) {
+-    wx$2.getDeviceInfo = wx$2.getSystemInfoSync;
++    wx$2.getDeviceInfo = () => ({});
+ }
+ let baseInfo = wx$2.getAppBaseInfo && wx$2.getAppBaseInfo();
+ if (!baseInfo) {
+-    baseInfo = wx$2.getSystemInfoSync();
++    baseInfo = {};
+ }
+ const host = baseInfo ? baseInfo.host : null;
+ const shareVideoMessage = host && host.env === 'SAAASDK'
+diff --git a/node_modules/@dcloudio/uni-mp-weixin/dist/uni.mp.esm.js b/node_modules/@dcloudio/uni-mp-weixin/dist/uni.mp.esm.js
+index 19ea174..da993a7 100644
+--- a/node_modules/@dcloudio/uni-mp-weixin/dist/uni.mp.esm.js
++++ b/node_modules/@dcloudio/uni-mp-weixin/dist/uni.mp.esm.js
+@@ -98,7 +98,8 @@ function getLocaleLanguage() {
+     var _a;
+     let localeLanguage = '';
+     {
+-        const appBaseInfo = ((_a = wx.getAppBaseInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || wx.getSystemInfoSync();
++        // 直接使用新API，不调用废弃的getSystemInfoSync
++        const appBaseInfo = ((_a = wx.getAppBaseInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || { language: LOCALE_EN };
+         const language = appBaseInfo && appBaseInfo.language ? appBaseInfo.language : LOCALE_EN;
+         localeLanguage = normalizeLocale(language) || LOCALE_EN;
+     }
