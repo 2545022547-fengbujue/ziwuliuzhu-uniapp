@@ -9,8 +9,22 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# 开发文档
-国内镜像源使用教程.md
-子午流注uniapp-快速入门.md
-子午流注uniapp-全量打包.md
-子午流注uniapp-核心逻辑.md
+# Development tools
+/.cache/
+/.config/
+.vscode/
+.idea/
+
+# Build artifacts
+tests/
+patches/
+*.vbs
+*.txt
+
+# Documentation (AI-generated, internal)
+DEV-*.md
+CHANGELOG.md
+*教程.md
+*指南.md
+*打包.md
+*核心逻辑.md
