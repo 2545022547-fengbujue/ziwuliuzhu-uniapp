@@ -46,17 +46,17 @@
 }
 
 .theme-celadon {
-  --theme-primary: #2F7D73;
-  --theme-primary-dark: #225E58;
-  --theme-secondary: #7A9B63;
-  --theme-bg: #EEF7F2;
-  --theme-surface: #FDFEFA;
-  --theme-surface-muted: #E3F0EA;
-  --theme-text: #17332F;
-  --theme-text-secondary: #526861;
-  --theme-text-hint: #71827B;
-  --theme-border: rgba(47, 125, 115, 0.14);
-  --theme-shadow: rgba(47, 125, 115, 0.10);
+  --theme-primary: #2F7D73;           /* 青瓷主色 */
+  --theme-primary-dark: #225E58;      /* 深青 */
+  --theme-secondary: #789262;         /* 竹青 - 点缀色 */
+  --theme-bg: #E8F4EC;                /* 青瓷釉面底色 - 更柔和 */
+  --theme-surface: #F5FAF7;           /* 卡片底色 - 温润白 */
+  --theme-surface-muted: #DCF0E4;     /* 次背景 - 淡青 */
+  --theme-text: #14302C;              /* 主文字 - 深青 */
+  --theme-text-secondary: #4A635D;    /* 次文字 */
+  --theme-text-hint: #85A097;         /* 提示文字 - 提亮 */
+  --theme-border: rgba(47, 125, 115, 0.18);
+  --theme-shadow: rgba(47, 125, 115, 0.12);
 }
 
 .theme-vermilion {
@@ -460,6 +460,242 @@
 
   .disclaimer-label {
     color: #0080FF !important;
+  }
+}
+
+/*
+   celadon 主题特殊样式：青瓷温润质感
+   设计理念：宋代青瓷釉面光泽感，柔和通透
+*/
+.theme-celadon {
+  /* 导航栏标题：深色文字 */
+  .navbar-title {
+    color: #14302C !important;
+    font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', serif;
+  }
+
+  /* 导航栏：青瓷渐变 */
+  .navbar {
+    background: linear-gradient(180deg, #E8F4EC 0%, #F0F8F4 100%) !important;
+    border-bottom: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+  }
+
+  /* 卡片：温润青瓷质感 + 柔和阴影 */
+  .ganzhi-card,
+  .result-panel,
+  .setting-card,
+  .method-card,
+  .desc-card,
+  .info-card,
+  .popup,
+  .confirm-popup,
+  .fullscreen-panel {
+    background: linear-gradient(135deg, #F5FAF7 0%, #F0F6F2 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+    box-shadow:
+      0 4rpx 16rpx rgba(47, 125, 115, 0.08),
+      0 1rpx 4rpx rgba(255, 255, 255, 0.60) inset !important;  /* 内阴影模拟釉面光泽 */
+  }
+
+  /* 方法切换栏：通透感 */
+  .method-tabs {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.90) 0%, rgba(240, 248, 244, 0.95) 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.15) !important;
+  }
+
+  /* 结果面板头部：浅色青瓷渐变 + 深色标题 */
+  .panel-header {
+    background: linear-gradient(180deg, rgba(47, 125, 115, 0.25) 0%, rgba(47, 125, 115, 0.15) 100%) !important;
+    border-bottom: 1rpx solid rgba(47, 125, 115, 0.35) !important;
+  }
+
+  .header-title,
+  .header-icon {
+    color: #2F7D73 !important;
+  }
+
+  /* 切换容器 */
+  .ganzhi-toggle,
+  .nazi-mode-switch {
+    background: linear-gradient(180deg, #F0F6F2 0%, #E8F4EC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .toggle-btn,
+  .switch-option {
+    background: transparent !important;
+  }
+
+  /* 未激活的方法名字：深青色 */
+  .method-tab:not(.active) .method-name {
+    color: #4A635D !important;
+  }
+
+  .method-tab:not(.active) .method-icon {
+    color: #2F7D73 !important;
+  }
+
+  .method-tab.active {
+    .method-icon,
+    .method-name {
+      color: #FFFFFF !important;
+    }
+  }
+
+  .toggle-btn.active {
+    .toggle-text {
+      color: #FFFFFF !important;
+    }
+  }
+
+  .theme-option.active {
+    background: rgba(47, 125, 115, 0.12) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.40) !important;
+  }
+
+  /* Switch开关：青瓷风格 */
+  switch .uni-switch-input,
+  .uni-switch-input {
+    background-color: #DCF0E4 !important;
+    border-color: rgba(47, 125, 115, 0.30) !important;
+  }
+
+  switch .uni-switch-input::before,
+  .uni-switch-input::before {
+    background-color: #DCF0E4 !important;
+  }
+
+  switch .uni-switch-input::after,
+  .uni-switch-input::after {
+    background-color: #2F7D73 !important;
+    box-shadow: 0 0 0 1rpx rgba(47, 125, 115, 0.25) !important;
+  }
+
+  /* 穴位详情弹窗胶囊 */
+  .info-item,
+  .location-box,
+  .method-item {
+    background: linear-gradient(135deg, #DCF0E4 0%, #D0E8DC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+  }
+
+  /* 手动模式选择器 */
+  .manual-controls {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 248, 244, 0.98) 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .picker-btn {
+    background: linear-gradient(135deg, #DCF0E4 0%, #D0E8DC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.30) !important;
+  }
+
+  .year-nav-btn {
+    background: #DCF0E4 !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .year-nav-icon {
+    color: #2F7D73 !important;
+  }
+
+  .picker-btn text {
+    color: #14302C !important;
+  }
+
+  .control-label {
+    color: #2F7D73 !important;
+  }
+
+  /* 穴位按钮 */
+  .point-btn {
+    background: linear-gradient(135deg, #DCF0E4 0%, #D0E8DC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  /* 干支标签 */
+  .ganzhi-tag-item {
+    background: linear-gradient(135deg, #DCF0E4 0%, #D0E8DC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .result-ganzhi-hour-tag {
+    background: linear-gradient(135deg, #DCF0E4 0%, #D0E8DC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+  }
+
+  /* 穴位弹窗标题区域 */
+  .header-icon-wrap {
+    background: rgba(47, 125, 115, 0.10) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.35) !important;
+  }
+
+  .close-btn {
+    background: #DCF0E4 !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .close-icon {
+    color: #2F7D73 !important;
+  }
+
+  /* 其他元素 */
+  .province-cities,
+  .tag-primary,
+  .bumu-tip,
+  .nazi-bumu-tip,
+  .confirm-cancel,
+  .theme-current,
+  .info-item {
+    background: linear-gradient(135deg, #DCF0E4 0%, #D0E8DC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+  }
+
+  .bumu-tip-icon,
+  .bumu-tip-text {
+    color: #14302C !important;
+  }
+
+  /* 补泻建议区域 */
+  .suggestion-box {
+    background: rgba(47, 125, 115, 0.08) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  /* 九宫信息 */
+  .palace-box {
+    background: rgba(47, 125, 115, 0.06) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+  }
+
+  /* 纳子法补母泻子说明文字 */
+  .nazi-bumu-tip-text {
+    color: #14302C !important;
+  }
+
+  /* 设置页全屏弹窗 */
+  .fullscreen-overlay {
+    background: linear-gradient(180deg, #E8F4EC 0%, #F0F6F2 100%) !important;
+  }
+
+  /* 免责声明卡片 */
+  .disclaimer-card {
+    background: rgba(47, 125, 115, 0.08) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .disclaimer-label {
+    color: #2F7D73 !important;
+  }
+
+  /* 禁止状态 */
+  .point-btn.disabled {
+    background: #E3E8E5 !important;
+    border-color: rgba(47, 125, 115, 0.15) !important;
+  }
+
+  .point-btn.disabled .point-name {
+    color: #85A097 !important;
   }
 }
 /* #endif */

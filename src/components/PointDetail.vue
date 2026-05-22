@@ -135,12 +135,11 @@ const naziBumuTip = computed(() => {
 
 /**
  * 格式化穴位类别
- * 有五行属性时：顿号改空格（"井穴、输穴" → "井穴 输穴"，配合横向布局）
- * 无五行属性时：顿号改逗号（"络穴、八脉交会穴" → "络穴，八脉交会穴"）
+ * 顿号统一改为空格分隔（"井穴、输穴" → "井穴 输穴"）
  */
 function formatCategory(category, wuxing) {
   if (!category) return ''
-  return category.replace(/、/g, wuxing ? ' ' : '，')
+  return category.replace(/、/g, ' ')
 }
 
 function handleClose() {
@@ -446,17 +445,18 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 /* === 纳子法补母泻子说明 === */
 .nazi-bumu-tip {
-  padding: 12px;
-  margin-bottom: 12px;
-  background: rgba(46, 139, 87, 0.05);
-  border-radius: 10px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx;
+  background: rgba($tcm-text, 0.04);
+  border-radius: 14rpx;
+  margin-top: $spacing-md;
 }
 
 .nazi-bumu-tip-text {
-  font-size: 12px;
-  color: rgba(46, 139, 87, 0.6);
-  line-height: 1.6;
-  font-family: $font-songti;
+  font-size: 24rpx;
+  color: $tcm-text-hint;
 }
 </style>
