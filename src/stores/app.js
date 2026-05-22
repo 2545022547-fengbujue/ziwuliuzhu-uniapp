@@ -53,9 +53,9 @@ const THEME_CHROME = {
     settingSelectedIconPath: '/static/tabbar/setting-active.png'
   },
   ink: {
-    backgroundColor: '#17140F',
-    color: '#9B927F',
-    selectedColor: '#D6A85A',
+    backgroundColor: '#000000',
+    color: '#9B9B9B',
+    selectedColor: '#0080FF',
     borderStyle: 'black',
     homeSelectedIconPath: '/static/tabbar/home-active-ink.png',
     settingSelectedIconPath: '/static/tabbar/setting-active-ink.png'
@@ -196,7 +196,7 @@ export const useAppStore = defineStore('app', () => {
   })
 
   const themeSwitchColor = computed(() => {
-    return activeTheme.value === 'ink' ? '#2A2419' : themePrimaryColor.value
+    return themePrimaryColor.value
   })
 
   // 自动模式下用于展示的有效时间；开启真太阳时时为校正后的时间
