@@ -42,8 +42,11 @@ export default {
     // App端 / H5：@font-face 在 styles/index.scss 中已配置（APP-PLUS）
     // #endif
 
-    // #ifdef APP-PLUS
+    // 初始化主题 tabBar（所有平台）
     const store = useAppStore()
+    store.applyThemeChrome()
+
+    // #ifdef APP-PLUS
     store.syncSystemThemeFromDevice()
     try {
       uni.onThemeChange((res) => {
@@ -56,7 +59,9 @@ export default {
   },
   onShow() {
     // #ifdef APP-PLUS
-    useAppStore().syncSystemThemeFromDevice()
+    const store = useAppStore()
+    store.syncSystemThemeFromDevice()
+    store.applyThemeChrome()
     // #endif
   },
   onHide() {}

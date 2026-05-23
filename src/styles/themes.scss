@@ -228,6 +228,13 @@
   }
 }
 
+/* vermilion 主题特殊样式：朱砂丹霞，穴位名称用红色 */
+.theme-vermilion {
+  .point-name {
+    color: #B83A2E !important;
+  }
+}
+
 /*
    ink 主题特殊样式：OLED纯黑 + 磨砂玻璃效果
    基于 UI/UX Pro Max skill 数据库的专业设计规范
@@ -246,6 +253,11 @@
     border-bottom: 1rpx solid rgba(255, 255, 255, 0.15) !important;
   }
 
+  /* 导航栏标题：宋体 */
+  .navbar-title {
+    font-family: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif !important;
+  }
+
   /* 磨砂玻璃卡片：backdrop-filter blur + rgba背景 + 高对比度边框 */
   .ganzhi-card,
   .result-panel,
@@ -261,6 +273,22 @@
     -webkit-backdrop-filter: blur(15px) !important;
     border: 1rpx solid rgba(255, 255, 255, 0.35) !important;
     box-shadow: 0 8rpx 32rpx rgba(0, 128, 255, 0.08) !important;
+  }
+
+  /* 确认弹窗额外样式 */
+  .confirm-popup {
+    background: rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+  }
+
+  .confirm-info {
+    border-bottom-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .confirm-value {
+    background: rgba(0, 128, 255, 0.15) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.35) !important;
   }
 
   /* 方法切换栏：磨砂玻璃 */
@@ -425,6 +453,10 @@
     border: 1rpx solid rgba(255, 255, 255, 0.35) !important;
   }
 
+  .tag-primary text {
+    color: #FFFFFF !important;
+  }
+
   .bumu-tip-icon,
   .bumu-tip-text {
     color: #FFFFFF !important;
@@ -460,6 +492,23 @@
 
   .disclaimer-label {
     color: #0080FF !important;
+  }
+
+  /* 手动查询确认弹窗 */
+  .confirm-title {
+    color: #0080FF !important;
+  }
+
+  .confirm-label {
+    color: #FFFFFF !important;
+  }
+
+  .confirm-value {
+    color: #0080FF !important;
+  }
+
+  .confirm-cancel text {
+    color: #E0E0E0 !important;
   }
 }
 

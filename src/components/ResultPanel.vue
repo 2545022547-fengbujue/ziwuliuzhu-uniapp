@@ -246,6 +246,7 @@ const showClosedWarning = computed(() => {
 })
 
 // 补母泻子法4个穴位的渲染数据（与六十六穴统一用 points-grid 展示）
+// 按名字字数排序：两字在前、三字在后
 const bumuPoints = computed(() => {
   const r = result.value
   if (!r) return []
@@ -254,7 +255,7 @@ const bumuPoints = computed(() => {
   if (r.yuanPoint) items.push({ point: r.yuanPoint })
   if (r.muPoint) items.push({ point: r.muPoint })
   if (r.ziPoint) items.push({ point: r.ziPoint })
-  return items
+  return items.sort((a, b) => (a.point?.name?.length || 0) - (b.point?.name?.length || 0))
 })
 
 // 穴位显示列表：纳子法按名字字数排序（两字在前、三字在后），其他方法不变
@@ -485,6 +486,7 @@ function handlePointClick(point) {
 .wuxing-text {
   font-size: $font-size-xs;
   font-weight: 500;
+  font-family: 'WenYuanSerifSC-Bold', 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 /* === 经络行 === */
@@ -500,6 +502,7 @@ function handlePointClick(point) {
   padding: 6rpx 16rpx;
   background: rgba($tcm-primary, 0.08);
   border-radius: $radius-sm;
+  border: 1rpx solid transparent;
   font-size: $font-size-xs;
   color: $tcm-primary;
 }
@@ -507,7 +510,7 @@ function handlePointClick(point) {
 /* === 九宫信息 === */
 .palace-box {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: $spacing-sm;
   padding: $spacing-md;
   margin-bottom: $spacing-md;

@@ -37,7 +37,7 @@ import { APP_CONFIG } from '@/config/index.js'
 const THEME_OPTIONS = [
   { id: 'classic', name: '古典宣纸', desc: '温润沉稳，经典默认风格' },
   // #ifdef H5 || APP-PLUS
-  { id: 'ink', name: '玄黑金篆', desc: '黑金低亮，适合夜间查看' },
+  { id: 'ink', name: '暗夜幽光', desc: '深邃静谧，适合夜间使用' },
   { id: 'celadon', name: '青瓷天青', desc: '清润舒展，适合白天使用' },
   { id: 'vermilion', name: '朱砂丹霞', desc: '温暖醒目，适合重点查阅' }
   // #endif
@@ -305,6 +305,7 @@ export const useAppStore = defineStore('app', () => {
     if (!chrome) return
     try {
       const { homeSelectedIconPath, settingSelectedIconPath, ...style } = chrome
+      console.log('[applyThemeChrome] activeTheme:', activeTheme.value, 'iconPath:', homeSelectedIconPath)
       uni.setTabBarStyle(style)
       uni.setTabBarItem({
         index: 0,
@@ -316,8 +317,9 @@ export const useAppStore = defineStore('app', () => {
         iconPath: '/static/tabbar/setting.png',
         selectedIconPath: settingSelectedIconPath
       })
-    } catch {
-      // 非 tabBar 页面或不支持的平台忽略，页面主题仍由 CSS class 生效。
+      console.log('[applyThemeChrome] setTabBarItem done')
+    } catch (e) {
+      console.warn('[applyThemeChrome] error:', e)
     }
   }
 

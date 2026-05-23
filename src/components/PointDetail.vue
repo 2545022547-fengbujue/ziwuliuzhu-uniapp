@@ -38,15 +38,15 @@
           <view class="info-grid" :class="{ 'info-grid-center': !point?.wuxing }">
             <view class="info-item">
               <text class="info-label">所属经络</text>
-              <text class="info-value info-value-center">{{ point?.meridian || '-' }}</text>
+              <text class="info-value info-value-center" :class="{ 'info-value-bold': isCategoryLong }">{{ point?.meridian || '-' }}</text>
             </view>
             <view class="info-item">
               <text class="info-label">穴位类别</text>
-              <text class="info-value info-value-center">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
+              <text class="info-value info-value-center info-value-large">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
             </view>
             <view v-if="point?.wuxing" class="info-item">
               <text class="info-label">五行属性</text>
-              <text class="info-value info-value-center wuxing-value" :style="{ color: getWuxingColor(point?.wuxing) }">
+              <text class="info-value info-value-center wuxing-value" :class="{ 'info-value-small': isCategoryLong }" :style="{ color: getWuxingColor(point?.wuxing) }">
                 {{ point.wuxing }}
               </text>
             </view>
@@ -131,6 +131,12 @@ const naziBumuTip = computed(() => {
   if (t === '母穴（补）') return '此穴为母穴，经脉虚证在经气方衰时取此行补法'
   if (t === '子穴（泻）') return '此穴为子穴，经脉实证在当前时辰取此行泻法'
   return ''
+})
+
+// 穴位类别文字是否较长（超过6个字符会换行成两行）
+const isCategoryLong = computed(() => {
+  const category = point.value?.category || ''
+  return category.replace(/、/g, ' ').length > 6
 })
 
 /**
@@ -324,6 +330,8 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   border-radius: 12px;
   box-sizing: border-box;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .info-label {
@@ -335,12 +343,28 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 .info-value {
-  display: block;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
   font-size: 14px;
   font-weight: 500;
   color: var(--theme-text);
   word-break: keep-all;
   font-family: 'WenYuanSerifSC-Bold', 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
+}
+
+.info-value-bold {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.info-value-large {
+  font-size: 15px;
+}
+
+.info-value-small {
+  font-size: 13px;
 }
 
 .info-value-center {

@@ -784,6 +784,7 @@ onBackPress(() => {
 .confirm-info {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 16rpx 0;
   border-bottom: 1rpx solid rgba($tcm-primary, 0.06);
 }
@@ -794,6 +795,9 @@ onBackPress(() => {
 }
 
 .confirm-value {
+  padding: 8rpx 20rpx;
+  background: rgba($tcm-primary, 0.08);
+  border-radius: 12rpx;
   font-size: $font-size-sm;
   color: $tcm-text;
   font-weight: 500;

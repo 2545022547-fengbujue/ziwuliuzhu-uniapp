@@ -468,7 +468,7 @@ onBackPress(() => {
   }
 
   &.ink {
-    background: linear-gradient(135deg, #17140F 0%, #D6A85A 100%);
+    background: linear-gradient(135deg, #000000 0%, #0080FF 100%);
   }
 
   &.celadon {
