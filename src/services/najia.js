@@ -483,7 +483,8 @@ export function calculateFanke(ganzhi, hourIndex) {
       openPoints.push({
         ...fullPoint,
         wuxing: fankePointData.wuxing,
-        category: fankePointData.type,
+        // 使用穴位真实类别（井穴、荥穴等），而非数据表中的"气纳三焦/血归包络"等取穴规则名称
+        category: fullPoint.category || '',
         isOpen: true,
         isPair: false
       })
