@@ -70,7 +70,7 @@
         }
     },
     "mp-weixin" : {
-        "appid" : "已删除",
+        "appid" : "wx32e2d3fcf6cdb9d4",
         "setting" : {
             "urlCheck" : true,
             "es6" : true,

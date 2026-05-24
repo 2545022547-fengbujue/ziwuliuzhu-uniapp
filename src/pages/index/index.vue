@@ -41,19 +41,33 @@
         <view v-if="store.isManualMode" class="manual-controls">
           <view class="control-row">
             <text class="control-label">📅 选择日期</text>
+            <!-- #ifndef MP-WEIXIN -->
+            <view class="picker-btn" @tap="showDatePicker = true">
+              <text>{{ selectedDateStr }}</text>
+            </view>
+            <!-- #endif -->
+            <!-- #ifdef MP-WEIXIN -->
             <picker mode="date" :value="selectedDateStr" @change="onDateChange">
               <view class="picker-btn">
                 <text>{{ selectedDateStr }}</text>
               </view>
             </picker>
+            <!-- #endif -->
           </view>
           <view class="control-row">
             <text class="control-label">🕐 选择时辰</text>
+            <!-- #ifndef MP-WEIXIN -->
+            <view class="picker-btn" @tap="showTimePicker = true">
+              <text>{{ hourLabels[selectedHourIdx] }}</text>
+            </view>
+            <!-- #endif -->
+            <!-- #ifdef MP-WEIXIN -->
             <picker :range="hourLabels" :value="selectedHourIdx" @change="onHourChange">
               <view class="picker-btn">
                 <text>{{ hourLabels[selectedHourIdx] }}</text>
               </view>
             </picker>
+            <!-- #endif -->
           </view>
           <view class="query-btn" @tap="handleQuery">
             <text class="query-btn-text">🔍 查询</text>
@@ -159,6 +173,23 @@
       </view>
     </view>
 
+    <!-- #ifndef MP-WEIXIN -->
+    <!-- H5/App端日历面板 -->
+    <DatePicker
+      v-if="showDatePicker"
+      :value="selectedDateStr"
+      @change="onDatePickerChange"
+      @close="showDatePicker = false"
+    />
+    <!-- H5/App端时辰面板 -->
+    <TimePicker
+      v-if="showTimePicker"
+      :value="selectedHourIdx"
+      @change="onTimePickerChange"
+      @close="showTimePicker = false"
+    />
+    <!-- #endif -->
+
   </view>
 </template>
 
@@ -205,6 +236,10 @@ import { formatDate, getHourIndexFromDate, HOUR_OPTIONS, SHICHEN_START_HOURS } f
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
+// #ifndef MP-WEIXIN
+import DatePicker from '@/components/DatePicker.vue'
+import TimePicker from '@/components/TimePicker.vue'
+// #endif
 
 
 const store = useAppStore()
@@ -252,6 +287,10 @@ const selectedDateStr = ref(formatDate(new Date()))  // 手动模式选择的日
 const selectedHourIdx = ref(0)                         // 手动模式选择的时辰索引（待确认）
 const hourLabels = HOUR_OPTIONS.map(h => h.label)      // 时辰下拉选项标签（"子时 23:00-01:00"）
 const showQueryConfirm = ref(false)                    // 是否显示查询确认弹窗
+// #ifndef MP-WEIXIN
+const showDatePicker = ref(false)                     // H5/App端日历面板
+const showTimePicker = ref(false)                     // H5/App端时辰面板
+// #endif
 // 已确认的查询参数（用于显示时间和干支，确认后才更新）
 const confirmedDateStr = ref('')
 const confirmedHourIdx = ref(-1)
@@ -294,6 +333,18 @@ function switchToManual() {
 function onDateChange(e) {
   selectedDateStr.value = e.detail.value
 }
+
+// #ifndef MP-WEIXIN
+/** H5/App端日历面板选择回调 */
+function onDatePickerChange(dateStr) {
+  selectedDateStr.value = dateStr
+}
+
+/** H5/App端时辰面板选择回调 */
+function onTimePickerChange(hourIdx) {
+  selectedHourIdx.value = hourIdx
+}
+// #endif
 
 /** 时辰选择器变化回调 */
 function onHourChange(e) {
@@ -368,6 +419,18 @@ function stopTimer() {
 
 /** 返回键拦截：优先拦截确认弹窗，其次拦截穴位弹窗 */
 onBackPress(() => {
+  // #ifndef MP-WEIXIN
+  // H5/App端：拦截日历面板
+  if (showDatePicker.value) {
+    showDatePicker.value = false
+    return true
+  }
+  // H5/App端：拦截时辰面板
+  if (showTimePicker.value) {
+    showTimePicker.value = false
+    return true
+  }
+  // #endif
   // 优先拦截确认弹窗的返回键
   if (showQueryConfirm.value) {
     showQueryConfirm.value = false

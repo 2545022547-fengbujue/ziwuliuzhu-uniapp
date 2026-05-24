@@ -28,7 +28,7 @@
       <!-- 城市列表标签 -->
       <view class="city-list-header">
         <text class="city-list-label">
-          {{ searchText ? `搜索结果（${searchResults.length}个）` : `选择省份/地区（${provinces.length}个）` }}
+          {{ searchText ? `搜索结果（${searchResults.length}个）` : `选择省份/地区（34个）` }}
         </text>
       </view>
 
@@ -131,7 +131,7 @@
  *   - CSS 必须用 px 单位（不用 rpx），否则在部分设备上布局异常
  */
 import { ref, computed, nextTick, onUnmounted } from 'vue'
-import { CITIES, searchCities } from '@/data/city-coordinates.js'
+import { CITIES, searchCities, PROVINCE_ORDER } from '@/data/city-coordinates.js'
 
 const show = ref(false)
 const selectedCity = ref('')
@@ -141,26 +141,21 @@ const expandedProvinces = ref([])
 // 控制 input 聚焦状态（关键：uni-app H5 弹窗中 input 聚焦的唯一可靠方案）
 const inputFocused = ref(false)
 
-// 模块级缓存：省份分组数据在应用生命周期内不会变化
-let _provincesCache = null
+// 构建省份分组数据（按硬编码顺序）
 function buildProvinces() {
-  if (_provincesCache) return _provincesCache
   const map = {}
   CITIES.forEach(city => {
     if (!map[city.province]) map[city.province] = []
     map[city.province].push(city)
   })
-  _provincesCache = Object.entries(map)
-    .map(([name, cities]) => ({
-      name,
-      cities: cities.sort((a, b) => a.pinyin.localeCompare(b.pinyin))
-    }))
-    .sort((a, b) => {
-      if (a.name === '直辖市') return -1
-      if (b.name === '直辖市') return 1
-      return a.name.localeCompare(b.name)
-    })
-  return _provincesCache
+  // 每个省份的城市按拼音排序
+  Object.keys(map).forEach(province => {
+    map[province].sort((a, b) => a.pinyin.localeCompare(b.pinyin))
+  })
+  // 按硬编码顺序排列省份
+  return PROVINCE_ORDER
+    .filter(name => map[name]) // 只保留数据中存在的省份
+    .map(name => ({ name, cities: map[name] }))
 }
 
 const provinces = computed(() => buildProvinces())
