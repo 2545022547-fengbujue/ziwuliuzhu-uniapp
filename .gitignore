@@ -20,6 +20,9 @@ tests/
 patches/
 *.vbs
 *.txt
+# 字库和base64文件需要跟踪
+!src/assets/fonts/chars_*.txt
+!src/assets/fonts/*-base64.txt
 
 # Documentation (AI-generated, internal)
 DEV-*.md

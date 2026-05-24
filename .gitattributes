@@ -1,0 +1,21 @@
+# 源码文件统一使用 LF 换行符（避免 Windows 上 CRLF 警告）
+*.vue text eol=lf
+*.js text eol=lf
+*.scss text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.py text eol=lf
+*.ts text eol=lf
+*.html text eol=lf
+
+# 文本文件使用 CRLF（Windows 友好）
+*.md text eol=crlf
+*.txt text eol=crlf
+
+# 二进制文件（不换行）
+*.ttf binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.woff binary
+*.woff2 binary
