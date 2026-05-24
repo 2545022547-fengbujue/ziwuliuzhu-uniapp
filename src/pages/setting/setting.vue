@@ -463,19 +463,19 @@ onBackPress(() => {
   border-radius: 50%;
   flex-shrink: 0;
 
-  &.classic {
+  &.yellow {
     background: linear-gradient(135deg, #8B4513 0%, #FFFDF5 100%);
   }
 
-  &.ink {
+  &.black {
     background: linear-gradient(135deg, #000000 0%, #0080FF 100%);
   }
 
-  &.celadon {
+  &.green {
     background: linear-gradient(135deg, #2F7D73 0%, #F7FBF8 100%);
   }
 
-  &.vermilion {
+  &.red {
     background: linear-gradient(135deg, #B83A2E 0%, #FFF1E5 100%);
   }
 }

@@ -1,15 +1,15 @@
 /* ============================================
    运行时主题
 
-   classic 保留现有编译期 SCSS 主题；额外主题用页面根节点 class 覆盖高频色彩。
+   yellow 保留现有编译期 SCSS 主题；额外主题用页面根节点 class 覆盖高频色彩。
 
-   ink 主题基于 UI/UX Pro Max skill 数据：
+   black 主题基于 UI/UX Pro Max skill 数据：
    - Dark Mode (OLED): 纯黑 #000000, 文字 #FFFFFF, 对比度 7:1+
    - Glassmorphism: backdrop-filter blur(15px), rgba背景, 高对比度边框
    ============================================ */
 @use 'variables' as *;
 
-.theme-classic {
+.theme-yellow {
   --theme-primary: #8B4513;
   --theme-primary-dark: #6B3410;
   --theme-secondary: #5B8C3E;
@@ -25,12 +25,12 @@
 
 /* #ifndef MP-WEIXIN */
 /*
-   ink 主题：OLED纯黑 + 磨砂玻璃效果
+   black 主题：OLED纯黑 + 磨砂玻璃效果
    基于 UI/UX Pro Max skill:
    - Dark Mode OLED: #000000 背景, 7:1+ 对比度
    - Glassmorphism: blur 15px, rgba(0,0,0, 0.25) 背景, rgba(255,255,255, 0.35) 边框
 */
-.theme-ink {
+.theme-black {
   /* OLED 纯黑背景 */
   --theme-primary: #0080FF;           /* 电蓝色 - UI/UX Pro Max Glassmorphism 推荐 */
   --theme-primary-dark: #0066CC;
@@ -45,7 +45,7 @@
   --theme-shadow: rgba(0, 128, 255, 0.12);
 }
 
-.theme-celadon {
+.theme-green {
   --theme-primary: #2F7D73;           /* 青瓷主色 */
   --theme-primary-dark: #225E58;      /* 深青 */
   --theme-secondary: #789262;         /* 竹青 - 点缀色 */
@@ -59,7 +59,7 @@
   --theme-shadow: rgba(47, 125, 115, 0.12);
 }
 
-.theme-vermilion {
+.theme-red {
   --theme-primary: #B83A2E;
   --theme-primary-dark: #8F2A22;
   --theme-secondary: #C8893D;
@@ -73,9 +73,9 @@
   --theme-shadow: rgba(184, 58, 46, 0.10);
 }
 
-.theme-ink,
-.theme-celadon,
-.theme-vermilion {
+.theme-black,
+.theme-green,
+.theme-red {
   background-color: var(--theme-bg) !important;
   color: var(--theme-text) !important;
 
@@ -228,18 +228,18 @@
   }
 }
 
-/* vermilion 主题特殊样式：朱砂丹霞，穴位名称用红色 */
-.theme-vermilion {
+/* red 主题特殊样式：朱砂丹霞，穴位名称用红色 */
+.theme-red {
   .point-name {
     color: #B83A2E !important;
   }
 }
 
 /*
-   ink 主题特殊样式：OLED纯黑 + 磨砂玻璃效果
+   black 主题特殊样式：OLED纯黑 + 磨砂玻璃效果
    基于 UI/UX Pro Max skill 数据库的专业设计规范
 */
-.theme-ink {
+.theme-black {
   /* 警告框 */
   .warning-box,
   .caution-box {
@@ -513,10 +513,10 @@
 }
 
 /*
-   celadon 主题特殊样式：青瓷温润质感
+   green 主题特殊样式：青瓷温润质感
    设计理念：宋代青瓷釉面光泽感，柔和通透
 */
-.theme-celadon {
+.theme-green {
   /* 导航栏标题：深色文字 */
   .navbar-title {
     color: #14302C !important;

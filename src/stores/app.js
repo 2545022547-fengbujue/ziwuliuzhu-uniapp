@@ -35,16 +35,16 @@ import { getHourIndexFromDate } from '@/utils/date.js'
 import { APP_CONFIG } from '@/config/index.js'
 
 const THEME_OPTIONS = [
-  { id: 'classic', name: '古典宣纸', desc: '温润沉稳，经典默认风格' },
+  { id: 'yellow', name: '古典宣纸', desc: '温润沉稳，经典默认风格' },
   // #ifdef H5 || APP-PLUS
-  { id: 'ink', name: '暗夜幽光', desc: '深邃静谧，适合夜间使用' },
-  { id: 'celadon', name: '青瓷天青', desc: '清润舒展，适合白天使用' },
-  { id: 'vermilion', name: '朱砂丹霞', desc: '温暖醒目，适合重点查阅' }
+  { id: 'black', name: '暗夜幽光', desc: '深邃静谧，适合夜间使用' },
+  { id: 'green', name: '青瓷天青', desc: '清润舒展，适合白天使用' },
+  { id: 'red', name: '朱砂丹霞', desc: '温暖醒目，适合重点查阅' }
   // #endif
 ]
 
 const THEME_CHROME = {
-  classic: {
+  yellow: {
     backgroundColor: '#FFFFFF',
     color: '#999999',
     selectedColor: '#8B4513',
@@ -52,7 +52,7 @@ const THEME_CHROME = {
     homeSelectedIconPath: '/static/tabbar/home-active.png',
     settingSelectedIconPath: '/static/tabbar/setting-active.png'
   },
-  ink: {
+  black: {
     backgroundColor: '#000000',
     color: '#9B9B9B',
     selectedColor: '#0080FF',
@@ -60,7 +60,7 @@ const THEME_CHROME = {
     homeSelectedIconPath: '/static/tabbar/home-active-ink.png',
     settingSelectedIconPath: '/static/tabbar/setting-active-ink.png'
   },
-  celadon: {
+  green: {
     backgroundColor: '#F7FBF8',
     color: '#71827B',
     selectedColor: '#2F7D73',
@@ -68,7 +68,7 @@ const THEME_CHROME = {
     homeSelectedIconPath: '/static/tabbar/home-active-celadon.png',
     settingSelectedIconPath: '/static/tabbar/setting-active-celadon.png'
   },
-  vermilion: {
+  red: {
     backgroundColor: '#FFF8F2',
     color: '#8A756B',
     selectedColor: '#B83A2E',
@@ -111,7 +111,7 @@ export const useAppStore = defineStore('app', () => {
   const showDetail = ref(false)
   const selectedPoint = ref(null)
   const naziMode = ref('daily')  // 纳子法模式：'daily'(一日六十六穴) | 'bumu'(补母泻子)
-  const theme = ref('classic')
+  const theme = ref('yellow')
   const themeMode = ref('system') // App 端默认跟随系统深色；用户手选主题后变为 manual
   const systemTheme = ref('light')
 
@@ -182,9 +182,9 @@ export const useAppStore = defineStore('app', () => {
 
   const activeTheme = computed(() => {
     if (supportsSystemTheme && themeMode.value === 'system' && systemTheme.value === 'dark') {
-      return 'ink'
+      return 'black'
     }
-    return supportsThemeSwitch && isKnownTheme(theme.value) ? theme.value : 'classic'
+    return supportsThemeSwitch && isKnownTheme(theme.value) ? theme.value : 'yellow'
   })
 
   const followsSystemTheme = computed(() => {
@@ -192,7 +192,7 @@ export const useAppStore = defineStore('app', () => {
   })
 
   const themePrimaryColor = computed(() => {
-    return THEME_CHROME[activeTheme.value]?.selectedColor || THEME_CHROME.classic.selectedColor
+    return THEME_CHROME[activeTheme.value]?.selectedColor || THEME_CHROME.yellow.selectedColor
   })
 
   const themeSwitchColor = computed(() => {
@@ -260,7 +260,7 @@ export const useAppStore = defineStore('app', () => {
 
   function setTheme(nextTheme) {
     if (!supportsThemeSwitch) {
-      theme.value = 'classic'
+      theme.value = 'yellow'
       return
     }
     if (isKnownTheme(nextTheme)) {
