@@ -443,7 +443,8 @@ onShow(() => {
   startTimer()
   if (!store.isManualMode) {
     minuteTick.value++
-    store.updateCurrentTime()
+    // 页面回到前台，强制更新时间以显示最新状态
+    store.updateCurrentTime(true)
   }
 })
 
@@ -457,6 +458,7 @@ function startTimer() {
     if (!store.isManualMode) {
       minuteTick.value++
       // store 内部会按真太阳时设置计算当前时辰，避免页面使用未校正时辰。
+      // 不传 forceUpdate（默认 false），只在时辰实际变化时才更新，避免无效重算
       store.updateCurrentTime()
     }
   }, APP_CONFIG.timerInterval)

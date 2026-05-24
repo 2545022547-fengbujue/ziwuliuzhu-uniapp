@@ -211,10 +211,17 @@ export const useAppStore = defineStore('app', () => {
     return getHourIndexFromDate(effectiveDate)
   }
 
-  function updateCurrentTime() {
+  function updateCurrentTime(forceUpdate = false) {
     const now = new Date()
-    currentTime.value = now
-    currentHour.value = getEffectiveHourIndex(now)
+    const newHour = getEffectiveHourIndex(now)
+    // 定时器调用时（forceUpdate=false），只在时辰实际变化时才更新，
+    // 避免每分钟触发 currentGanZhi/results 的无效重算
+    // （2小时内可节省约 118 次 × 5种方法的重复计算）
+    // 模式切换/经度变化时（forceUpdate=true），无条件更新以确保时间准确
+    if (forceUpdate || newHour !== currentHour.value) {
+      currentTime.value = now
+      currentHour.value = newHour
+    }
   }
 
   function queryTime(date, hour) {
@@ -225,7 +232,8 @@ export const useAppStore = defineStore('app', () => {
 
   function switchToAutoMode() {
     isManualMode.value = false
-    updateCurrentTime()
+    // 切换回自动模式，强制更新时间
+    updateCurrentTime(true)
   }
 
   function switchToManualMode(date, hour) {
@@ -240,14 +248,16 @@ export const useAppStore = defineStore('app', () => {
     longitude.value = newLongitude
     useTrueSolarTime.value = true
     if (city) selectedCity.value = city
-    if (!isManualMode.value) updateCurrentTime()
+    // 经度变化可能导致时辰跳变，强制更新
+    if (!isManualMode.value) updateCurrentTime(true)
   }
 
   // 真太阳时开关变化同理：自动模式刷新时间，手动模式 computed 自动追踪 longitude/useTrueSolarTime 变化
   function toggleTrueSolarTime(enabled) {
     useTrueSolarTime.value = enabled
     if (!enabled) longitude.value = APP_CONFIG.defaultLongitude
-    if (!isManualMode.value) updateCurrentTime()
+    // 开关变化可能导致时辰跳变，强制更新
+    if (!isManualMode.value) updateCurrentTime(true)
   }
 
   function setActiveMethod(method) {
@@ -334,7 +344,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   // === 初始化 ===
-  updateCurrentTime()
+  updateCurrentTime(true)  // 强制初始化，确保首次加载时间正确
 
   return {
     // State
