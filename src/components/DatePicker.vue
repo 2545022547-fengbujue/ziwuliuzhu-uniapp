@@ -75,10 +75,10 @@
       <!-- 操作按钮 -->
       <view class="action-row">
         <view class="action-btn cancel" @tap="close">
-          <text>取消</text>
+          <text class="action-btn-text">取消</text>
         </view>
         <view class="action-btn confirm" @tap="confirm">
-          <text>确定</text>
+          <text class="action-btn-text">确定</text>
         </view>
       </view>
     </view>
@@ -468,13 +468,13 @@ function confirm() {
   /* 取消按钮 */
   &.cancel {
     background: var(--theme-surface-muted);
-    text { color: var(--theme-text-secondary); }
+    .action-btn-text { color: var(--theme-text-secondary); }
   }
 
   /* 确认按钮：渐变背景 */
   &.confirm {
     background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
-    text { color: var(--theme-surface); font-weight: 600; }
+    .action-btn-text { color: var(--theme-surface); font-weight: 600; }
   }
 }
 

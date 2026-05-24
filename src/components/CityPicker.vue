@@ -178,7 +178,9 @@ function buildProvinces() {
     .map(name => ({ name, cities: map[name] }))
 }
 
-const provinces = computed(() => buildProvinces())
+// 省份数据缓存（模块级单例，只在首次加载时计算一次，避免每次打开弹窗都重新遍历 348 个城市）
+const provincesCache = buildProvinces()
+const provinces = ref(provincesCache)
 
 const searchResults = computed(() => {
   if (!searchText.value) return []

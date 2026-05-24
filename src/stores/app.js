@@ -37,7 +37,7 @@ import { APP_CONFIG } from '@/config/index.js'
 const THEME_OPTIONS = [
   { id: 'yellow', name: '古典宣纸', desc: '温润沉稳，经典默认风格' },
   // #ifdef H5 || APP-PLUS
-  { id: 'black', name: '暗夜幽光', desc: '深邃静谧，适合夜间使用' },
+  { id: 'black', name: '暗夜幽光', desc: '静谧深邃，适合夜间使用' },
   { id: 'green', name: '青瓷天青', desc: '清润舒展，适合白天使用' },
   { id: 'red', name: '朱砂丹霞', desc: '温暖醒目，适合重点查阅' }
   // #endif

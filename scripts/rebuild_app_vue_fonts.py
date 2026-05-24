@@ -15,7 +15,7 @@ FONT_DIR = PROJECT_DIR / "src/assets/fonts"
 
 # 字体文件配置
 KAITI_TTF = FONT_DIR / "kaiti-gb2312.ttf"            # 楷体（完整）
-SONGTI_TTF = FONT_DIR / "wenjinmincho-subset-v4.ttf" # 宋体常规（裁剪）
+SONGTI_TTF = FONT_DIR / "wenjinmincho-subset-v5.ttf" # 宋体常规（裁剪v5，添加"基"字）
 BOLD_TTF = FONT_DIR / "WenYuanSerifSC-Bold-subset-v2.ttf"  # 宋体粗体（裁剪）
 
 def generate_base64(ttf_path: Path) -> str:

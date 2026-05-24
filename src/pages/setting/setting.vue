@@ -42,7 +42,7 @@
           <view class="setting-row">
             <view class="setting-copy">
               <text class="setting-label">跟随系统深色模式</text>
-              <text class="setting-tip inline">系统为深色时自动使用玄黑金篆</text>
+              <text class="setting-tip inline">系统为深色时自动使用暗夜幽光</text>
             </view>
             <switch
               :checked="store.followsSystemTheme"

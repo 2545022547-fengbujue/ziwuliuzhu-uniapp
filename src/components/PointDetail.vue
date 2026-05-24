@@ -35,18 +35,18 @@
             <view class="title-dot"></view>
             <text>基本信息</text>
           </view>
-          <view class="info-grid" :class="{ 'info-grid-center': !point?.wuxing }">
+          <view class="info-grid" :class="{ 'info-grid-center': !point?.wuxing, 'info-grid-meridian-long': isMeridianLong }">
             <view class="info-item">
               <text class="info-label">所属经络</text>
-              <text class="info-value info-value-center" :class="{ 'info-value-bold': isCategoryLong }">{{ point?.meridian || '-' }}</text>
+              <text class="info-value info-value-center">{{ point?.meridian || '-' }}</text>
             </view>
             <view class="info-item">
               <text class="info-label">穴位类别</text>
-              <text class="info-value info-value-center info-value-large">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
+              <text class="info-value info-value-center">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
             </view>
             <view v-if="point?.wuxing" class="info-item">
               <text class="info-label">五行属性</text>
-              <text class="info-value info-value-center wuxing-value" :class="{ 'info-value-small': isCategoryLong }" :style="{ color: getWuxingColor(point?.wuxing) }">
+              <text class="info-value info-value-center wuxing-value" :class="{ 'wuxing-value-large': isCategoryLong }" :style="{ color: getWuxingColor(point?.wuxing) }">
                 {{ point.wuxing }}
               </text>
             </view>
@@ -137,6 +137,12 @@ const naziBumuTip = computed(() => {
 const isCategoryLong = computed(() => {
   const category = point.value?.category || ''
   return category.replace(/、/g, ' ').length > 6
+})
+
+// 经络名是否为6字且有五行属性（此时经络框变宽，五行框变窄）
+const isMeridianLong = computed(() => {
+  const meridian = point.value?.meridian || ''
+  return meridian.length === 6 && point.value?.wuxing
 })
 
 /**
@@ -322,6 +328,14 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   max-width: 48%;
 }
 
+/* 经络6字且有五行时，经络框变宽，五行框变窄 */
+.info-grid-meridian-long .info-item:first-child {
+  flex: 1.3;
+}
+.info-grid-meridian-long .info-item:last-child {
+  flex: 0.7;
+}
+
 .info-item {
   flex: 1;
   min-width: 80px;
@@ -347,24 +361,11 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   flex: 1;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--theme-text);
   word-break: keep-all;
   font-family: 'WenYuanSerifSC-Bold', 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
-}
-
-.info-value-bold {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.info-value-large {
-  font-size: 15px;
-}
-
-.info-value-small {
-  font-size: 13px;
 }
 
 .info-value-center {
@@ -372,8 +373,13 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 .wuxing-value {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
+}
+
+/* 类别文字较长时，五行属性字号放大 */
+.wuxing-value-large {
+  font-size: 18px;
 }
 
 /* === 定位 === */

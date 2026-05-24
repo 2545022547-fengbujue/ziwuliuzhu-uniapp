@@ -41,49 +41,17 @@
         <view v-if="store.isManualMode" class="manual-controls">
           <view class="control-row">
             <text class="control-label">📅 选择日期</text>
-            <!--
-              条件编译：日期选择器
-              - #ifndef MP-WEIXIN：H5 和 App 端使用自定义 DatePicker 组件（日历面板）
-              - #ifdef MP-WEIXIN：微信小程序使用原生 picker 组件（mode="date"）
-
-              原因：微信小程序原生 picker 体验更好，无需自定义组件；
-              但 H5/App 端原生 picker 样式不统一，需要自定义日历面板。
-            -->
-            <!-- #ifndef MP-WEIXIN -->
+            <!-- 三端统一使用自定义 DatePicker 日历面板 -->
             <view class="picker-btn" @tap="showDatePicker = true">
               <text>{{ selectedDateStr }}</text>
             </view>
-            <!-- #endif -->
-            <!-- #ifdef MP-WEIXIN -->
-            <picker mode="date" :value="selectedDateStr" @change="onDateChange">
-              <view class="picker-btn">
-                <text>{{ selectedDateStr }}</text>
-              </view>
-            </picker>
-            <!-- #endif -->
           </view>
           <view class="control-row">
             <text class="control-label">🕐 选择时辰</text>
-            <!--
-              条件编译：时辰选择器
-              - #ifndef MP-WEIXIN：H5 和 App 端使用自定义 TimePicker 组件（12时辰列表）
-              - #ifdef MP-WEIXIN：微信小程序使用原生 picker 组件（range 数组）
-
-              原因：微信小程序原生 picker 支持数组选项，体验足够好；
-              但 H5/App 端需要自定义列表面板，提供更好的视觉效果。
-            -->
-            <!-- #ifndef MP-WEIXIN -->
+            <!-- 三端统一使用自定义 TimePicker 时辰列表 -->
             <view class="picker-btn" @tap="showTimePicker = true">
               <text>{{ hourLabels[selectedHourIdx] }}</text>
             </view>
-            <!-- #endif -->
-            <!-- #ifdef MP-WEIXIN -->
-            <picker :range="hourLabels" :value="selectedHourIdx" @change="onHourChange">
-              <view class="picker-btn">
-                <text>{{ hourLabels[selectedHourIdx] }}</text>
-              </view>
-            </picker>
-            <!-- #endif -->
           </view>
           <view class="query-btn" @tap="handleQuery">
             <text class="query-btn-text">🔍 查询</text>
@@ -168,7 +136,7 @@
 
     <!-- 手动查询确认弹窗 -->
     <view v-if="showQueryConfirm" class="confirm-overlay" @tap="showQueryConfirm = false">
-      <view class="confirm-popup" @tap.stop>
+      <view class="confirm-popup" :class="`theme-${store.activeTheme}`" @tap.stop>
         <text class="confirm-title">确认查询</text>
         <view class="confirm-info">
           <text class="confirm-label">日期</text>
@@ -190,36 +158,26 @@
     </view>
 
     <!--
-      自定义日期/时辰选择面板（仅 H5/App 端）
-
-      条件编译说明：
-      - #ifndef MP-WEIXIN：仅在非微信小程序环境渲染这两个组件
-      - v-if：面板显示/隐藏控制，避免一直占用 DOM
+      三端统一：自定义日期/时辰选择面板（H5/微信小程序/App）
 
       组件说明：
       - DatePicker：日历面板，年份左上角、月份居中、周日最后
       - TimePicker：时辰列表，12 时辰选项、选中项高亮
-
-      事件处理：
-      - @change：确认选择时触发，更新日期/时辰值
-      - @close：关闭面板时触发，隐藏面板
     -->
-    <!-- #ifndef MP-WEIXIN -->
-    <!-- H5/App端日历面板 -->
+    <!-- 日历面板 -->
     <DatePicker
       v-if="showDatePicker"
       :value="selectedDateStr"
       @change="onDatePickerChange"
       @close="showDatePicker = false"
     />
-    <!-- H5/App端时辰面板 -->
+    <!-- 时辰面板 -->
     <TimePicker
       v-if="showTimePicker"
       :value="selectedHourIdx"
       @change="onTimePickerChange"
       @close="showTimePicker = false"
     />
-    <!-- #endif -->
 
   </view>
 </template>
@@ -267,21 +225,9 @@ import { formatDate, getHourIndexFromDate, HOUR_OPTIONS, SHICHEN_START_HOURS } f
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
-/*
-  条件编译：自定义日期/时辰选择器组件导入
-
-  说明：
-  - #ifndef MP-WEIXIN：仅在 H5 和 App 端导入这两个组件
-  - 微信小程序使用原生 picker 组件，无需导入自定义组件
-
-  原因：
-  - 微信小程序原生 picker 体验足够好，直接使用 mode="date" 和 range 数组
-  - H5/App 端原生 picker 样式不统一，需要自定义日历面板和时辰列表面板
-*/
-// #ifndef MP-WEIXIN
+// 三端统一使用自定义日期/时辰选择器
 import DatePicker from '@/components/DatePicker.vue'  // 日历面板（年份左上角、月份居中）
 import TimePicker from '@/components/TimePicker.vue'  // 时辰列表（12时辰选项）
-// #endif
 
 
 const store = useAppStore()
@@ -330,20 +276,15 @@ const selectedHourIdx = ref(0)                         // 手动模式选择的�
 const hourLabels = HOUR_OPTIONS.map(h => h.label)      // 时辰下拉选项标签（"子时 23:00-01:00"）
 const showQueryConfirm = ref(false)                    // 是否显示查询确认弹窗
 /*
-  条件编译：自定义选择器面板显示状态
+  自定义选择器面板显示状态
 
   说明：
-  - #ifndef MP-WEIXIN：仅在 H5 和 App 端定义这两个状态变量
-  - 微信小程序使用原生 picker，无需这些状态变量
-
-  用法：
+  - 三端（H5/微信小程序/App）统一使用
   - 点击日期/时辰按钮 → 设置为 true → 显示面板
   - 面板关闭时设置为 false
 */
-// #ifndef MP-WEIXIN
-const showDatePicker = ref(false)                     // H5/App端日历面板显示状态
-const showTimePicker = ref(false)                     // H5/App端时辰面板显示状态
-// #endif
+const showDatePicker = ref(false)                     // 日历面板显示状态
+const showTimePicker = ref(false)                     // 时辰面板显示状态
 // 已确认的查询参数（用于显示时间和干支，确认后才更新）
 const confirmedDateStr = ref('')
 const confirmedHourIdx = ref(-1)
@@ -382,26 +323,14 @@ function switchToManual() {
   store.switchToManualMode(now, hourIdx)
 }
 
-/** 日期选择器变化回调 */
-function onDateChange(e) {
-  selectedDateStr.value = e.detail.value
-}
-
-// #ifndef MP-WEIXIN
-/** H5/App端日历面板选择回调 */
+/** 日期选择面板回调（三端统一使用） */
 function onDatePickerChange(dateStr) {
   selectedDateStr.value = dateStr
 }
 
-/** H5/App端时辰面板选择回调 */
+/** 时辰面板回调（三端统一使用） */
 function onTimePickerChange(hourIdx) {
   selectedHourIdx.value = hourIdx
-}
-// #endif
-
-/** 时辰选择器变化回调 */
-function onHourChange(e) {
-  selectedHourIdx.value = Number(e.detail.value)
 }
 
 /** 手动查询：弹出确认弹窗 */
@@ -474,18 +403,16 @@ function stopTimer() {
 
 /** 返回键拦截：优先拦截确认弹窗，其次拦截穴位弹窗 */
 onBackPress(() => {
-  // #ifndef MP-WEIXIN
-  // H5/App端：拦截日历面板
+  // 拦截日历面板
   if (showDatePicker.value) {
     showDatePicker.value = false
     return true
   }
-  // H5/App端：拦截时辰面板
+  // 拦截时辰面板
   if (showTimePicker.value) {
     showTimePicker.value = false
     return true
   }
-  // #endif
   // 优先拦截确认弹窗的返回键
   if (showQueryConfirm.value) {
     showQueryConfirm.value = false
@@ -884,17 +811,17 @@ onBackPress(() => {
 
 .confirm-popup {
   width: 75%;
-  background: #FFFDF5;
+  background: var(--theme-surface);
   border-radius: 28rpx;
   padding: 48rpx 40rpx;
-  box-shadow: 0 8rpx 30rpx rgba(0, 0, 0, 0.18);
+  box-shadow: 0 8rpx 30rpx var(--theme-shadow);
 }
 
 .confirm-title {
   display: block;
   font-size: 36rpx;
   font-weight: 700;
-  color: $tcm-primary;
+  color: var(--theme-primary);
   text-align: center;
   margin-bottom: 36rpx;
 }
@@ -904,20 +831,20 @@ onBackPress(() => {
   justify-content: space-between;
   align-items: center;
   padding: 16rpx 0;
-  border-bottom: 1rpx solid rgba($tcm-primary, 0.06);
+  border-bottom: 1rpx solid var(--theme-border);
 }
 
 .confirm-label {
   font-size: $font-size-sm;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint);
 }
 
 .confirm-value {
   padding: 8rpx 20rpx;
-  background: rgba($tcm-primary, 0.08);
+  background: var(--theme-surface-muted);
   border-radius: 12rpx;
   font-size: $font-size-sm;
-  color: $tcm-text;
+  color: var(--theme-text);
   font-weight: 500;
 }
 
@@ -930,22 +857,29 @@ onBackPress(() => {
 .confirm-cancel {
   flex: 1;
   padding: 24rpx 0;
-  background: $tcm-bg;
+  background: var(--theme-surface-muted);
   border-radius: 20rpx;
   text-align: center;
   font-size: $font-size-sm;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary);
 }
 
 .confirm-ok {
   flex: 1;
   padding: 24rpx 0;
-  background: linear-gradient(135deg, $tcm-primary 0%, $tcm-primary-dark 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
   border-radius: 20rpx;
   text-align: center;
   font-size: $font-size-sm;
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 4rpx 16rpx rgba(139, 69, 19, 0.2);
 }
+
+/* 暗夜幽光主题特殊样式 */
+.theme-black .confirm-popup {
+  /* #ifdef MP-WEIXIN */
+  background: rgba(0, 0, 0, 0.5);
+  /* #endif */
+}
+
 </style>
