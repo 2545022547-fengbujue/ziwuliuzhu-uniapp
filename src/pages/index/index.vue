@@ -41,6 +41,14 @@
         <view v-if="store.isManualMode" class="manual-controls">
           <view class="control-row">
             <text class="control-label">📅 选择日期</text>
+            <!--
+              条件编译：日期选择器
+              - #ifndef MP-WEIXIN：H5 和 App 端使用自定义 DatePicker 组件（日历面板）
+              - #ifdef MP-WEIXIN：微信小程序使用原生 picker 组件（mode="date"）
+
+              原因：微信小程序原生 picker 体验更好，无需自定义组件；
+              但 H5/App 端原生 picker 样式不统一，需要自定义日历面板。
+            -->
             <!-- #ifndef MP-WEIXIN -->
             <view class="picker-btn" @tap="showDatePicker = true">
               <text>{{ selectedDateStr }}</text>
@@ -56,6 +64,14 @@
           </view>
           <view class="control-row">
             <text class="control-label">🕐 选择时辰</text>
+            <!--
+              条件编译：时辰选择器
+              - #ifndef MP-WEIXIN：H5 和 App 端使用自定义 TimePicker 组件（12时辰列表）
+              - #ifdef MP-WEIXIN：微信小程序使用原生 picker 组件（range 数组）
+
+              原因：微信小程序原生 picker 支持数组选项，体验足够好；
+              但 H5/App 端需要自定义列表面板，提供更好的视觉效果。
+            -->
             <!-- #ifndef MP-WEIXIN -->
             <view class="picker-btn" @tap="showTimePicker = true">
               <text>{{ hourLabels[selectedHourIdx] }}</text>
@@ -173,6 +189,21 @@
       </view>
     </view>
 
+    <!--
+      自定义日期/时辰选择面板（仅 H5/App 端）
+
+      条件编译说明：
+      - #ifndef MP-WEIXIN：仅在非微信小程序环境渲染这两个组件
+      - v-if：面板显示/隐藏控制，避免一直占用 DOM
+
+      组件说明：
+      - DatePicker：日历面板，年份左上角、月份居中、周日最后
+      - TimePicker：时辰列表，12 时辰选项、选中项高亮
+
+      事件处理：
+      - @change：确认选择时触发，更新日期/时辰值
+      - @close：关闭面板时触发，隐藏面板
+    -->
     <!-- #ifndef MP-WEIXIN -->
     <!-- H5/App端日历面板 -->
     <DatePicker
@@ -236,9 +267,20 @@ import { formatDate, getHourIndexFromDate, HOUR_OPTIONS, SHICHEN_START_HOURS } f
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
+/*
+  条件编译：自定义日期/时辰选择器组件导入
+
+  说明：
+  - #ifndef MP-WEIXIN：仅在 H5 和 App 端导入这两个组件
+  - 微信小程序使用原生 picker 组件，无需导入自定义组件
+
+  原因：
+  - 微信小程序原生 picker 体验足够好，直接使用 mode="date" 和 range 数组
+  - H5/App 端原生 picker 样式不统一，需要自定义日历面板和时辰列表面板
+*/
 // #ifndef MP-WEIXIN
-import DatePicker from '@/components/DatePicker.vue'
-import TimePicker from '@/components/TimePicker.vue'
+import DatePicker from '@/components/DatePicker.vue'  // 日历面板（年份左上角、月份居中）
+import TimePicker from '@/components/TimePicker.vue'  // 时辰列表（12时辰选项）
 // #endif
 
 
@@ -287,9 +329,20 @@ const selectedDateStr = ref(formatDate(new Date()))  // 手动模式选择的日
 const selectedHourIdx = ref(0)                         // 手动模式选择的时辰索引（待确认）
 const hourLabels = HOUR_OPTIONS.map(h => h.label)      // 时辰下拉选项标签（"子时 23:00-01:00"）
 const showQueryConfirm = ref(false)                    // 是否显示查询确认弹窗
+/*
+  条件编译：自定义选择器面板显示状态
+
+  说明：
+  - #ifndef MP-WEIXIN：仅在 H5 和 App 端定义这两个状态变量
+  - 微信小程序使用原生 picker，无需这些状态变量
+
+  用法：
+  - 点击日期/时辰按钮 → 设置为 true → 显示面板
+  - 面板关闭时设置为 false
+*/
 // #ifndef MP-WEIXIN
-const showDatePicker = ref(false)                     // H5/App端日历面板
-const showTimePicker = ref(false)                     // H5/App端时辰面板
+const showDatePicker = ref(false)                     // H5/App端日历面板显示状态
+const showTimePicker = ref(false)                     // H5/App端时辰面板显示状态
 // #endif
 // 已确认的查询参数（用于显示时间和干支，确认后才更新）
 const confirmedDateStr = ref('')

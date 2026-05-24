@@ -141,18 +141,38 @@ const expandedProvinces = ref([])
 // 控制 input 聚焦状态（关键：uni-app H5 弹窗中 input 聚焦的唯一可靠方案）
 const inputFocused = ref(false)
 
-// 构建省份分组数据（按硬编码顺序）
+/**
+ * 构建省份分组数据（按硬编码顺序排列）
+ *
+ * 算法说明：
+ * 1. 将 CITIES 数组按 province 字段分组到 map 对象
+ * 2. 每个省份内部的城市按拼音排序（如：河北的城市按 baoding, cangzhou... 排序）
+ * 3. 省份顺序按 PROVINCE_ORDER 硬编码数组排列（而非动态计算）
+ *
+ * 为什么使用硬编码排序？
+ * - 之前尝试动态排序（按省份名称拼音首字母），在微信开发者工具中排序不稳定
+ * - 特别行政区偶尔会排在台湾省之后，而非预期的最后一个位置
+ * - 硬编码保证排序始终一致：直辖市优先 → 拼音排序省份 → 特别行政区最后
+ *
+ * @returns {Array} [{ name: '直辖市', cities: [...] }, { name: '安徽省', cities: [...] }, ...]
+ */
 function buildProvinces() {
+  // 步骤1：按省份分组
   const map = {}
   CITIES.forEach(city => {
     if (!map[city.province]) map[city.province] = []
     map[city.province].push(city)
   })
-  // 每个省份的城市按拼音排序
+
+  // 步骤2：每个省份内部的城市按拼音排序
+  // 例：河北省的城市按拼音排序为：保定(baoding)、沧州(cangzhou)、承德(chengde)...
   Object.keys(map).forEach(province => {
     map[province].sort((a, b) => a.pinyin.localeCompare(b.pinyin))
   })
-  // 按硬编码顺序排列省份
+
+  // 步骤3：按 PROVINCE_ORDER 硬编码顺序排列省份
+  // PROVINCE_ORDER 定义：直辖市 → 按拼音排序的省份 → 特别行政区
+  // filter：只保留数据中实际存在的省份（防止硬编码数组中有废弃省份名）
   return PROVINCE_ORDER
     .filter(name => map[name]) // 只保留数据中存在的省份
     .map(name => ({ name, cities: map[name] }))
