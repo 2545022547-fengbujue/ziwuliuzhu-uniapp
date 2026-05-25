@@ -32,13 +32,13 @@ An intelligent acupuncture point selection assistant based on Traditional Chines
 
 | Theme | Name | Platform |
 |-------|------|----------|
-| classic | Classic Default | All platforms |
-| ink | Black & Gold | H5/App |
-| celadon | Celadon Green | H5/App |
-| vermilion | Vermilion Red | H5/App |
+| yellow | Classic Paper | All platforms |
+| black | Dark Night Glow | H5/App |
+| green | Celadon Blue | H5/App |
+| red | Vermilion Red | H5/App |
 
-- **WeChat Mini Program**: Only classic theme, no theme switcher UI
-- **H5/App**: Full 4-theme support + App follows system dark mode
+- **WeChat Mini Program**: Only yellow theme, no theme switcher UI
+- **H5/App**: Full 4-theme support
 
 ## Typography: Kaiti for Titles, Songti for Body
 
@@ -46,9 +46,9 @@ Traditional Chinese medical text style: Kaiti (楷体) for titles, Songti (宋�
 
 | Font | Usage | Loading Method |
 |------|-------|----------------|
-| Kaiti GB2312 (subset 415 chars) | Titles, point names, Gan-Zhi labels | Mini Program: base64 inline; H5/App: @font-face |
-| WenYuan Serif (subset 471 chars) | Popup body text, meridian/category/element | Mini Program: base64 inline; H5/App: @font-face |
-| WenYuan Serif Bold (subset 53 chars) | Bold body text areas | Mini Program: base64 inline; H5/App: @font-face |
+| Kaiti GB2312 (subset 122KB) | Titles, point names, Gan-Zhi labels | Mini Program: base64 inline; H5/App: @font-face |
+| WenYuan Serif (subset 226KB) | Popup body text, meridian/category/element | Mini Program: base64 inline; H5/App: @font-face |
+| WenYuan Serif Bold (subset 23KB) | Bold body text areas | Mini Program: base64 inline; H5/App: @font-face |
 
 ## Tech Stack
 
@@ -90,11 +90,15 @@ src/
 │   ├── ResultPanel.vue     # Acupuncture result cards (with closed-point warning)
 │   ├── PointDetail.vue     # Point detail popup (Kaiti-Songti typography)
 │   ├── CityPicker.vue      # City picker (for true solar time)
+│   ├── DatePicker.vue      # Calendar panel (cross-platform unified)
+│   ├── TimePicker.vue      # Time period picker (cross-platform unified)
 │   └ AppNavbar.vue         # Bottom navigation bar
 ├── styles/          # Global Styles
 │   ├── variables.scss      # SCSS variables
 │   ├── themes.scss         # Theme CSS variable definitions
 │   └ index.scss            # Global styles + font declarations
+├── scripts/         # Build Scripts
+│   └ rebuild_app_vue_fonts.py  # Font rebuild script
 └── static/          # Static Assets
     ├── fonts/              # Font files (subset TTF)
     └ tabbar/               # TabBar icons (4 theme variants)

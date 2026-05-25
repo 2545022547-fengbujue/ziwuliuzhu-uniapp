@@ -32,13 +32,13 @@
 
 | 主题 | 名称 | 适用平台 |
 |------|------|----------|
-| classic | 经典默认 | 全平台 |
-| ink | 玄黑金篆 | H5/App |
-| celadon | 青瓷天青 | H5/App |
-| vermilion | 朱砂丹霞 | H5/App |
+| yellow | 古典宣纸 | 全平台 |
+| black | 暗夜幽光 | H5/App |
+| green | 青瓷天青 | H5/App |
+| red | 朱砂丹霞 | H5/App |
 
-- **微信小程序**：仅支持 classic，不显示主题切换入口
-- **H5/App**：支持4主题切换 + App端跟随系统深色模式
+- **微信小程序**：仅支持 yellow，不显示主题切换入口
+- **H5/App**：支持4主题切换
 
 ## 字体方案：楷题宋文
 
@@ -46,9 +46,9 @@
 
 | 字体 | 用途 | 加载方式 |
 |------|------|----------|
-| 楷体_GB2312（子集化415字） | 标题、穴位名、干支标签 | 小程序: base64内联；H5/App: @font-face |
-| 文源宋体（子集化471字） | 弹窗正文、经络/类别/五行 | 小程序: base64内联；H5/App: @font-face |
-| 文源宋体Bold（子集化53字） | 正文加粗区域 | 小程序: base64内联；H5/App: @font-face |
+| 楷体_GB2312（子集化122KB） | 标题、穴位名、干支标签 | 小程序: base64内联；H5/App: @font-face |
+| 文源宋体（子集化226KB） | 弹窗正文、经络/类别/五行 | 小程序: base64内联；H5/App: @font-face |
+| 文源宋体Bold（子集化23KB） | 正文加粗区域 | 小程序: base64内联；H5/App: @font-face |
 
 ## 技术栈
 
@@ -90,11 +90,15 @@ src/
 │   ├── ResultPanel.vue     # 取穴结果卡片（含闭穴警告）
 │   ├── PointDetail.vue     # 穴位详情弹窗（楷题宋文）
 │   ├── CityPicker.vue      # 城市选择器（真太阳时）
+│   ├── DatePicker.vue      # 日历面板（三端统一）
+│   ├── TimePicker.vue      # 时辰选择面板（三端统一）
 │   └ AppNavbar.vue         # 底部导航栏
 ├── styles/          # 全局样式
 │   ├── variables.scss      # SCSS变量
 │   ├── themes.scss         # 主题CSS变量定义
 │   └ index.scss            # 全局样式 + 字体声明
+├── scripts/         # 构建脚本
+│   └ rebuild_app_vue_fonts.py  # 字体重建脚本
 └── static/          # 静态资源
     ├── fonts/              # 字体文件（子集化TTF）
     └ tabbar/               # TabBar图标（4组主题图标）
