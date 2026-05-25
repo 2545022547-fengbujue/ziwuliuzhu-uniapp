@@ -15,7 +15,7 @@ FONT_DIR = PROJECT_DIR / "src/assets/fonts"
 
 # 字体文件配置
 KAITI_TTF = FONT_DIR / "kaiti-gb2312.ttf"            # 楷体（完整）
-SONGTI_TTF = FONT_DIR / "wenjinmincho-subset-v5.ttf" # 宋体常规（裁剪v5，添加"基"字）
+SONGTI_TTF = FONT_DIR / "wenjinmincho-subset-v6.ttf" # 宋体常规（裁剪v6，添加"设"字）
 BOLD_TTF = FONT_DIR / "WenYuanSerifSC-Bold-subset-v2.ttf"  # 宋体粗体（裁剪）
 
 def generate_base64(ttf_path: Path) -> str:
@@ -93,33 +93,7 @@ export default {{
       }}
     }})
     // #endif
-
-    // #ifdef APP-PLUS
-    // App端：使用本地字体文件
-    uni.loadFontFace({{
-      global: true,
-      family: 'WenYuanSerifSC',
-      source: 'url("/static/fonts/wenjinmincho-subset-v4.ttf")',
-      success() {{
-        console.log('WenYuanSerifSC font loaded (App)')
-      }},
-      fail(err) {{
-        console.warn('WenYuanSerifSC font load failed (App):', err)
-      }}
-    }})
-
-    uni.loadFontFace({{
-      global: true,
-      family: 'WenYuanSerifSC-Bold',
-      source: 'url("/static/fonts/WenYuanSerifSC-Bold-subset-v2.ttf")',
-      success() {{
-        console.log('WenYuanSerifSC-Bold font loaded (App)')
-      }},
-      fail(err) {{
-        console.warn('WenYuanSerifSC-Bold font load failed (App):', err)
-      }}
-    }})
-    // #endif
+    // App端字体由 index.scss 的 @font-face 处理（#ifndef MP-WEIXIN），无需在此动态加载
   }},
   onShow() {{
     // #ifdef APP-PLUS

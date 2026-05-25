@@ -96,7 +96,7 @@
           <text class="nazi-bumu-tip-text">{{ naziBumuTip }}</text>
         </view>
 
-        <view style="height: 40rpx;"></view>
+        <view style="height: 80rpx;"></view>
       </scroll-view>
     </view>
   </view>
@@ -116,6 +116,7 @@
  *   - 弹窗背景框右边截断：所有卡片需加 box-sizing: border-box; width: 100%; overflow: hidden
  *   - 定位文字换行不美观：用 word-break: normal; overflow-wrap: break-word 避免中途断行
  *   - 安卓不支持 KaiTi 字体：需加 'STKaiti', '楷体' 作为 fallback
+ *   - 单位统一使用 rpx（2026-05-25 从 px 迁移，确保全App单位一致）
  */
 import { computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
@@ -162,18 +163,18 @@ function handleClose() {
 <style lang="scss" scoped>
 /* ============================================
    PointDetail - 穴位详情弹窗样式
-   
+
    布局说明：
    - overlay：fixed 全屏遮罩
    - popup：居中弹窗容器，flex column
    - popup-header：顶部固定区域（名称+代码+关闭按钮）
    - popup-body：可滚动内容区（基本信息、定位、操作方法等）
-   
+
    重要：所有卡片容器必须加 box-sizing: border-box; width: 100%; overflow: hidden
          否则在 uni-app H5 模式下会出现右边截断的问题
-   ============================================ */
 
-/* CSS 必须用 px 单位（不用 rpx），否则在部分设备上弹窗布局异常（与 CityPicker 同理） */
+   单位：全部使用 rpx（2026-05-25 从 px 迁移，确保与全App一致）
+   ============================================ */
 
 /* 宋体字体族：正文区域使用，与标题楷体形成"楷题宋文"传统排版 */
 $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
@@ -193,10 +194,10 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   width: 92%;
   max-height: 85vh;
   background: var(--theme-surface);
-  border-radius: 24px;
+  border-radius: 48rpx;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 16rpx 60rpx rgba(0, 0, 0, 0.18);
   overflow: hidden;
 }
 
@@ -204,11 +205,11 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 120rpx 40rpx;
 }
 
 .empty-text {
-  font-size: 14px;
+  font-size: 28rpx;
   color: $tcm-text-hint;
 }
 
@@ -216,16 +217,16 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 20px;
-  border-bottom: 1px solid var(--theme-border);
+  padding: 48rpx 40rpx;
+  border-bottom: 2rpx solid var(--theme-border);
   flex-shrink: 0;
   position: relative;
-  min-height: 72px;
+  min-height: 144rpx;
 }
 
 .header-icon-wrap {
-  width: 44px;
-  height: 44px;
+  width: 88rpx;
+  height: 88rpx;
   border-radius: 50%;
   background: var(--theme-border);
   display: flex;
@@ -236,22 +237,22 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 .header-icon {
-  font-size: 20px;
+  font-size: 40rpx;
 }
 
 .header-name-layer {
   position: absolute;
-  left: 76px;
+  left: 152rpx;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 12rpx;
   z-index: 1;
 }
 
 .point-name {
-  font-size: 38px;
+  font-size: 76rpx;
   font-weight: 700;
   color: var(--theme-text);
   font-family: 'KaitiGB2312', 'KaiTi', '楷体', 'STKaiti', serif;
@@ -259,32 +260,37 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 .point-code {
-  font-size: 10px;
+  font-size: 20rpx;
   color: var(--theme-text-hint);
   font-family: monospace;
-  letter-spacing: 0.5px;
-  transform: translateY(4px);
+  letter-spacing: 1rpx;
+  transform: translateY(8rpx);
 }
 
 .close-btn {
-  width: 36px;
-  height: 36px;
+  width: 72rpx;
+  height: 72rpx;
   border-radius: 50%;
   background: var(--theme-surface-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.92);
+  }
 }
 
 .close-icon {
-  font-size: 18px;
+  font-size: 36rpx;
   color: var(--theme-text-secondary);
 }
 
 .popup-body {
   flex: 1;
-  padding: 20px;
+  padding: 40rpx;
   max-height: 65vh;
   width: 100%;
   box-sizing: border-box;
@@ -293,31 +299,31 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 /* === 信息区块 === */
 .info-section {
-  margin-bottom: 20px;
+  margin-bottom: 40rpx;
 }
 
 .section-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  font-size: 15px;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+  font-size: 30rpx;
   font-weight: 600;
   color: var(--theme-text-secondary);
   font-family: $font-songti;
 }
 
 .title-dot {
-  width: 4px;
-  height: 16px;
-  border-radius: 2px;
+  width: 8rpx;
+  height: 32rpx;
+  border-radius: 4rpx;
   background: var(--theme-secondary);
 }
 
 .info-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 20rpx;
 }
 
 .info-grid-center {
@@ -338,10 +344,10 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .info-item {
   flex: 1;
-  min-width: 80px;
-  padding: 12px;
+  min-width: 160rpx;
+  padding: 24rpx;
   background: var(--theme-surface-muted);
-  border-radius: 12px;
+  border-radius: 24rpx;
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
@@ -350,9 +356,9 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .info-label {
   display: block;
-  font-size: 12px;
+  font-size: 24rpx;
   color: var(--theme-text-hint);
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
   font-family: $font-songti;
 }
 
@@ -361,7 +367,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   flex: 1;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 700;
   color: var(--theme-text);
   word-break: keep-all;
@@ -373,31 +379,31 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 .wuxing-value {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 700;
 }
 
 /* 类别文字较长时，五行属性字号放大 */
 .wuxing-value-large {
-  font-size: 18px;
+  font-size: 36rpx;
 }
 
 /* === 定位 === */
 .location-box {
-  padding: 14px;
+  padding: 28rpx;
   background: var(--theme-surface-muted);
-  border: 1px solid var(--theme-border);
-  border-radius: 12px;
+  border: 2rpx solid var(--theme-border);
+  border-radius: 24rpx;
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
 }
 
 .location-text {
-  font-size: 15px;
+  font-size: 30rpx;
   color: var(--theme-text-secondary);
   line-height: 2;
-  letter-spacing: 0.5px;
+  letter-spacing: 1rpx;
   word-break: normal;
   overflow-wrap: break-word;
 }
@@ -406,29 +412,29 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 .method-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20rpx;
 }
 
 .method-item {
-  padding: 14px;
+  padding: 28rpx;
   background: var(--theme-surface-muted);
-  border: 1px solid var(--theme-border);
-  border-radius: 12px;
+  border: 2rpx solid var(--theme-border);
+  border-radius: 24rpx;
   box-sizing: border-box;
   width: 100%;
 }
 
 .method-label {
   display: block;
-  font-size: 12px;
+  font-size: 24rpx;
   color: var(--theme-text-hint);
-  margin-bottom: 6px;
+  margin-bottom: 12rpx;
   font-family: $font-songti;
 }
 
 .method-value {
   display: block;
-  font-size: 14px;
+  font-size: 28rpx;
   color: var(--theme-text-secondary);
   line-height: 1.7;
   word-break: break-all;
@@ -438,10 +444,10 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 /* === 注意事项 === */
 .caution-box {
-  padding: 14px;
-  background: rgba(211, 47, 47, 0.04);
-  border: 1px solid rgba(211, 47, 47, 0.15);
-  border-radius: 12px;
+  padding: 28rpx;
+  background: rgba($tcm-red, 0.04);
+  border: 2rpx solid rgba($tcm-red, 0.15);
+  border-radius: 24rpx;
   box-sizing: border-box;
   width: 100%;
 }
@@ -449,24 +455,24 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 .caution-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
 }
 
 .caution-icon {
-  font-size: 14px;
+  font-size: 28rpx;
 }
 
 .caution-title {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 600;
-  color: #D32F2F;
+  color: $tcm-red;
   font-family: $font-songti;
 }
 
 .caution-text {
-  font-size: 13px;
-  color: rgba(211, 47, 47, 0.8);
+  font-size: 26rpx;
+  color: rgba($tcm-red, 0.8);
   line-height: 1.7;
   word-break: break-all;
   text-align: justify;
@@ -478,10 +484,10 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8rpx;
+  gap: 16rpx;
   padding: 20rpx;
   background: rgba($tcm-text, 0.04);
-  border-radius: 14rpx;
+  border-radius: 28rpx;
   margin-top: $spacing-md;
 }
 

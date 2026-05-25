@@ -256,6 +256,7 @@
   /* 导航栏标题：宋体 */
   .navbar-title {
     font-family: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif !important;
+    letter-spacing: 0.05em;
   }
 
   /* 磨砂玻璃卡片：backdrop-filter blur + rgba背景 + 高对比度边框 */
@@ -517,10 +518,10 @@
    设计理念：宋代青瓷釉面光泽感，柔和通透
 */
 .theme-green {
-  /* 导航栏标题：深色文字 */
+  /* 导航栏标题：楷体 */
   .navbar-title {
     color: #14302C !important;
-    font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', serif;
+    font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', serif !important;
   }
 
   /* 导航栏：青瓷渐变 */

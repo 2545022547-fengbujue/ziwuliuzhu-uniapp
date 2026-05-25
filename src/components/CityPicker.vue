@@ -333,17 +333,20 @@ defineExpose({ open, close, isOpen })
 }
 
 .close-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--theme-surface-muted);
-  display: flex;
+  background: none !important;
+  border: none !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  padding: 0;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .close-icon {
-  font-size: 16px;
+  font-size: 18px;
   color: var(--theme-text-secondary);
 }
 

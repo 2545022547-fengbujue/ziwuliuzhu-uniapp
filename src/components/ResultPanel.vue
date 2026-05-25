@@ -23,7 +23,7 @@
 
       <!-- 闭穴提示 -->
       <view v-if="showClosedWarning" class="warning-box">
-        <text class="warning-icon">⚠️</text>
+        <text class="warning-icon">ⓘ</text>
         <text class="warning-text">当前时辰为闭穴</text>
       </view>
 
@@ -318,7 +318,7 @@ function handlePointClick(point) {
 
 .panel-header {
   padding: 28rpx 36rpx;
-  background: linear-gradient(135deg, #8B4513 0%, #6B3410 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -378,25 +378,25 @@ function handlePointClick(point) {
   justify-content: center;
   padding: 6rpx 16rpx;
   border-radius: 12rpx;
-  background: rgba($tcm-primary, 0.12);
+  background: var(--theme-surface-muted);
 }
 
 .result-ganzhi-hour-text {
   font-size: $font-size-sm;
   font-weight: 700;
-  color: $tcm-primary;
+  color: var(--theme-primary);
   font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
 }
 
-/* === 警告框 === */
+/* === 警告框（闭穴提示）=== */
 .warning-box {
   display: flex;
   align-items: center;
   gap: $spacing-sm;
   padding: $spacing-md;
   margin-bottom: $spacing-md;
-  background: rgba($tcm-red, 0.04);
-  border: 1rpx solid rgba($tcm-red, 0.15);
+  background: var(--theme-surface-muted);
+  border: 1rpx solid var(--theme-border);
   border-radius: 18rpx;
 }
 
@@ -407,7 +407,7 @@ function handlePointClick(point) {
 .warning-text {
   font-size: 28rpx;
   font-weight: 500;
-  color: $tcm-red;
+  color: var(--theme-text-secondary);
 }
 
 /* === 区块 === */
@@ -457,7 +457,7 @@ function handlePointClick(point) {
   gap: 10rpx;
   padding: 14rpx 28rpx;
   border-radius: 20rpx;
-  background: rgba($tcm-primary, 0.1);
+  background: var(--theme-surface-muted);
   transition: all 0.25s ease;
 
   &:active {
@@ -469,7 +469,7 @@ function handlePointClick(point) {
 .point-name {
   font-size: 28rpx;
   font-weight: 700;
-  color: $tcm-primary;
+  color: var(--theme-primary);
   font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
 }
 
@@ -500,11 +500,11 @@ function handlePointClick(point) {
 .tag-primary {
   display: inline-flex;
   padding: 6rpx 16rpx;
-  background: rgba($tcm-primary, 0.08);
+  background: var(--theme-surface-muted);
   border-radius: $radius-sm;
   border: 1rpx solid transparent;
   font-size: $font-size-xs;
-  color: $tcm-primary;
+  color: var(--theme-primary);
 }
 
 /* === 九宫信息 === */
@@ -514,7 +514,7 @@ function handlePointClick(point) {
   gap: $spacing-sm;
   padding: $spacing-md;
   margin-bottom: $spacing-md;
-  background: rgba($tcm-secondary, 0.06);
+  background: var(--theme-surface-muted);
   border-radius: $radius-md;
 }
 
@@ -596,7 +596,7 @@ function handlePointClick(point) {
 /* === 纳子法模式切换 === */
 .nazi-mode-switch {
   display: flex;
-  border: 1rpx solid rgba($tcm-primary, 0.15);
+  border: 1rpx solid var(--theme-border);
   border-radius: 12rpx;
   overflow: hidden;
   margin-left: auto;
@@ -606,11 +606,11 @@ function handlePointClick(point) {
   padding: 4rpx 14rpx;
   font-size: 22rpx;
   color: $tcm-text-secondary;
-  background: rgba($tcm-primary, 0.04);
+  background: var(--theme-surface-muted);
 
   &.active {
     color: #fff;
-    background: $tcm-primary;
+    background: var(--theme-primary);
   }
 }
 

@@ -484,8 +484,8 @@ onBackPress(() => {
   transition: all 0.25s ease;
 
   &.active {
-    background: $tcm-primary;
-    box-shadow: 0 4rpx 12rpx rgba(139, 69, 19, 0.25);
+    background: var(--theme-primary);
+    box-shadow: 0 8rpx 32rpx var(--theme-shadow);
     .toggle-text { color: #fff; }
   }
 }
@@ -503,7 +503,7 @@ onBackPress(() => {
 .manual-controls {
   margin-bottom: $spacing-md;
   padding: $spacing-md;
-  background: rgba($tcm-primary, 0.03);
+  background: var(--theme-surface-muted);
   border-radius: 20rpx;
 }
 
@@ -521,8 +521,8 @@ onBackPress(() => {
 
 .picker-btn {
   padding: 12rpx 28rpx;
-  background: #fff;
-  border: 1rpx solid rgba($tcm-primary, 0.15);
+  background: var(--theme-surface);
+  border: 1rpx solid var(--theme-border);
   border-radius: 16rpx;
   font-size: $font-size-sm;
   color: $tcm-text;
@@ -533,10 +533,15 @@ onBackPress(() => {
 .query-btn {
   margin-top: $spacing-sm;
   padding: $spacing-md;
-  background: linear-gradient(135deg, $tcm-primary 0%, $tcm-primary-dark 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
   border-radius: 20rpx;
   text-align: center;
-  box-shadow: 0 4rpx 16rpx rgba(139, 69, 19, 0.2);
+  box-shadow: 0 8rpx 32rpx var(--theme-shadow);
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
 }
 
 .query-btn-text {
@@ -551,7 +556,7 @@ onBackPress(() => {
   align-items: center;
   gap: $spacing-xs;
   padding: $spacing-md 0;
-  border-top: 1rpx solid rgba($tcm-primary, 0.08);
+  border-top: 1rpx solid var(--theme-border);
 }
 
 .datetime-text {
@@ -578,10 +583,10 @@ onBackPress(() => {
   justify-content: center;
   padding: 8rpx 20rpx;
   border-radius: 16rpx;
-  background: rgba($tcm-primary, 0.08);
+  background: var(--theme-surface-muted);
 
   &.highlight {
-    background: rgba($tcm-primary, 0.15);
+    background: var(--theme-border);
 
     .ganzhi-tag-text {
       font-weight: 700;
@@ -591,7 +596,7 @@ onBackPress(() => {
 
 .ganzhi-tag-text {
   font-size: $font-size-sm;
-  color: $tcm-primary;
+  color: var(--theme-primary);
   font-weight: 600;
   font-family: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
@@ -619,8 +624,8 @@ onBackPress(() => {
   transition: all 0.3s ease;
 
   &.active {
-    background: $tcm-primary;
-    box-shadow: 0 6rpx 20rpx rgba(139, 69, 19, 0.3);
+    background: var(--theme-primary);
+    box-shadow: 0 8rpx 32rpx var(--theme-shadow);
     transform: scale(1.02);
 
     .method-name {
@@ -784,7 +789,7 @@ onBackPress(() => {
 .divider-line {
   flex: 1;
   height: 1rpx;
-  background: linear-gradient(to right, transparent, rgba($tcm-primary, 0.12), transparent);
+  background: linear-gradient(to right, transparent, var(--theme-border), transparent);
 }
 
 .divider-text {
@@ -862,6 +867,11 @@ onBackPress(() => {
   text-align: center;
   font-size: $font-size-sm;
   color: var(--theme-text-secondary);
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.96);
+  }
 }
 
 .confirm-ok {
@@ -873,6 +883,11 @@ onBackPress(() => {
   font-size: $font-size-sm;
   color: #fff;
   font-weight: 600;
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.96);
+  }
 }
 
 /* 暗夜幽光主题特殊样式 */
