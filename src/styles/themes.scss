@@ -240,14 +240,7 @@
    基于 UI/UX Pro Max skill 数据库的专业设计规范
 */
 .theme-black {
-  /* 警告框 */
-  .warning-box,
-  .caution-box {
-    background: rgba(211, 47, 47, 0.15) !important;
-    border: 1rpx solid rgba(211, 47, 47, 0.40) !important;
-  }
-
-  /* 导航栏：纯黑 */
+  /* 磨砂玻璃卡片：backdrop-filter blur + rgba背景 + 高对比度边框 */
   .navbar {
     background: #000000 !important;
     border-bottom: 1rpx solid rgba(255, 255, 255, 0.15) !important;
