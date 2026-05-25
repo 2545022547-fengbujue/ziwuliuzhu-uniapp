@@ -38,19 +38,6 @@
             <text class="card-icon">◐</text>
             <text>外观主题</text>
           </view>
-          <!-- #ifdef APP-PLUS -->
-          <view class="setting-row">
-            <view class="setting-copy">
-              <text class="setting-label">跟随系统深色模式</text>
-              <text class="setting-tip inline">系统为深色时自动使用暗夜幽光</text>
-            </view>
-            <switch
-              :checked="store.followsSystemTheme"
-              @change="onFollowSystemThemeChange"
-              :color="store.themeSwitchColor"
-            />
-          </view>
-          <!-- #endif -->
           <view class="theme-current" @tap="themeExpanded = !themeExpanded">
             <view class="theme-current-left">
               <view class="theme-swatch" :class="store.activeTheme"></view>
@@ -255,11 +242,6 @@ function onSolarTimeToggle(e) {
 /** 反克法显示模式切换 */
 function onFankeModeChange(e) {
   store.fankeDisplayMode = e.detail.value ? 'separate' : 'merged'
-}
-
-/** App 端跟随系统深色模式 */
-function onFollowSystemThemeChange(e) {
-  store.toggleFollowSystemTheme(e.detail.value)
 }
 
 /** 打开城市选择弹窗（复用 CityPicker 组件） */

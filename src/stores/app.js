@@ -56,25 +56,25 @@ const THEME_CHROME = {
     backgroundColor: '#000000',
     color: '#9B9B9B',
     selectedColor: '#0080FF',
-    borderStyle: 'black',
-    homeSelectedIconPath: '/static/tabbar/home-active-ink.png',
-    settingSelectedIconPath: '/static/tabbar/setting-active-ink.png'
+    borderStyle: 'white',
+    homeSelectedIconPath: '/static/tabbar/home-active-black.png',
+    settingSelectedIconPath: '/static/tabbar/setting-active-black.png'
   },
   green: {
     backgroundColor: '#F7FBF8',
     color: '#71827B',
     selectedColor: '#2F7D73',
     borderStyle: 'white',
-    homeSelectedIconPath: '/static/tabbar/home-active-celadon.png',
-    settingSelectedIconPath: '/static/tabbar/setting-active-celadon.png'
+    homeSelectedIconPath: '/static/tabbar/home-active-green.png',
+    settingSelectedIconPath: '/static/tabbar/setting-active-green.png'
   },
   red: {
     backgroundColor: '#FFF8F2',
     color: '#8A756B',
     selectedColor: '#B83A2E',
     borderStyle: 'white',
-    homeSelectedIconPath: '/static/tabbar/home-active-vermilion.png',
-    settingSelectedIconPath: '/static/tabbar/setting-active-vermilion.png'
+    homeSelectedIconPath: '/static/tabbar/home-active-red.png',
+    settingSelectedIconPath: '/static/tabbar/setting-active-red.png'
   }
 }
 
@@ -83,17 +83,8 @@ let supportsThemeSwitch = false
 supportsThemeSwitch = true
 // #endif
 
-let supportsSystemTheme = false
-// #ifdef APP-PLUS
-supportsSystemTheme = true
-// #endif
-
 function isKnownTheme(themeId) {
   return THEME_OPTIONS.some(t => t.id === themeId)
-}
-
-function normalizeSystemTheme(themeName) {
-  return themeName === 'dark' ? 'dark' : 'light'
 }
 
 export const useAppStore = defineStore('app', () => {
@@ -112,8 +103,6 @@ export const useAppStore = defineStore('app', () => {
   const selectedPoint = ref(null)
   const naziMode = ref('daily')  // 纳子法模式：'daily'(一日六十六穴) | 'bumu'(补母泻子)
   const theme = ref('yellow')
-  const themeMode = ref('system') // App 端默认跟随系统深色；用户手选主题后变为 manual
-  const systemTheme = ref('light')
 
   // === 真太阳时设置 ===
   const useTrueSolarTime = ref(false)
@@ -181,14 +170,7 @@ export const useAppStore = defineStore('app', () => {
   const currentResults = computed(() => results.value[activeMethod.value])
 
   const activeTheme = computed(() => {
-    if (supportsSystemTheme && themeMode.value === 'system' && systemTheme.value === 'dark') {
-      return 'black'
-    }
     return supportsThemeSwitch && isKnownTheme(theme.value) ? theme.value : 'yellow'
-  })
-
-  const followsSystemTheme = computed(() => {
-    return supportsSystemTheme && themeMode.value === 'system'
   })
 
   const themePrimaryColor = computed(() => {
@@ -274,39 +256,9 @@ export const useAppStore = defineStore('app', () => {
       return
     }
     if (isKnownTheme(nextTheme)) {
-      themeMode.value = 'manual'
       theme.value = nextTheme
       applyThemeChrome()
     }
-  }
-
-  function syncSystemTheme(nextTheme) {
-    if (!supportsSystemTheme) return
-    systemTheme.value = normalizeSystemTheme(nextTheme)
-    applyThemeChrome()
-  }
-
-  function syncSystemThemeFromDevice() {
-    if (!supportsSystemTheme) return
-    try {
-      // 微信小程序：使用新API避免弃用警告
-      if (typeof wx !== 'undefined' && wx.getAppBaseInfo) {
-        const appInfo = wx.getAppBaseInfo()
-        syncSystemTheme(appInfo.theme || 'light')
-      } else {
-        const info = uni.getSystemInfoSync()
-        syncSystemTheme(info.theme || info.osTheme || 'light')
-      }
-    } catch {
-      syncSystemTheme('light')
-    }
-  }
-
-  function toggleFollowSystemTheme(enabled) {
-    if (!supportsSystemTheme) return
-    themeMode.value = enabled ? 'system' : 'manual'
-    syncSystemThemeFromDevice()
-    applyThemeChrome()
   }
 
   function applyThemeChrome() {
@@ -358,10 +310,7 @@ export const useAppStore = defineStore('app', () => {
     selectedPoint,
     naziMode,
     theme,
-    themeMode,
-    systemTheme,
     activeTheme,
-    followsSystemTheme,
     themePrimaryColor,
     themeSwitchColor,
     themes: THEME_OPTIONS,
@@ -383,9 +332,6 @@ export const useAppStore = defineStore('app', () => {
     setActiveMethod,
     setNaziMode,
     setTheme,
-    syncSystemTheme,
-    syncSystemThemeFromDevice,
-    toggleFollowSystemTheme,
     applyThemeChrome,
     selectPoint,
     closeDetail
@@ -411,7 +357,7 @@ export const useAppStore = defineStore('app', () => {
             }
           }
         },
-        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'theme', 'themeMode']
+        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'theme']
       }
     ]
   }

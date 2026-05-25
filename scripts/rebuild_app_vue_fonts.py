@@ -63,6 +63,7 @@ def rebuild_app_vue():
 
 <script>
 import {{ useAppStore }} from '@/stores/app.js'
+import {{ watch }} from 'vue'
 
 export default {{
   onLaunch() {{
@@ -93,12 +94,25 @@ export default {{
       }}
     }})
     // #endif
-    // App端字体由 index.scss 的 @font-face 处理（#ifndef MP-WEIXIN），无需在此动态加载
+
+    // #ifdef APP-PLUS
+    // App端：启动时应用主题 tabBar
+    const store = useAppStore()
+    store.applyThemeChrome()
+
+    // 监听 theme 变化，自动更新 tabBar
+    watch(
+      () => store.theme,
+      (newTheme) => {{
+        console.log('[watch] theme changed:', newTheme)
+        setTimeout(() => store.applyThemeChrome(), 50)
+      }}
+    )
+    // #endif
   }},
   onShow() {{
     // #ifdef APP-PLUS
     const store = useAppStore()
-    store.syncSystemThemeFromDevice()
     store.applyThemeChrome()
     // #endif
   }},
