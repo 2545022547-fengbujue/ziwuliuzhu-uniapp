@@ -69,7 +69,10 @@
         <!-- ========== 反克法显示模式 ========== -->
         <view class="setting-card">
           <view class="setting-row">
-            <text class="setting-label">单独显示反克法</text>
+            <view class="setting-copy">
+              <text class="setting-label">单独显示反克法</text>
+              <text class="setting-hint">开启后，反克法有取穴结果时会单独显示</text>
+            </view>
             <switch
               :checked="store.fankeDisplayMode === 'separate'"
               @change="onFankeModeChange"
@@ -332,6 +335,10 @@ onBackPress(() => {
   justify-content: space-between;
   padding: $spacing-md 0;
   border-bottom: 1rpx solid var(--theme-border);
+
+  &.no-border {
+    border-bottom: none;
+  }
 }
 
 .setting-copy {
@@ -343,6 +350,11 @@ onBackPress(() => {
 .setting-label {
   font-size: $font-size-sm;
   color: $tcm-text;
+}
+
+.setting-hint {
+  font-size: $font-size-xs;
+  color: $tcm-text-hint;
 }
 
 .setting-value {

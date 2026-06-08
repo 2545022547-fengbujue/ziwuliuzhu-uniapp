@@ -26,7 +26,7 @@
   font-display: swap;
 }
 /* #endif */
-/* 微信小程序：在 App.vue onLaunch 中用 uni.loadFontFace + base64 动态加载 */
+/* 微信小程序：在 font-loader.js 中用 uni.loadFontFace + 生成的 base64 模块动态加载 */
 
 /* === 文源宋体 === */
 /* App端 + H5端：打包内置字体，用于弹窗正文"楷题宋文"排版 */
@@ -49,7 +49,7 @@
   font-display: swap;
 }
 /* #endif */
-/* 微信小程序：在 App.vue onLaunch 中用 uni.loadFontFace + base64 动态加载 */
+/* 微信小程序：在 font-loader.js 中用 uni.loadFontFace + 生成的 base64 模块动态加载 */
 
 /* === 基础重置 === */
 page {

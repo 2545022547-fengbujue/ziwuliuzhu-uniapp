@@ -15,14 +15,15 @@ yarn-error.log*
 .vscode/
 .idea/
 
-# Build artifacts
-tests/
-patches/
+# Local scripts/backups
+patches/*.backup
 *.vbs
 *.txt
 # 字库和base64文件需要跟踪
 !src/assets/fonts/chars_*.txt
 !src/assets/fonts/*-base64.txt
+!patches/
+!patches/*.patch
 
 # Documentation (AI-generated, internal)
 DEV-*.md

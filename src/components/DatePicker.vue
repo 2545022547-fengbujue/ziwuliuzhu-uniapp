@@ -1,6 +1,6 @@
 <template>
   <!--
-    DatePicker.vue - 日历面板式日期选择器（H5/App端专用）
+    DatePicker.vue - 日历面板式日期选择器（三端统一）
 
     功能：
     - 年份在左上角显示，可左右切换（◀2026▶）
@@ -11,9 +11,9 @@
     调用方式：
     <DatePicker :value="selectedDate" @change="onDateChange" @close="showDatePicker = false" />
 
-    条件编译：
-    - 仅在 H5 和 App 端使用（微信小程序用原生 picker）
-    - 通过 #ifndef MP-WEIXIN 控制是否渲染此组件
+    平台说明：
+    - H5、App、微信小程序均使用此自定义组件，不依赖原生 picker
+    - 微信小程序端仅在样式层排除不支持的 backdrop-filter
 
     已知坑：
     - JS getDay() 返回 0=周日，需转换为周日放最后的顺序

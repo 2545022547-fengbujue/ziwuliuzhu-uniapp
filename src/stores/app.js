@@ -225,7 +225,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   // 经度变化时，自动模式同时刷新 currentTime/currentHour（以防真太阳时校正导致跨时辰）
-  // 手动模式下 computed 自动追踪 longitude 变化，无需额外操作
+  // 手动模式选择的是“某日某时辰”的概念时间，不应用真太阳时校正
   function updateLongitude(newLongitude, city) {
     longitude.value = newLongitude
     useTrueSolarTime.value = true
@@ -234,7 +234,7 @@ export const useAppStore = defineStore('app', () => {
     if (!isManualMode.value) updateCurrentTime(true)
   }
 
-  // 真太阳时开关变化同理：自动模式刷新时间，手动模式 computed 自动追踪 longitude/useTrueSolarTime 变化
+  // 真太阳时开关变化同理：自动模式刷新时间；手动模式不受该设置影响
   function toggleTrueSolarTime(enabled) {
     useTrueSolarTime.value = enabled
     if (!enabled) longitude.value = APP_CONFIG.defaultLongitude
@@ -267,7 +267,6 @@ export const useAppStore = defineStore('app', () => {
     if (!chrome) return
     try {
       const { homeSelectedIconPath, settingSelectedIconPath, ...style } = chrome
-      console.log('[applyThemeChrome] activeTheme:', activeTheme.value, 'iconPath:', homeSelectedIconPath)
       uni.setTabBarStyle(style)
       uni.setTabBarItem({
         index: 0,
@@ -279,7 +278,6 @@ export const useAppStore = defineStore('app', () => {
         iconPath: '/static/tabbar/setting.png',
         selectedIconPath: settingSelectedIconPath
       })
-      console.log('[applyThemeChrome] setTabBarItem done')
     } catch (e) {
       console.warn('[applyThemeChrome] error:', e)
     }

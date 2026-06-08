@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 
 # 配置
-PROJECT_DIR = Path("<PROJECT_ROOT>")
+PROJECT_DIR = Path(__file__).resolve().parents[1]
 APP_VUE_PATH = PROJECT_DIR / "src/App.vue"
 FONT_DIR = PROJECT_DIR / "src/assets/fonts"
 

@@ -16,9 +16,8 @@
  * （时天干对应八卦宫位，宫位对应八脉交会穴）
  *
  * 【配穴规则】
- * - 主穴：按时天干取穴（如甲时→坤卦→照海）
- * - 配穴：按日天干取穴（如甲日→坤卦→照海）
- * - 主穴配穴相配，形成四对八穴
+ * - 主穴：按时天干取穴（如甲时→公孙）
+ * - 配穴：主穴的固定配对穴（公孙↔内关、足临泣↔外关、后溪↔申脉、列缺↔照海）
  *
  * 【数据来源】
  * 八卦宫位配穴见 data/eight-points.js（先天八卦部分）
@@ -71,7 +70,7 @@ export function calculateFeiteng(ganzhi, hourIndex) {
   const dayStem = ganzhi.day.heavenlyStem
   const hourStem = ganzhi.hour.heavenlyStem
   
-  // 飞腾八法：时天干为主穴，日天干为配穴
+  // 飞腾八法：时天干定主穴；配穴来自主穴的固定配对关系
   const dayGuaData = STEM_GUA_MAP[dayStem]
   const hourGuaData = STEM_GUA_MAP[hourStem]
 
@@ -90,22 +89,20 @@ export function calculateFeiteng(ganzhi, hourIndex) {
         gua: hourGuaData?.gua,
         number: hourGuaData?.number
       })
-    }
-  }
 
-  // 日天干 → 配穴（仅当日天干与时天干不同时）
-  const dayCode = STEM_POINT_MAP[dayStem]
-  if (dayCode && dayCode !== hourCode) {
-    const dayPoint = getEightPointFull(dayCode)
-    if (dayPoint) {
-      openPoints.push({
-        ...dayPoint,
-        isOpen: true,
-        isPair: true,
-        basis: '日天干（配穴）',
-        gua: dayGuaData?.gua,
-        number: dayGuaData?.number
-      })
+      // 配穴 = 主穴的配对穴（固定配对关系：公孙↔内关、足临泣↔外关、后溪↔申脉、列缺↔照海）
+      const pairedCode = hourPoint.pairedCode
+      if (pairedCode) {
+        const pairedPoint = getEightPointFull(pairedCode)
+        if (pairedPoint) {
+          openPoints.push({
+            ...pairedPoint,
+            isOpen: true,
+            isPair: true,
+            basis: '主穴配对'
+          })
+        }
+      }
     }
   }
   

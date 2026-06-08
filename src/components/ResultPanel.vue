@@ -245,16 +245,23 @@ const showClosedWarning = computed(() => {
   return true
 })
 
-// 补母泻子法4个穴位的渲染数据（与六十六穴统一用 points-grid 展示）
+// 补母泻子法穴位渲染数据（按穴位code去重，避免本穴原穴相同时重复显示）
 // 按名字字数排序：两字在前、三字在后
 const bumuPoints = computed(() => {
   const r = result.value
   if (!r) return []
+
+  // 按穴位code去重，只保留第一个出现的
+  const seen = new Set()
   const items = []
-  if (r.benPoint) items.push({ point: r.benPoint })
-  if (r.yuanPoint) items.push({ point: r.yuanPoint })
-  if (r.muPoint) items.push({ point: r.muPoint })
-  if (r.ziPoint) items.push({ point: r.ziPoint })
+  const pointOrder = [r.benPoint, r.yuanPoint, r.muPoint, r.ziPoint]
+  for (const point of pointOrder) {
+    if (!point) continue
+    if (seen.has(point.code)) continue
+    seen.add(point.code)
+    items.push({ point })
+  }
+
   return items.sort((a, b) => (a.point?.name?.length || 0) - (b.point?.name?.length || 0))
 })
 
@@ -439,8 +446,8 @@ function handlePointClick(point) {
 .fanke-merged {
   padding: $spacing-md;
   margin-bottom: $spacing-md;
-  background: rgba($tcm-red, 0.03);
-  border: 1rpx dashed rgba($tcm-red, 0.2);
+  background: var(--theme-surface-muted);
+  border: 1rpx solid var(--theme-border);
   border-radius: $radius-md;
 }
 

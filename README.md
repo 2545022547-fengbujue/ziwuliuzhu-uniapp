@@ -22,13 +22,13 @@
 
 ### 其他功能
 
-- **真太阳时校正** — 根据城市经纬度校准地方真太阳时，自动模式可选启用
+- **真太阳时校正** — 根据城市经度与均时差校准地方真太阳时，自动模式可选启用
 - **手动查询** — 支持指定任意日期和时辰查询开穴
-- **穴位详情** — 弹窗展示定位、功能主治、操作方法、注意事项等
+- **穴位详情** — 弹窗展示定位、操作方法、注意事项等
 
 ## 主题系统
 
-4套主题通过CSS变量实现运行时切换：
+4套主题按组件适配当前主题，H5/App 运行时切换：
 
 | 主题 | 名称 | 适用平台 |
 |------|------|----------|
@@ -46,17 +46,35 @@
 
 | 字体 | 用途 | 加载方式 |
 |------|------|----------|
-| 楷体_GB2312（子集化122KB） | 标题、穴位名、干支标签 | 小程序: base64内联；H5/App: @font-face |
-| 文源宋体（子集化226KB） | 弹窗正文、经络/类别/五行 | 小程序: base64内联；H5/App: @font-face |
-| 文源宋体Bold（子集化23KB） | 正文加粗区域 | 小程序: base64内联；H5/App: @font-face |
+| 楷体_GB2312（子集化122KB） | 标题、穴位名、干支标签 | 小程序: `font-loader.js` 从生成的 base64 模块加载；H5/App: @font-face |
+| 文源宋体（子集化226KB） | 弹窗正文、经络/类别/五行 | 小程序: `font-loader.js` 从生成的 base64 模块加载；H5/App: @font-face |
+| 文源宋体Bold（子集化23KB） | 正文加粗区域 | 小程序: 未单独动态加载，回退到常规宋体/系统字体；H5/App: @font-face |
+
+## 开发与验证
+
+```bash
+npm install
+npm run dev:h5
+npm run build:h5
+npm run build:mp-weixin
+npm run fonts:base64
+node tests/verify-lingui-fix.js
+node tests/verify-algorithms.js
+```
+
+- App 产品版本以 `src/manifest.json` 的 `versionName` / `versionCode` 为准；`package.json` 版本保持同步。
+- `patches/*.patch` 由 `patch-package` 在 `postinstall` 阶段自动应用，用于修复小程序端依赖中的废弃 API 调用。
+- 修改字体 TTF 后先运行 `npm run fonts:base64`，同步小程序端 `loadFontFace` 使用的 base64 生成模块。
+- 当前 DCloud Vue3 工具链将 `@dcloudio/vite-plugin-uni` 的 peer 依赖精确锁定为 `vite@5.2.8`（2026-06 核验，新版 alpha 仍锁定 5.2.8）。`npm audit` 中 Vite/esbuild 相关项主要属于开发服务器与构建链风险；不要直接运行 `npm audit fix --force`，优先限制 dev server 只在本机/可信网络使用，并等待 DCloud 放宽或升级 Vite。
+- 仓库目前没有 `npm test` 脚本，算法校验需直接运行上面的 `node tests/...` 脚本。
 
 ## 技术栈
 
 | 类别 | 技术 |
 |------|------|
-| 框架 | uni-app (Vue 3 + Vite) |
+| 框架 | uni-app (Vue 3 + DCloud 锁定的 Vite 5.2.8) |
 | 状态管理 | Pinia + pinia-plugin-persist-uni |
-| 样式 | SCSS + CSS变量（运行时主题切换） |
+| 样式 | SCSS + 组件主题适配（H5/App 运行时切换） |
 | 日期计算 | lunar-javascript（农历/干支） |
 
 ## 系统要求
@@ -82,7 +100,7 @@ src/
 │   ├── special-points.js    # 五输穴数据
 │   └ acupuncture-points-gb2021.json # 穴位库（GB/T 2021）
 ├── stores/          # Pinia 状态管理
-│   └ app.js         # 时区/主题/纳子法模式/反克显示模式持久化
+│   └ app.js         # 真太阳时/主题/纳子法模式/反克显示模式持久化
 ├── pages/           # 页面
 │   ├── index/       # 取穴页（时间选择 + 结果展示）
 │   └ setting/       # 设置页（全屏弹窗：方法说明、关于）
@@ -92,17 +110,16 @@ src/
 │   ├── CityPicker.vue      # 城市选择器（真太阳时）
 │   ├── DatePicker.vue      # 日历面板（三端统一）
 │   ├── TimePicker.vue      # 时辰选择面板（三端统一）
-│   └ AppNavbar.vue         # 底部导航栏
+│   └ AppNavbar.vue         # 顶部自定义导航栏
 ├── styles/          # 全局样式
 │   ├── variables.scss      # SCSS变量
 │   ├── themes.scss         # 主题CSS变量定义
 │   └ index.scss            # 全局样式 + 字体声明
-├── scripts/         # 构建脚本
-│   └ rebuild_app_vue_fonts.py  # 字体重建脚本
-└── static/          # 静态资源
-    ├── fonts/              # 字体文件（子集化TTF）
-    └ tabbar/               # TabBar图标（4组主题图标）
+├── assets/fonts/    # 字体文件（子集化TTF）与小程序base64中间产物
+└── static/tabbar/   # TabBar图标（4组主题图标）
 ```
+
+根目录还包含 `scripts/`（字体重建、资源处理脚本）、`patches/`（patch-package 补丁）和 `tests/`（算法校验脚本）。
 
 ## 作者
 

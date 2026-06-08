@@ -9,7 +9,7 @@ import base64
 from pathlib import Path
 
 # 配置
-PROJECT_DIR = Path("<PROJECT_ROOT>")
+PROJECT_DIR = Path(__file__).resolve().parents[1]
 APP_VUE_PATH = PROJECT_DIR / "src/App.vue"
 FONT_DIR = PROJECT_DIR / "src/assets/fonts"
 
@@ -73,9 +73,6 @@ export default {{
       global: true,
       family: 'KaitiGB2312',
       source: 'url("data:font/ttf;charset=utf-8;base64,{kaiti_b64}")',
-      success() {{
-        console.log('KaitiGB2312 font loaded')
-      }},
       fail(err) {{
         console.warn('KaitiGB2312 font load failed:', err)
       }}
@@ -86,9 +83,6 @@ export default {{
       global: true,
       family: 'WenYuanSerifSC',
       source: 'url("data:font/ttf;charset=utf-8;base64,{songti_b64}")',
-      success() {{
-        console.log('WenYuanSerifSC font loaded')
-      }},
       fail(err) {{
         console.warn('WenYuanSerifSC font load failed:', err)
       }}
@@ -103,8 +97,7 @@ export default {{
     // 监听 theme 变化，自动更新 tabBar
     watch(
       () => store.theme,
-      (newTheme) => {{
-        console.log('[watch] theme changed:', newTheme)
+      () => {{
         setTimeout(() => store.applyThemeChrome(), 50)
       }}
     )

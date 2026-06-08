@@ -115,7 +115,9 @@
  * 已知坑：
  *   - 弹窗背景框右边截断：所有卡片需加 box-sizing: border-box; width: 100%; overflow: hidden
  *   - 定位文字换行不美观：用 word-break: normal; overflow-wrap: break-word 避免中途断行
- *   - 安卓不支持 KaiTi 字体：需加 'STKaiti', '楷体' 作为 fallback
+ *   - Android 无原生楷体：已打包内置 kaiti-gb2312.ttf（子集化122KB），通过 @font-face 加载
+ *     App端用 #ifdef APP-PLUS，微信小程序用 font-loader.js 加载生成的 base64 模块。详见 index.scss。
+ *     font-family fallback 'KaiTi', '楷体', 'STKaiti' 只是兜底，非主方案。
  *   - 单位统一使用 rpx（2026-05-25 从 px 迁移，确保全App单位一致）
  */
 import { computed } from 'vue'
@@ -334,7 +336,12 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   max-width: 48%;
 }
 
-/* 经络6字且有五行时，经络框变宽，五行框变窄 */
+/* 经络框默认加长，方便显示较长经络名 */
+.info-item:first-child {
+  flex: 1.15;
+}
+
+/* 经络6字且有五行时，经络框进一步变宽，五行框变窄 */
 .info-grid-meridian-long .info-item:first-child {
   flex: 1.3;
 }

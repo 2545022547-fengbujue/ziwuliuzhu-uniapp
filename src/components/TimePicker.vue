@@ -1,6 +1,6 @@
 <template>
   <!--
-    TimePicker.vue - 时辰选择面板（H5/App端专用）
+    TimePicker.vue - 时辰选择面板（三端统一）
 
     功能：
     - 显示12时辰选项（子丑寅卯辰巳午未申酉戌亥）
@@ -10,9 +10,9 @@
     调用方式：
     <TimePicker :value="selectedHourIndex" @change="onHourChange" @close="showTimePicker = false" />
 
-    条件编译：
-    - 仅在 H5 和 App 端使用（微信小程序用原生 picker）
-    - 通过 #ifndef MP-WEIXIN 控制是否渲染此组件
+    平台说明：
+    - H5、App、微信小程序均使用此自定义组件，不依赖原生 picker
+    - 微信小程序端仅在样式层排除不支持的 backdrop-filter
 
     已知坑：
     - 微信小程序不支持 backdrop-filter，需用条件编译排除

@@ -22,13 +22,13 @@ An intelligent acupuncture point selection assistant based on Traditional Chines
 
 ### Other Features
 
-- **True Solar Time Correction** — Adjusts time based on city longitude/latitude. Optional in automatic mode
+- **True Solar Time Correction** — Adjusts time based on city longitude and the equation of time. Optional in automatic mode
 - **Manual Query** — Query opening points for any specified date and time period (Shichen)
-- **Acupuncture Point Details** — Popup showing location, indications, operation method, precautions, etc.
+- **Acupuncture Point Details** — Popup showing location, operation method, precautions, etc.
 
 ## Theme System
 
-4 themes via CSS variables for runtime switching:
+4 themes are adapted at component level, with runtime switching on H5/App:
 
 | Theme | Name | Platform |
 |-------|------|----------|
@@ -46,17 +46,35 @@ Traditional Chinese medical text style: Kaiti (楷体) for titles, Songti (宋�
 
 | Font | Usage | Loading Method |
 |------|-------|----------------|
-| Kaiti GB2312 (subset 122KB) | Titles, point names, Gan-Zhi labels | Mini Program: base64 inline; H5/App: @font-face |
-| WenYuan Serif (subset 226KB) | Popup body text, meridian/category/element | Mini Program: base64 inline; H5/App: @font-face |
-| WenYuan Serif Bold (subset 23KB) | Bold body text areas | Mini Program: base64 inline; H5/App: @font-face |
+| Kaiti GB2312 (subset 122KB) | Titles, point names, Gan-Zhi labels | Mini Program: `font-loader.js` loads the generated base64 module; H5/App: @font-face |
+| WenYuan Serif (subset 226KB) | Popup body text, meridian/category/element | Mini Program: `font-loader.js` loads the generated base64 module; H5/App: @font-face |
+| WenYuan Serif Bold (subset 23KB) | Bold body text areas | Mini Program: not loaded separately and falls back to regular serif/system fonts; H5/App: @font-face |
+
+## Development And Verification
+
+```bash
+npm install
+npm run dev:h5
+npm run build:h5
+npm run build:mp-weixin
+npm run fonts:base64
+node tests/verify-lingui-fix.js
+node tests/verify-algorithms.js
+```
+
+- The App product version is sourced from `versionName` / `versionCode` in `src/manifest.json`; keep `package.json` in sync.
+- `patches/*.patch` files are applied by `patch-package` during `postinstall` to patch deprecated API usage in Mini Program dependencies.
+- After changing TTF files, run `npm run fonts:base64` to sync the generated base64 module used by Mini Program `loadFontFace`.
+- The current DCloud Vue3 toolchain pins the `@dcloudio/vite-plugin-uni` peer dependency to exactly `vite@5.2.8` (verified in 2026-06; newer alpha builds still pin 5.2.8). Vite/esbuild findings from `npm audit` are mainly dev-server/build-tooling risks; do not run `npm audit fix --force`. Keep the dev server limited to local/trusted networks and wait for DCloud to relax or upgrade Vite.
+- This repository currently has no `npm test` script; run the `node tests/...` verification scripts directly.
 
 ## Tech Stack
 
 | Category | Technology |
 |----------|------------|
-| Framework | uni-app (Vue 3 + Vite) |
+| Framework | uni-app (Vue 3 + DCloud-pinned Vite 5.2.8) |
 | State Management | Pinia + pinia-plugin-persist-uni |
-| Styling | SCSS + CSS Variables (runtime theme switching) |
+| Styling | SCSS + component-level theme adaptation (H5/App runtime switching) |
 | Date Calculation | lunar-javascript (lunar calendar / Gan-Zhi) |
 
 ## System Requirements
@@ -82,7 +100,7 @@ src/
 │   ├── special-points.js    # Five Shu points data
 │   └ acupuncture-points-gb2021.json # Acupuncture points library (GB/T 2021)
 ├── stores/          # Pinia State Management
-│   └ app.js         # Persisted: timezone / theme / Na Zi mode / Fan Ke display mode
+│   └ app.js         # Persisted: true solar time / theme / Na Zi mode / Fan Ke display mode
 ├── pages/           # Pages
 │   ├── index/       # Main page (time selection + results display)
 │   └ setting/       # Settings page (fullscreen popup: methods, about)
@@ -92,17 +110,16 @@ src/
 │   ├── CityPicker.vue      # City picker (for true solar time)
 │   ├── DatePicker.vue      # Calendar panel (cross-platform unified)
 │   ├── TimePicker.vue      # Time period picker (cross-platform unified)
-│   └ AppNavbar.vue         # Bottom navigation bar
+│   └ AppNavbar.vue         # Custom top navigation bar
 ├── styles/          # Global Styles
 │   ├── variables.scss      # SCSS variables
 │   ├── themes.scss         # Theme CSS variable definitions
 │   └ index.scss            # Global styles + font declarations
-├── scripts/         # Build Scripts
-│   └ rebuild_app_vue_fonts.py  # Font rebuild script
-└── static/          # Static Assets
-    ├── fonts/              # Font files (subset TTF)
-    └ tabbar/               # TabBar icons (4 theme variants)
+├── assets/fonts/    # Font files (subset TTF) and Mini Program base64 intermediates
+└── static/tabbar/   # TabBar icons (4 theme variants)
 ```
+
+The repository root also contains `scripts/` (font rebuild and asset scripts), `patches/` (patch-package patches), and `tests/` (algorithm verification scripts).
 
 ## Author
 

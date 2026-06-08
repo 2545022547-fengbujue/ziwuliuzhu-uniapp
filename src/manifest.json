@@ -14,15 +14,6 @@
             "autoclose" : true,
             "waiting" : true
         },
-        "icons" : {
-            "android" : {
-                "48" : "/static/icons/icon-48.png",
-                "72" : "/static/icons/icon-72.png",
-                "96" : "/static/icons/icon-96.png",
-                "144" : "/static/icons/icon-144.png",
-                "192" : "/static/icons/icon-192.png"
-            }
-        },
         "distribute" : {
             "android" : {
                 "permissions" : [
