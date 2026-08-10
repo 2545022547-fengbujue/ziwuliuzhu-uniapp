@@ -54,6 +54,14 @@
   font-style: normal;
   font-display: swap;
 }
+/* 水墨风专用：陆昊光 LXGW ZhenKai Slab GB，保留碑刻般的楷体骨架与墨块感 */
+@font-face {
+  font-family: 'LXGWZhenKaiSlabGB';
+  src: url('@/assets/fonts/LXGWZhenKaiSlabGB-subset.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 /* #endif */
 /* 微信小程序：在 font-loader.js 中用 uni.loadFontFace + 生成的 base64 模块动态加载 */
 

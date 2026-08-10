@@ -138,6 +138,12 @@ def main() -> None:
             "楷体 GB2312",
             kaiti_characters,
         ),
+        (
+            Path(r"<HOME_DIR>\LXGWZhenKaiSlabGB-Regular.ttf"),
+            FONT_DIR / "LXGWZhenKaiSlabGB-subset.ttf",
+            "LXGW ZhenKai Slab GB",
+            characters,
+        ),
     ]
 
     print(f"项目字符集：{len(characters)} 个字符")

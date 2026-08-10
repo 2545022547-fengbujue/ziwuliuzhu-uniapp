@@ -1,7 +1,8 @@
 // #ifdef MP-WEIXIN
 import {
   kaitiGB2312Base64,
-  wenYuanSerifBase64
+  wenYuanSerifBase64,
+  lxgwZhenKaiSlabBase64
 } from '@/assets/fonts/mp-font-base64.generated.js'
 // #endif
 
@@ -15,7 +16,8 @@ export function loadMiniProgramFonts() {
   // #ifdef MP-WEIXIN
   const fonts = [
     { family: 'KaitiGB2312', base64: kaitiGB2312Base64 },
-    { family: 'WenYuanSerifSC', base64: wenYuanSerifBase64 }
+    { family: 'WenYuanSerifSC', base64: wenYuanSerifBase64 },
+    { family: 'LXGWZhenKaiSlabGB', base64: lxgwZhenKaiSlabBase64 }
   ]
 
   fonts.forEach(({ family, base64 }) => {

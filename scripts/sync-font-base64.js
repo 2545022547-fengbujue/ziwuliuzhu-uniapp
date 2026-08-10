@@ -19,6 +19,11 @@ const fonts = [
     exportName: 'wenYuanSerifBoldBase64',
     source: 'WenYuanSerifSC-Bold-subset-v2.ttf',
     target: 'bold-v2-base64.txt'
+  },
+  {
+    exportName: 'lxgwZhenKaiSlabBase64',
+    source: 'LXGWZhenKaiSlabGB-subset.ttf',
+    target: 'lxgw-zhenkai-slab-base64.txt'
   }
 ]
 
