@@ -12,7 +12,17 @@
           </view>
           <view class="setting-row">
             <text class="setting-label">启用真太阳时</text>
+            <view
+              v-if="store.activeUiStyle === 'ink'"
+              class="ink-switch"
+              :class="{ active: store.useTrueSolarTime }"
+              @tap="onSolarTimeToggle({ detail: { value: !store.useTrueSolarTime } })"
+            >
+              <view class="ink-switch-track"></view>
+              <view class="ink-switch-knob"></view>
+            </view>
             <switch
+              v-else
               :checked="store.useTrueSolarTime"
               @change="onSolarTimeToggle"
               :color="store.themeSwitchColor"
@@ -62,7 +72,17 @@
               <text class="setting-label">单独显示反克法</text>
               <text class="setting-hint">开启后，反克法有取穴结果时会单独显示</text>
             </view>
+            <view
+              v-if="store.activeUiStyle === 'ink'"
+              class="ink-switch"
+              :class="{ active: store.fankeDisplayMode === 'separate' }"
+              @tap="onFankeModeChange({ detail: { value: store.fankeDisplayMode !== 'separate' } })"
+            >
+              <view class="ink-switch-track"></view>
+              <view class="ink-switch-knob"></view>
+            </view>
             <switch
+              v-else
               :checked="store.fankeDisplayMode === 'separate'"
               @change="onFankeModeChange"
               :color="store.themeSwitchColor"

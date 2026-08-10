@@ -90,7 +90,7 @@ const UI_STYLE_OPTIONS = [
 // 每种新风格的主色（用于 switch 开关等原生组件着色）
 const UI_STYLE_PRIMARY = {
   modern: '#4F46E5',
-  ink: '#2B2B2B',
+  ink: '#2F4A48',
   morandi: '#B08D8D',
   watercolor: '#4A6FA5'
 }
@@ -106,9 +106,9 @@ const UI_STYLE_CHROME = {
     settingSelectedIconPath: '/static/tabbar/setting.png'
   },
   ink: {
-    backgroundColor: '#F7F3EA',
-    color: '#8A8578',
-    selectedColor: '#2B2B2B',
+    backgroundColor: '#FDFDFA',
+    color: '#7A817D',
+    selectedColor: '#2F4A48',
     borderStyle: 'white',
     homeSelectedIconPath: '/static/tabbar/home.png',
     settingSelectedIconPath: '/static/tabbar/setting.png'
