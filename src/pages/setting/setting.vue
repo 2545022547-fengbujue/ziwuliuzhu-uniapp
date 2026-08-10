@@ -1,5 +1,5 @@
 <template>
-  <view class="page" :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '']">
+  <view class="page" :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '', store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : '']">
     <AppNavbar title="设置" />
     <view :style="{ height: navHeight + 'px' }" class="nav-placeholder"></view>
     <scroll-view scroll-y class="page-scroll" :show-scrollbar="false">
@@ -173,7 +173,7 @@
  *   复用 CityPicker 弹窗组件，选择后更新 store 的经度和城市名
  */
 import { ref, computed } from 'vue'
-import { onShow, onBackPress } from '@dcloudio/uni-app'
+import { onShow, onHide, onBackPress } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
@@ -191,9 +191,28 @@ const showAbout = ref(false)
 const version = manifest.versionName || '1.0.0'
 
 const methodDescs = METHOD_DESCS
+let visualClockTimer = null
+
+function startVisualClockTimer() {
+  if (visualClockTimer) clearInterval(visualClockTimer)
+  visualClockTimer = setInterval(() => store.refreshVisualClock(), 60 * 1000)
+}
+
+function stopVisualClockTimer() {
+  if (visualClockTimer) {
+    clearInterval(visualClockTimer)
+    visualClockTimer = null
+  }
+}
 
 onShow(() => {
+  store.refreshVisualClock()
   store.applyThemeChrome()
+  startVisualClockTimer()
+})
+
+onHide(() => {
+  stopVisualClockTimer()
 })
 
 /** 真太阳时开关变化回调，开启时自动弹出城市选择 */

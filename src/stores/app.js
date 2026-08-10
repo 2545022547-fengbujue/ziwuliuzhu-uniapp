@@ -149,6 +149,8 @@ function isKnownTheme(themeId) {
 export const useAppStore = defineStore('app', () => {
   // === 时间状态 ===
   const currentTime = ref(new Date())
+  // 仅服务于时间相关的视觉效果，不参与取穴计算，避免每分钟重算全部算法。
+  const visualClock = ref(new Date())
   const currentHour = ref(0)
   const selectedDate = ref(new Date())
   const selectedHour = ref(0)
@@ -274,6 +276,20 @@ export const useAppStore = defineStore('app', () => {
     return getTrueSolarDate(currentTime.value, longitude.value, useTrueSolarTime.value)
   })
 
+  /** 水墨主题的七时段背景。使用设备当地时间，不受手动查询模式影响。 */
+  const inkBackgroundPeriod = computed(() => {
+    const hour = visualClock.value.getHours()
+    const minuteOfDay = hour * 60 + visualClock.value.getMinutes()
+    if (minuteOfDay >= 300 && minuteOfDay < 390) return 'sunrise'   // 05:00-06:29
+    if (minuteOfDay >= 390 && minuteOfDay < 540) return 'morning'   // 06:30-08:59
+    if (hour >= 9 && hour < 11) return 'forenoon'
+    if (hour >= 11 && hour < 14) return 'noon'
+    if (hour >= 14 && hour < 17) return 'afternoon'
+    if (minuteOfDay >= 1020 && minuteOfDay < 1100) return 'sunset'  // 17:00-18:19
+    if (minuteOfDay >= 1100 && minuteOfDay < 1200) return 'dusk'    // 18:20-19:59
+    return 'night'
+  })
+
   // === Actions（只改状态，不触计算）===
 
   function getEffectiveHourIndex(date) {
@@ -283,6 +299,7 @@ export const useAppStore = defineStore('app', () => {
 
   function updateCurrentTime(forceUpdate = false) {
     const now = new Date()
+    visualClock.value = now
     const newHour = getEffectiveHourIndex(now)
     // 定时器调用时（forceUpdate=false），只在时辰实际变化时才更新，
     // 避免每分钟触发 currentGanZhi/results 的无效重算
@@ -292,6 +309,10 @@ export const useAppStore = defineStore('app', () => {
       currentTime.value = now
       currentHour.value = newHour
     }
+  }
+
+  function refreshVisualClock() {
+    visualClock.value = new Date()
   }
 
   function queryTime(date, hour) {
@@ -435,8 +456,10 @@ export const useAppStore = defineStore('app', () => {
     currentResults,
     currentGanZhi,
     effectiveCurrentTime,
+    inkBackgroundPeriod,
     // Actions
     updateCurrentTime,
+    refreshVisualClock,
     queryTime,
     switchToAutoMode,
     switchToManualMode,
