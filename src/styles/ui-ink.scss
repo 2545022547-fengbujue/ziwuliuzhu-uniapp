@@ -45,6 +45,15 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
     linear-gradient(145deg, #E8E1D4 0%, #F8F4EA 43%, #DED7CA 100%) !important;
   color: $ink-text !important;
 
+  // 明确清除其他风格可能遗留的水彩层：切换风格时根节点不会重建，
+  // 因此水墨必须主动覆盖所有页面级色洗。
+  &.page,
+  .page-scroll,
+  .setting-content {
+    background: transparent !important;
+    background-image: none !important;
+  }
+
   /* === 导航栏：半透明宣纸 + 淡墨线 === */
   .navbar {
     background:
@@ -616,7 +625,19 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   }
 
   .close-icon {
-    color: $ink-text-secondary !important;
+    color: $ink-seal !important;
+    font-family: $ink-song !important;
+    font-weight: 700;
+  }
+
+  .popup .close-btn {
+    background: rgba(176, 58, 46, 0.10) !important;
+    border: 2rpx solid rgba(176, 58, 46, 0.42) !important;
+    box-shadow: 0 4rpx 12rpx rgba(95, 48, 40, 0.16), inset 0 1rpx 0 rgba(255,255,255,0.55) !important;
+  }
+
+  .popup .close-btn:active {
+    background: rgba(176, 58, 46, 0.22) !important;
   }
 
   .info-item,
