@@ -21,7 +21,11 @@
     - 暗夜幽光主题需要毛玻璃效果，但微信小程序不支持 backdrop-filter
   -->
   <view class="date-picker-overlay" @tap="close">
-    <view class="date-picker-panel" :class="`theme-${store.activeTheme}`" @tap.stop>
+    <view
+      class="date-picker-panel"
+      :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '']"
+      @tap.stop
+    >
       <!-- 年份标题（左上角）：◀2026▶ -->
       <view class="year-header">
         <view class="year-nav" @tap="prevYear">

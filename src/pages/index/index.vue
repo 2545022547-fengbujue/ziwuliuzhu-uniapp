@@ -7,7 +7,7 @@
     - 中间：可滚动区域（干支卡片、方法切换、结果面板）
     - 底部：弹窗（PointDetail）
   -->
-  <view class="page" :class="`theme-${store.activeTheme}`">
+  <view class="page" :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '']">
     <!-- 导航栏 -->
     <AppNavbar title="子午流注取穴" />
     <view :style="{ height: navHeight + 'px' }" class="nav-placeholder"></view>

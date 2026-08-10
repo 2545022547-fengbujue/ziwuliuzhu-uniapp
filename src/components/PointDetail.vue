@@ -1,6 +1,9 @@
 <template>
   <view v-if="!point" class="overlay" @tap="handleClose">
-    <view class="popup" @tap.stop>
+    <view class="popup" :class="`watercolor-wash-${watercolorWash}`" @tap.stop>
+      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-primary"></view>
+      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-secondary"></view>
+      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-paper-texture"></view>
       <view class="popup-header">
         <view class="close-btn" @tap="handleClose">
           <text class="close-icon">✕</text>
@@ -12,7 +15,10 @@
     </view>
   </view>
   <view v-else class="overlay" @tap="handleClose">
-    <view class="popup" @tap.stop>
+    <view class="popup" :class="`watercolor-wash-${watercolorWash}`" @tap.stop>
+      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-primary"></view>
+      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-secondary"></view>
+      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-paper-texture"></view>
       <!-- 头部 -->
       <view class="popup-header">
         <view class="header-icon-wrap">
@@ -120,12 +126,72 @@
  *     font-family fallback 'KaiTi', '楷体', 'STKaiti' 只是兜底，非主方案。
  *   - 单位统一使用 rpx（2026-05-25 从 px 迁移，确保全App单位一致）
  */
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { getWuxingColor } from '@/utils/wuxing.js'
 
 const store = useAppStore()
 const point = computed(() => store.selectedPoint)
+const watercolorWashes = ['mist', 'peach', 'ocean', 'rose', 'golden', 'shore']
+
+function getSecureRandomIndex(length) {
+  const cryptoApi = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined
+
+  if (cryptoApi?.getRandomValues) {
+    const range = 0x100000000
+    const unbiasedLimit = range - (range % length)
+    const randomValue = new Uint32Array(1)
+
+    do {
+      cryptoApi.getRandomValues(randomValue)
+    } while (randomValue[0] >= unbiasedLimit)
+
+    return randomValue[0] % length
+  }
+
+  // 部分小程序/App WebView 不提供 Web Crypto；混合高精度时间作为兼容回退。
+  const highResolutionTime = typeof performance !== 'undefined'
+    ? Math.floor(performance.now() * 1000)
+    : 0
+  let seed = (Date.now() ^ highResolutionTime ^ Math.floor(Math.random() * 0xFFFFFFFF)) >>> 0
+  seed ^= seed << 13
+  seed ^= seed >>> 17
+  seed ^= seed << 5
+  return (seed >>> 0) % length
+}
+
+const watercolorWash = ref(watercolorWashes[getSecureRandomIndex(watercolorWashes.length)])
+
+function applyRandomValue(value) {
+  const range = 0x100000000
+  const unbiasedLimit = range - (range % watercolorWashes.length)
+  if (value < unbiasedLimit) {
+    watercolorWash.value = watercolorWashes[value % watercolorWashes.length]
+    return true
+  }
+  return false
+}
+
+// TabBar 位于页面根节点之外，详情弹窗显示时须单独隐藏，避免破坏模态焦点。
+onMounted(() => {
+  // #ifdef MP-WEIXIN
+  wx.getRandomValues({
+    length: 16,
+    success: ({ randomValues }) => {
+      const values = new Uint32Array(randomValues)
+      for (const value of values) {
+        if (applyRandomValue(value)) break
+      }
+    }
+  })
+  // #endif
+
+  uni.hideTabBar({ animation: false })
+})
+
+onUnmounted(() => {
+  uni.showTabBar({ animation: false })
+})
 
 // 纳子法补母泻子说明文字
 const naziBumuTip = computed(() => {
@@ -185,7 +251,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 .overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 200;
+  z-index: 1100;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
@@ -257,7 +323,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   font-size: 76rpx;
   font-weight: 700;
   color: var(--theme-text);
-  font-family: 'KaitiGB2312', 'KaiTi', '楷体', 'STKaiti', serif;
+  font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', '楷体', 'STKaiti', serif;
   line-height: 1.2;
 }
 

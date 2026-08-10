@@ -78,6 +78,65 @@ const THEME_CHROME = {
   }
 }
 
+// === 多套界面风格（uiStyle）===
+// classic = 原始界面（theme-* 主题体系）；其余为全新界面风格（ui-* class 体系）
+const UI_STYLE_OPTIONS = [
+  { id: 'modern', name: '现代简约', desc: '留白扁平，干净清爽' },
+  { id: 'ink', name: '水墨意境', desc: '宣纸墨色，东方留白' },
+  { id: 'morandi', name: '莫兰迪奶油', desc: '低饱和灰调，温柔治愈' },
+  { id: 'watercolor', name: '水彩画风', desc: '纸面晕染，柔和诗意' }
+]
+
+// 每种新风格的主色（用于 switch 开关等原生组件着色）
+const UI_STYLE_PRIMARY = {
+  modern: '#4F46E5',
+  ink: '#2B2B2B',
+  morandi: '#B08D8D',
+  watercolor: '#4A6FA5'
+}
+
+// 每种新风格的 TabBar 配色；可按风格同时覆盖普通与选中图标。
+const UI_STYLE_CHROME = {
+  modern: {
+    backgroundColor: '#FFFFFF',
+    color: '#9CA3AF',
+    selectedColor: '#4F46E5',
+    borderStyle: 'white',
+    homeSelectedIconPath: '/static/tabbar/home.png',
+    settingSelectedIconPath: '/static/tabbar/setting.png'
+  },
+  ink: {
+    backgroundColor: '#F7F3EA',
+    color: '#8A8578',
+    selectedColor: '#2B2B2B',
+    borderStyle: 'white',
+    homeSelectedIconPath: '/static/tabbar/home.png',
+    settingSelectedIconPath: '/static/tabbar/setting.png'
+  },
+  morandi: {
+    backgroundColor: '#F7F4EE',
+    color: '#A8A196',
+    selectedColor: '#B08D8D',
+    borderStyle: 'white',
+    homeSelectedIconPath: '/static/tabbar/home.png',
+    settingSelectedIconPath: '/static/tabbar/setting.png'
+  },
+  watercolor: {
+    backgroundColor: '#FAF8F5',
+    color: '#8A9DB3',
+    selectedColor: '#4A6FA5',
+    borderStyle: 'white',
+    homeIconPath: '/static/tabbar/home-watercolor.png',
+    homeSelectedIconPath: '/static/tabbar/home-watercolor-active.png',
+    settingIconPath: '/static/tabbar/setting-watercolor.png',
+    settingSelectedIconPath: '/static/tabbar/setting-watercolor-active.png'
+  }
+}
+
+function isKnownUiStyle(styleId) {
+  return styleId === 'classic' || UI_STYLE_OPTIONS.some(s => s.id === styleId)
+}
+
 let supportsThemeSwitch = false
 // #ifdef H5 || APP-PLUS
 supportsThemeSwitch = true
@@ -103,6 +162,8 @@ export const useAppStore = defineStore('app', () => {
   const selectedPoint = ref(null)
   const naziMode = ref('daily')  // 纳子法模式：'daily'(一日六十六穴) | 'bumu'(补母泻子)
   const theme = ref('yellow')
+  // 外观风格内部状态：classic 使用传统配色主题，其余使用独立视觉方案
+  const uiStyle = ref('classic')
 
   // === 真太阳时设置 ===
   const useTrueSolarTime = ref(false)
@@ -173,7 +234,33 @@ export const useAppStore = defineStore('app', () => {
     return supportsThemeSwitch && isKnownTheme(theme.value) ? theme.value : 'yellow'
   })
 
+  // 兜底校验：持久化值非法（如风格已下架）时回退经典界面
+  const activeUiStyle = computed(() => {
+    return isKnownUiStyle(uiStyle.value) ? uiStyle.value : 'classic'
+  })
+
+  // 设置页只展示一套“外观风格”，避免 theme 与 uiStyle 两套概念互相覆盖。
+  const appearanceOptions = computed(() => [
+    ...THEME_OPTIONS.map(item => ({
+      id: `theme-${item.id}`,
+      name: item.name,
+      desc: item.desc,
+      swatch: item.id,
+      active: activeUiStyle.value === 'classic' && activeTheme.value === item.id
+    })),
+    ...UI_STYLE_OPTIONS.map(item => ({
+      id: `style-${item.id}`,
+      name: item.name,
+      desc: item.desc,
+      active: activeUiStyle.value === item.id
+    }))
+  ])
+
   const themePrimaryColor = computed(() => {
+    // 新界面风格下使用风格专属主色（此时外观主题设置不生效）
+    if (activeUiStyle.value !== 'classic' && UI_STYLE_PRIMARY[activeUiStyle.value]) {
+      return UI_STYLE_PRIMARY[activeUiStyle.value]
+    }
     return THEME_CHROME[activeTheme.value]?.selectedColor || THEME_CHROME.yellow.selectedColor
   })
 
@@ -257,25 +344,48 @@ export const useAppStore = defineStore('app', () => {
     }
     if (isKnownTheme(nextTheme)) {
       theme.value = nextTheme
+      uiStyle.value = 'classic'
       applyThemeChrome()
+    }
+  }
+
+  /** 切换独立界面风格，切换后同步刷新 TabBar 配色 */
+  function setUiStyle(styleId) {
+    uiStyle.value = isKnownUiStyle(styleId) ? styleId : 'classic'
+    applyThemeChrome()
+  }
+
+  function setAppearance(optionId) {
+    if (optionId.startsWith('theme-')) {
+      setTheme(optionId.slice(6))
+    } else if (optionId.startsWith('style-')) {
+      setUiStyle(optionId.slice(6))
     }
   }
 
   function applyThemeChrome() {
     if (!supportsThemeSwitch) return
-    const chrome = THEME_CHROME[activeTheme.value]
+    const chrome = activeUiStyle.value === 'classic'
+      ? THEME_CHROME[activeTheme.value]
+      : UI_STYLE_CHROME[activeUiStyle.value]
     if (!chrome) return
     try {
-      const { homeSelectedIconPath, settingSelectedIconPath, ...style } = chrome
+      const {
+        homeIconPath = '/static/tabbar/home.png',
+        homeSelectedIconPath,
+        settingIconPath = '/static/tabbar/setting.png',
+        settingSelectedIconPath,
+        ...style
+      } = chrome
       uni.setTabBarStyle(style)
       uni.setTabBarItem({
         index: 0,
-        iconPath: '/static/tabbar/home.png',
+        iconPath: homeIconPath,
         selectedIconPath: homeSelectedIconPath
       })
       uni.setTabBarItem({
         index: 1,
-        iconPath: '/static/tabbar/setting.png',
+        iconPath: settingIconPath,
         selectedIconPath: settingSelectedIconPath
       })
     } catch (e) {
@@ -308,6 +418,10 @@ export const useAppStore = defineStore('app', () => {
     selectedPoint,
     naziMode,
     theme,
+    uiStyle,
+    activeUiStyle,
+    uiStyles: UI_STYLE_OPTIONS,
+    appearanceOptions,
     activeTheme,
     themePrimaryColor,
     themeSwitchColor,
@@ -330,6 +444,8 @@ export const useAppStore = defineStore('app', () => {
     setActiveMethod,
     setNaziMode,
     setTheme,
+    setUiStyle,
+    setAppearance,
     applyThemeChrome,
     selectPoint,
     closeDetail
@@ -355,7 +471,7 @@ export const useAppStore = defineStore('app', () => {
             }
           }
         },
-        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'theme']
+        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'theme', 'uiStyle']
       }
     ]
   }

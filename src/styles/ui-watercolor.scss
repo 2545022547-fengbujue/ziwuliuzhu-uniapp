@@ -1,0 +1,964 @@
+/* ============================================
+   水彩画风（ui-watercolor）
+
+   依据 STYLEKIT watercolor-style 规范实现：
+   - 纸张底 #FAF8F5 + 水彩晕染径向渐变色块（蓝/粉/绿低透明叠加）
+   - 细边框 rgba(74,111,165,0.20)（规范的 border-[#4a6fa5]/20）
+   - 弥散柔影 rgba(74,111,165,0.12)（规范的 shadow 体系）
+   - 大圆角（规范的 rounded-2xl/3xl → 24~32rpx）
+   - 标题 serif light + 宽字距，正文 sans light
+   - 禁止项遵守：无纯黑、无直角、无硬阴影、无粗字重、无刺眼饱和色
+
+   注：规范中 [TEMPLATES]/[CHECKLIST] 两段（border-black/font-black/硬阴影）
+   与 Token 字典及 FORBIDDEN 自相矛盾（疑从其他风格误复制），按水彩本体规则执行。
+
+   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
+   ============================================ */
+
+$wc-primary: #4A6FA5;            // 水彩蓝（规范主色）
+$wc-primary-dark: #3B5A87;
+$wc-apricot: #E8A87C;            // Figma accent-1：杏橙
+$wc-teal: #85CDCA;               // Figma accent-2：青绿
+$wc-rose: #C38D94;               // Figma accent-3：豆沙粉
+$wc-ochre: #D4A373;              // Figma accent-4：赭金
+$wc-bg: #FAF8F5;                 // 水彩纸底（规范底色）
+$wc-surface: rgba(253, 251, 247, 0.86); // 半透明卡片纸面，让底层色洗透出
+$wc-muted: rgba(74, 111, 165, 0.07);
+$wc-text: #3E4450;
+$wc-text-secondary: #6E7686;
+$wc-text-hint: #A3AAB8;
+$wc-border: rgba(74, 111, 165, 0.20);      // 规范细边框
+$wc-shadow: 0 8rpx 40rpx rgba(74, 111, 165, 0.12);  // 规范中阴影
+$wc-serif: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
+$wc-sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+
+.ui-watercolor {
+  /* === 主题变量重定义 === */
+  --theme-primary: #{$wc-primary};
+  --theme-primary-dark: #{$wc-primary-dark};
+  --theme-secondary: #{$wc-teal};
+  --theme-bg: #{$wc-bg};
+  --theme-surface: #{$wc-surface};
+  --theme-surface-muted: #{$wc-muted};
+  --theme-text: #{$wc-text};
+  --theme-text-secondary: #{$wc-text-secondary};
+  --theme-text-hint: #{$wc-text-hint};
+  --theme-border: #{$wc-border};
+  --theme-shadow: rgba(74, 111, 165, 0.10);
+  --wc-accent-1: #{$wc-apricot};
+  --wc-accent-2: #{$wc-teal};
+  --wc-accent-3: #{$wc-rose};
+  --wc-accent-4: #{$wc-ochre};
+
+  // 纸底 + 重叠色洗：用更大面积的低透明晕染模拟湿纸扩散。
+  background:
+    radial-gradient(ellipse at 2% 6%, rgba(232, 168, 124, 0.20), transparent 42%),
+    radial-gradient(ellipse at 96% 18%, rgba(133, 205, 202, 0.20), transparent 44%),
+    radial-gradient(ellipse at 74% 94%, rgba(195, 141, 148, 0.17), transparent 42%),
+    radial-gradient(ellipse at 10% 88%, rgba(212, 163, 115, 0.13), transparent 36%),
+    $wc-bg !important;
+  color: $wc-text !important;
+
+  // 页面组件自身有实色背景；在根容器重复纸面晕染，确保水彩特征可见。
+  &.page {
+    background:
+      radial-gradient(ellipse at 0% 6%, rgba(232, 168, 124, 0.22), transparent 40%),
+      radial-gradient(ellipse at 100% 30%, rgba(133, 205, 202, 0.22), transparent 42%),
+      radial-gradient(ellipse at 74% 100%, rgba(195, 141, 148, 0.18), transparent 42%),
+      radial-gradient(ellipse at 8% 92%, rgba(212, 163, 115, 0.14), transparent 34%),
+      $wc-bg !important;
+  }
+
+  /* === 导航栏：纸面透明 + 细蓝线 + serif 标题 === */
+  .navbar {
+    background: rgba(250, 248, 245, 0.92) !important;
+    border-bottom: 1rpx solid $wc-border !important;
+    backdrop-filter: none !important;
+  }
+
+  .navbar-title {
+    color: $wc-text !important;
+    font-family: $wc-serif !important;
+    font-weight: 400;
+    letter-spacing: 6rpx !important;
+  }
+
+  /* === 卡片通用：纸面 + 细蓝边 + 弥散蓝影 + 大圆角（规范 REQUIRED） === */
+  .ganzhi-card,
+  .method-tabs,
+  .result-panel,
+  .setting-card,
+  .method-card,
+  .desc-card,
+  .info-card,
+  .confirm-popup,
+  .fullscreen-panel,
+  .date-picker-panel,
+  .time-picker-panel {
+    background: $wc-surface !important;
+    box-shadow: $wc-shadow !important;
+    border: 1rpx solid $wc-border !important;
+    border-radius: 32rpx 26rpx 34rpx 28rpx !important;
+    backdrop-filter: none !important;
+  }
+
+  // 穴位详情在每次打开时随机采用一种 Showcase 色洗；均以不透明纸面收底。
+  .popup {
+    background: #FDFBF7 !important;
+    position: relative;
+  }
+
+  .watercolor-wash-layer {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(112rpx);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .watercolor-wash-primary {
+    width: 70%;
+    height: 70%;
+    top: -10%;
+    left: -5%;
+  }
+
+  .watercolor-wash-secondary {
+    width: 55%;
+    height: 55%;
+    right: -4%;
+    bottom: -8%;
+  }
+
+  .watercolor-paper-texture {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.16;
+    background-image:
+      repeating-linear-gradient(18deg, rgba(74, 111, 165, 0.025) 0, rgba(74, 111, 165, 0.025) 1rpx, transparent 1rpx, transparent 7rpx),
+      repeating-linear-gradient(102deg, rgba(212, 163, 115, 0.022) 0, rgba(212, 163, 115, 0.022) 1rpx, transparent 1rpx, transparent 9rpx);
+  }
+
+  .popup.watercolor-wash-mist {
+    .watercolor-wash-primary { background: rgba(74, 111, 165, 0.22); }
+    .watercolor-wash-secondary { background: rgba(133, 205, 202, 0.18); }
+  }
+
+  .popup.watercolor-wash-peach {
+    .watercolor-wash-primary { background: rgba(232, 168, 124, 0.22); }
+    .watercolor-wash-secondary { background: rgba(212, 163, 115, 0.18); }
+  }
+
+  .popup.watercolor-wash-ocean {
+    .watercolor-wash-primary { background: rgba(133, 205, 202, 0.22); }
+    .watercolor-wash-secondary { background: rgba(74, 111, 165, 0.18); }
+  }
+
+  .popup.watercolor-wash-rose {
+    .watercolor-wash-primary { background: rgba(195, 141, 148, 0.22); }
+    .watercolor-wash-secondary { background: rgba(232, 168, 124, 0.18); }
+  }
+
+  .popup.watercolor-wash-golden {
+    .watercolor-wash-primary { background: rgba(212, 163, 115, 0.22); }
+    .watercolor-wash-secondary { background: rgba(232, 168, 124, 0.18); }
+  }
+
+  .popup.watercolor-wash-shore {
+    .watercolor-wash-primary { background: rgba(133, 205, 202, 0.22); }
+    .watercolor-wash-secondary { background: rgba(195, 141, 148, 0.18); }
+  }
+
+  .popup-body {
+    background: transparent !important;
+    position: relative;
+    z-index: 1;
+  }
+
+  // 标题栏与正文共用同一张色洗纸面，避免详情弹窗被视觉上切成两块。
+  .popup .popup-header {
+    background: transparent !important;
+    position: relative;
+    z-index: 1;
+  }
+
+  .popup .close-btn {
+    background: rgba(253, 251, 247, 0.72) !important;
+    border: 1rpx solid rgba(74, 111, 165, 0.20) !important;
+    box-shadow: 0 4rpx 18rpx rgba(74, 111, 165, 0.12) !important;
+  }
+
+  .popup .close-icon {
+    color: $wc-primary !important;
+  }
+
+  /* === 干支卡片 === */
+  .ganzhi-title {
+    color: $wc-text-hint !important;
+    font-family: $wc-serif !important;
+    letter-spacing: 6rpx;
+  }
+
+  .ganzhi-toggle {
+    background: $wc-muted !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+    padding: 6rpx !important;
+  }
+
+  .toggle-btn {
+    border-radius: 999rpx !important;
+
+    &.active {
+      background: $wc-surface !important;
+      border: 1rpx solid $wc-border !important;
+      box-shadow: 0 4rpx 20rpx rgba(74, 111, 165, 0.15) !important;
+
+      .toggle-text {
+        color: $wc-primary !important;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .toggle-icon {
+    display: none !important;
+  }
+
+  .toggle-text {
+    color: $wc-text-secondary !important;
+  }
+
+  .manual-controls {
+    background: $wc-muted !important;
+    border: none !important;
+    border-radius: 24rpx !important;
+    backdrop-filter: none !important;
+  }
+
+  .control-label {
+    color: $wc-text-secondary !important;
+  }
+
+  .picker-btn {
+    background: rgba(255, 255, 255, 0.60) !important;   // 规范输入框 bg-white/60
+    border: 1rpx solid $wc-border !important;
+    border-radius: 24rpx !important;
+    backdrop-filter: none !important;
+
+    text {
+      color: $wc-text !important;
+    }
+  }
+
+  // 查询按钮：水彩蓝渐变 + 弥散影
+  .query-btn {
+    background: linear-gradient(135deg, #6B8FBF 0%, $wc-primary 100%) !important;
+    border: none !important;
+    border-radius: 24rpx !important;
+    box-shadow: 0 8rpx 40rpx rgba(74, 111, 165, 0.20) !important;
+  }
+
+  .query-btn-text {
+    font-weight: 400;
+    letter-spacing: 4rpx;
+  }
+
+  .current-datetime {
+    border-top-color: $wc-border !important;
+  }
+
+  .datetime-text {
+    color: $wc-text-hint !important;
+  }
+
+  .datetime-value {
+    color: $wc-text-secondary !important;
+  }
+
+  // 干支标签：两行两列水彩晕染块，日/时为蓝色晕染加深
+  .ganzhi-display {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16rpx;
+  }
+
+  .ganzhi-tag-item {
+    width: calc(50% - 8rpx);
+    box-sizing: border-box;
+    padding: 24rpx 0 !important;
+    background: linear-gradient(135deg, rgba(74, 111, 165, 0.10) 0%, rgba(195, 141, 148, 0.10) 100%) !important;
+    border: none !important;
+    border-radius: 24rpx !important;
+
+    &.highlight {
+      background: linear-gradient(135deg, #6B8FBF 0%, $wc-primary 100%) !important;
+      box-shadow: 0 8rpx 30rpx rgba(74, 111, 165, 0.22) !important;
+
+      .ganzhi-tag-text {
+        color: #FDFBF7 !important;
+      }
+    }
+  }
+
+  .ganzhi-tag-text {
+    color: $wc-primary !important;
+    font-family: $wc-serif !important;
+    font-weight: 400;
+    font-size: 32rpx !important;
+  }
+
+  /* === 方法切换栏：淡蓝轨道 + 纸面滑块 === */
+  .method-tabs {
+    background: $wc-muted !important;
+    border: 1rpx solid $wc-border !important;
+    border-radius: 999rpx !important;
+    box-shadow: none !important;
+    padding: 8rpx !important;
+  }
+
+  .method-tab {
+    border-radius: 999rpx !important;
+
+    &.active {
+      background: $wc-surface !important;
+      border: none !important;
+      box-shadow: 0 4rpx 20rpx rgba(74, 111, 165, 0.15) !important;
+      transform: none !important;
+
+      .method-name {
+        color: $wc-primary !important;
+        font-weight: 500;
+      }
+
+      .method-icon {
+        color: $wc-rose !important;
+        transform: none !important;
+      }
+    }
+
+    &:not(.active) {
+      .method-name {
+        color: $wc-text-secondary !important;
+      }
+
+      .method-icon {
+        color: $wc-text-hint !important;
+      }
+    }
+  }
+
+  .method-indicator {
+    display: none !important;
+  }
+
+  /* === 结果面板 === */
+  .panel-header {
+    background: $wc-surface !important;
+    border-bottom: 1rpx solid $wc-border !important;
+  }
+
+  .header-title {
+    color: $wc-text !important;
+    font-family: $wc-serif !important;
+    font-weight: 400;
+    letter-spacing: 4rpx;
+  }
+
+  .header-icon {
+    color: $wc-rose !important;
+  }
+
+  .result-ganzhi-date,
+  .result-ganzhi-hour-label {
+    color: $wc-text-hint !important;
+  }
+
+  // 时辰标签：水彩粉晕染
+  .result-ganzhi-hour-tag {
+    background: linear-gradient(135deg, #D4A5B5 0%, $wc-rose 100%) !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+  }
+
+  .result-ganzhi-hour-text {
+    color: #FDFBF7 !important;
+    font-weight: 400;
+  }
+
+  .warning-box {
+    background: rgba(212, 163, 115, 0.14) !important;
+    border: 1rpx solid rgba(212, 163, 115, 0.34) !important;
+    border-radius: 24rpx !important;
+  }
+
+  .warning-text {
+    color: #96702A !important;
+    font-weight: 400;
+  }
+
+  .section-title {
+    color: $wc-text-secondary !important;
+    font-family: $wc-serif !important;
+    letter-spacing: 3rpx;
+  }
+
+  .dot.primary,
+  .dot.secondary,
+  .title-dot {
+    background: $wc-teal !important;
+  }
+
+  .dot.fanke {
+    background: $wc-rose !important;
+  }
+
+  .fanke-merged {
+    background: $wc-muted !important;
+    border-color: $wc-border !important;
+  }
+
+  // 穴位按钮：纸面细蓝边药片
+  .point-btn {
+    background: rgba(255, 255, 255, 0.60) !important;
+    border: 1rpx solid $wc-border !important;
+    border-radius: 24rpx !important;
+    backdrop-filter: none !important;
+
+    &:active {
+      background: rgba(74, 111, 165, 0.12) !important;
+    }
+  }
+
+  .point-name {
+    color: $wc-primary !important;
+    font-family: $wc-serif !important;
+    font-weight: 400;
+  }
+
+  .point-code {
+    color: $wc-text-hint !important;
+  }
+
+  .tag-primary {
+    background: rgba(133, 205, 202, 0.18) !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+
+    text {
+      color: #397C7A !important;
+    }
+  }
+
+  .nazi-mode-switch {
+    background: $wc-muted !important;
+    border: 1rpx solid $wc-border !important;
+    border-radius: 999rpx !important;
+    overflow: hidden;
+  }
+
+  .switch-option {
+    background: transparent !important;
+    color: $wc-text-secondary !important;
+    border-radius: 999rpx !important;
+
+    &.active {
+      background: $wc-surface !important;
+      color: $wc-primary !important;
+      box-shadow: 0 4rpx 16rpx rgba(74, 111, 165, 0.15) !important;
+    }
+  }
+
+  .palace-box {
+    background: rgba(195, 141, 148, 0.12) !important;
+    border: 1rpx solid rgba(195, 141, 148, 0.28) !important;
+    border-radius: 24rpx !important;
+  }
+
+  .palace-icon {
+    color: $wc-rose !important;
+  }
+
+  .palace-text {
+    color: $wc-text-secondary !important;
+  }
+
+  .palace-note {
+    color: $wc-text-hint !important;
+  }
+
+  .suggestion-box {
+    background: rgba(133, 205, 202, 0.16) !important;
+    border: 1rpx solid rgba(133, 205, 202, 0.34) !important;
+    border-radius: 24rpx !important;
+  }
+
+  .suggestion-title {
+    color: #397C7A !important;
+    font-weight: 500;
+  }
+
+  .principle-text {
+    color: $wc-text-secondary !important;
+  }
+
+  .bumu-tip {
+    background: $wc-muted !important;
+    border: none !important;
+  }
+
+  .bumu-tip-icon,
+  .bumu-tip-text {
+    color: $wc-text-hint !important;
+  }
+
+  .empty-text {
+    color: $wc-text-hint !important;
+  }
+
+  /* === 反克法补充 === */
+  .fanke-supplement {
+    background: $wc-surface !important;
+    border: 1rpx dashed rgba(195, 141, 148, 0.40) !important;
+    border-radius: 28rpx !important;
+  }
+
+  .fanke-icon,
+  .fanke-title {
+    color: $wc-rose !important;
+  }
+
+  .fanke-desc {
+    color: $wc-text-hint !important;
+  }
+
+  /* === 对比区域 === */
+  .divider-line {
+    background: $wc-border !important;
+  }
+
+  .divider-text {
+    color: $wc-text-hint !important;
+    font-family: $wc-serif !important;
+    letter-spacing: 6rpx;
+  }
+
+  /* === 确认弹窗 === */
+  .confirm-title {
+    color: $wc-text !important;
+    font-family: $wc-serif !important;
+    font-weight: 400;
+  }
+
+  .confirm-info {
+    border-bottom-color: $wc-border !important;
+  }
+
+  .confirm-label {
+    color: $wc-text-hint !important;
+  }
+
+  .confirm-value {
+    background: $wc-muted !important;
+    border: none !important;
+    color: $wc-text !important;
+  }
+
+  .confirm-cancel {
+    background: $wc-muted !important;
+    border: none !important;
+    border-radius: 24rpx !important;
+
+    text {
+      color: $wc-text-secondary !important;
+    }
+  }
+
+  .confirm-ok {
+    background: linear-gradient(135deg, #6B8FBF 0%, $wc-primary 100%) !important;
+    border: none !important;
+    border-radius: 24rpx !important;
+    box-shadow: 0 8rpx 40rpx rgba(74, 111, 165, 0.20) !important;
+  }
+
+  /* === 设置页 === */
+  .setting-row,
+  .info-row,
+  .popup-header,
+  .popup-footer,
+  .fullscreen-header,
+  .province-group,
+  .city-item,
+  .method-desc {
+    border-color: $wc-border !important;
+  }
+
+  .card-title {
+    color: $wc-text !important;
+    font-family: $wc-serif !important;
+    font-weight: 400;
+    letter-spacing: 3rpx;
+  }
+
+  .setting-label,
+  .theme-name {
+    color: $wc-text !important;
+  }
+
+  .setting-value,
+  .method-detail {
+    color: $wc-text-secondary !important;
+  }
+
+  .setting-hint,
+  .setting-tip,
+  .picker-arrow,
+  .theme-expand-arrow,
+  .theme-desc,
+  .app-version,
+  .disclaimer-text {
+    color: $wc-text-hint !important;
+  }
+
+  .theme-current,
+  .ui-style-option {
+    background: $wc-muted !important;
+    border-color: $wc-border !important;
+  }
+
+  .ui-style-name {
+    color: $wc-text !important;
+  }
+
+  .ui-style-desc {
+    color: $wc-text-hint !important;
+  }
+
+  .ui-style-option.active {
+    background: $wc-surface !important;
+    border-color: $wc-primary !important;
+    box-shadow: 0 4rpx 20rpx rgba(74, 111, 165, 0.15) !important;
+
+    .ui-style-name {
+      color: $wc-primary !important;
+    }
+  }
+
+  .theme-option {
+    background: $wc-surface !important;
+    border-color: $wc-border !important;
+
+    &.active {
+      background: rgba(74, 111, 165, 0.10) !important;
+      border-color: $wc-primary !important;
+    }
+  }
+
+  .city-picker-btn {
+    background: rgba(255, 255, 255, 0.60) !important;
+    border-color: $wc-border !important;
+  }
+
+  .city-name-text {
+    color: $wc-primary !important;
+  }
+
+  .fullscreen-overlay {
+    background: $wc-bg !important;
+  }
+
+  .fullscreen-header {
+    background: $wc-surface !important;
+    border-bottom: 1rpx solid $wc-border !important;
+  }
+
+  .fullscreen-title {
+    color: $wc-text !important;
+    font-family: $wc-serif !important;
+    font-weight: 400;
+    letter-spacing: 6rpx;
+  }
+
+  .app-name {
+    color: $wc-text !important;
+    font-family: $wc-serif !important;
+    font-weight: 400;
+    letter-spacing: 8rpx;
+  }
+
+  .logo-icon {
+    color: $wc-rose !important;
+  }
+
+  .desc-text {
+    color: $wc-text-secondary !important;
+  }
+
+  .disclaimer-card {
+    background: $wc-muted !important;
+    border-color: $wc-border !important;
+  }
+
+  .disclaimer-label {
+    color: $wc-text-hint !important;
+  }
+
+  /* === 穴位详情弹窗 === */
+  .popup-header {
+    background: $wc-surface !important;
+    border-bottom: 1rpx solid $wc-border !important;
+  }
+
+  .popup-title {
+    color: $wc-text !important;
+    font-family: $wc-serif !important;
+    font-weight: 400;
+  }
+
+  .header-icon-wrap {
+    background: rgba(195, 141, 148, 0.14) !important;
+    border: 1rpx solid rgba(195, 141, 148, 0.30) !important;
+  }
+
+  .header-icon {
+    color: $wc-rose !important;
+  }
+
+  // 穴位大名：serif 蓝色
+  .popup .point-name {
+    color: $wc-primary !important;
+    font-family: $wc-serif !important;
+  }
+
+  .close-icon {
+    color: $wc-text-secondary !important;
+  }
+
+  .info-item,
+  .location-box,
+  .method-item {
+    background: $wc-muted !important;
+    border: 1rpx solid $wc-border !important;
+    backdrop-filter: none !important;
+  }
+
+  .info-label,
+  .method-label {
+    color: $wc-text-hint !important;
+  }
+
+  .info-value,
+  .method-value,
+  .location-text {
+    color: $wc-text !important;
+  }
+
+  .caution-box {
+    background: rgba(232, 168, 124, 0.16) !important;
+    border: 1rpx solid rgba(232, 168, 124, 0.36) !important;
+  }
+
+  .caution-title,
+  .caution-icon {
+    color: #9A6238 !important;
+  }
+
+  .caution-text {
+    color: #754527 !important;
+  }
+
+  .nazi-bumu-tip {
+    background: $wc-muted !important;
+    border: none !important;
+  }
+
+  .nazi-bumu-tip-text {
+    color: $wc-text-secondary !important;
+  }
+
+  /* === 日历/时辰面板（px 单位组件） === */
+  .date-picker-panel,
+  .time-picker-panel {
+    border-radius: 18px !important;
+  }
+
+  .year-nav,
+  .month-nav {
+    background: $wc-muted !important;
+    border: 1px solid $wc-border !important;
+  }
+
+  .year-arrow,
+  .month-arrow {
+    color: $wc-primary !important;
+  }
+
+  .year-text,
+  .month-text,
+  .picker-title-text {
+    color: $wc-text !important;
+    font-family: $wc-serif !important;
+  }
+
+  .week-item {
+    color: $wc-text-hint !important;
+  }
+
+  .day-item {
+    &.selected {
+      background: linear-gradient(135deg, #6B8FBF 0%, $wc-primary 100%) !important;
+      box-shadow: 0 4rpx 20rpx rgba(74, 111, 165, 0.25) !important;
+    }
+  }
+
+  .hour-item {
+    &.selected {
+      background: linear-gradient(135deg, #6B8FBF 0%, $wc-primary 100%) !important;
+      border: none !important;
+      box-shadow: 0 4rpx 20rpx rgba(74, 111, 165, 0.25) !important;
+    }
+  }
+
+  .action-btn.confirm,
+  .btn-confirm {
+    background: linear-gradient(135deg, #6B8FBF 0%, $wc-primary 100%) !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .action-btn.cancel,
+  .btn-cancel {
+    background: $wc-muted !important;
+    border: none !important;
+  }
+
+  /* === 城市选择弹窗 === */
+  .search-input {
+    background: rgba(255, 255, 255, 0.60) !important;
+    border: 1px solid $wc-border !important;
+    color: $wc-text !important;
+  }
+
+  .search-label,
+  .city-list-label {
+    color: $wc-text-hint !important;
+  }
+
+  .tip-box {
+    background: rgba(133, 205, 202, 0.16) !important;
+    border: 1px solid rgba(133, 205, 202, 0.34) !important;
+  }
+
+  .tip-title {
+    color: #397C7A !important;
+  }
+
+  .tip-desc {
+    color: $wc-text-secondary !important;
+  }
+
+  .province-header {
+    background: $wc-muted !important;
+
+    &:active {
+      background: $wc-border !important;
+    }
+  }
+
+  .province-name-text {
+    color: $wc-text !important;
+  }
+
+  .province-count,
+  .province-arrow {
+    color: $wc-text-hint !important;
+  }
+
+  .province-cities {
+    background: $wc-surface !important;
+    border: none !important;
+  }
+
+  .city-item {
+    &.selected {
+      background: rgba(74, 111, 165, 0.10) !important;
+    }
+  }
+
+  .city-abbr {
+    background: $wc-muted !important;
+    color: $wc-text-secondary !important;
+  }
+
+  .city-item.selected .city-abbr {
+    background: $wc-primary !important;
+    color: #FDFBF7 !important;
+  }
+
+  .city-province,
+  .city-longitude,
+  .empty-tip {
+    color: $wc-text-hint !important;
+  }
+}
+
+/* 水彩选择器使用不透明纸面，避免底层内容穿透，并压过旧 theme-* 弹窗规则。 */
+.date-picker-panel.ui-watercolor,
+.time-picker-panel.ui-watercolor,
+.popup.ui-watercolor {
+  background: #FAF8F5 !important;
+  color: $wc-text !important;
+  border: 1px solid rgba(74, 111, 165, 0.16) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.date-picker-panel.ui-watercolor,
+.time-picker-panel.ui-watercolor {
+  .day-text,
+  .hour-text {
+    color: $wc-text !important;
+  }
+
+  .day-item.selected {
+    background: transparent !important;
+    box-shadow: none !important;
+
+    .day-text {
+      background: rgba(74, 111, 165, 0.13) !important;
+      color: $wc-primary-dark !important;
+      border: 1px solid rgba(74, 111, 165, 0.30) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 4px 14px rgba(74, 111, 165, 0.12) !important;
+    }
+  }
+
+  .hour-item.selected {
+    background: rgba(74, 111, 165, 0.12) !important;
+    border: 1px solid rgba(74, 111, 165, 0.28) !important;
+    box-shadow: none !important;
+
+    .hour-text {
+      color: $wc-primary-dark !important;
+    }
+  }
+}
+
+.ui-watercolor switch .uni-switch-input,
+.ui-watercolor .uni-switch-input {
+  background-color: #E4EFED !important;
+  border-color: rgba(133, 205, 202, 0.55) !important;
+}
+
+.ui-watercolor switch .uni-switch-input::before,
+.ui-watercolor .uni-switch-input::before {
+  background-color: #E4EFED !important;
+}
+
+.ui-watercolor switch .uni-switch-input::after,
+.ui-watercolor .uni-switch-input::after {
+  background-color: #4F9995 !important;
+  box-shadow: 0 2px 8px rgba(79, 153, 149, 0.20) !important;
+}

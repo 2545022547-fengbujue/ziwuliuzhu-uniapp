@@ -346,7 +346,7 @@ function handlePointClick(point) {
   font-size: 32rpx;
   font-weight: 600;
   color: #fff;
-  font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', 'Noto Serif SC', serif;
+  font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', 'Noto Serif SC', serif;
 }
 
 .panel-body {

@@ -19,7 +19,11 @@
     - 暗夜幽光主题选中项需用电蓝色边框提高对比度
   -->
   <view class="time-picker-overlay" @tap="close">
-    <view class="time-picker-panel" :class="`theme-${store.activeTheme}`" @tap.stop>
+    <view
+      class="time-picker-panel"
+      :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '']"
+      @tap.stop
+    >
       <!-- 标题 -->
       <view class="picker-title">
         <text class="picker-title-text">选择时辰</text>

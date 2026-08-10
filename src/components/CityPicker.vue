@@ -1,6 +1,10 @@
 <template>
   <view v-if="show" class="overlay" @tap="handleOverlayTap">
-    <view class="popup" @tap="handlePopupTap">
+    <view
+      class="popup"
+      :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '']"
+      @tap="handlePopupTap"
+    >
       <!-- 头部 -->
       <view class="popup-header">
         <text class="popup-title">真太阳时校正</text>
@@ -132,7 +136,9 @@
  */
 import { ref, computed, nextTick, onUnmounted } from 'vue'
 import { CITIES, searchCities, PROVINCE_ORDER } from '@/data/city-coordinates.js'
+import { useAppStore } from '@/stores/app.js'
 
+const store = useAppStore()
 const show = ref(false)
 const selectedCity = ref('')
 const searchText = ref('')
@@ -542,12 +548,20 @@ defineExpose({ open, close, isOpen })
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .city-abbr {
   font-size: 11px;
   color: var(--theme-text-hint);
   width: 30px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .city-name-text {

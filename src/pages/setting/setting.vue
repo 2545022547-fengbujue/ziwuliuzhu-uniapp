@@ -1,5 +1,5 @@
 <template>
-  <view class="page" :class="`theme-${store.activeTheme}`">
+  <view class="page" :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '']">
     <AppNavbar title="设置" />
     <view :style="{ height: navHeight + 'px' }" class="nav-placeholder"></view>
     <scroll-view scroll-y class="page-scroll" :show-scrollbar="false">
@@ -31,40 +31,29 @@
           </view>
         </view>
 
-        <!-- ========== 外观主题区域 ========== -->
-        <!-- #ifndef MP-WEIXIN -->
+        <!-- ========== 外观风格统一切换 ========== -->
         <view class="setting-card">
           <view class="card-title">
-            <text class="card-icon">◐</text>
-            <text>外观主题</text>
+            <text class="card-icon">✦</text>
+            <text>外观风格</text>
           </view>
-          <view class="theme-current" @tap="themeExpanded = !themeExpanded">
-            <view class="theme-current-left">
-              <view class="theme-swatch" :class="store.activeTheme"></view>
-              <view class="theme-copy">
-                <text class="theme-name">{{ activeThemeName }}</text>
-                <text class="theme-desc">{{ activeThemeDesc }}</text>
-              </view>
-            </view>
-            <text class="theme-expand-arrow" :class="{ expanded: themeExpanded }">▶</text>
-          </view>
-          <view v-if="themeExpanded" class="theme-options">
+          <view class="ui-style-list">
             <view
-              v-for="theme in otherThemes"
-              :key="theme.id"
-              class="theme-option"
-              :class="{ active: store.activeTheme === theme.id }"
-              @tap="store.setTheme(theme.id)"
+              v-for="style in store.appearanceOptions"
+              :key="style.id"
+              class="ui-style-option"
+              :class="{ active: style.active }"
+              @tap="store.setAppearance(style.id)"
             >
-              <view class="theme-swatch" :class="theme.id"></view>
-              <view class="theme-copy">
-                <text class="theme-name">{{ theme.name }}</text>
-                <text class="theme-desc">{{ theme.desc }}</text>
+              <view v-if="style.swatch" class="theme-swatch" :class="style.swatch"></view>
+              <view class="ui-style-copy">
+                <text class="ui-style-name">{{ style.name }}</text>
+                <text class="ui-style-desc">{{ style.desc }}</text>
               </view>
+              <text v-if="style.active" class="ui-style-check">✓</text>
             </view>
           </view>
         </view>
-        <!-- #endif -->
 
         <!-- ========== 反克法显示模式 ========== -->
         <view class="setting-card">
@@ -197,33 +186,9 @@ const { statusBarHeight, safeAreaBottom } = useSystemInfo()
 const navHeight = computed(() => statusBarHeight.value + 44)
 const safeBottom = computed(() => safeAreaBottom.value)
 const cityPickerRef = ref(null)
-const themeExpanded = ref(false)
 const showMethods = ref(false)
 const showAbout = ref(false)
 const version = manifest.versionName || '1.0.0'
-
-/**
- * 当前主题名称（用于折叠面板显示）
- * 根据store.activeTheme返回中文主题名
- */
-const activeThemeName = computed(() => {
-  const t = store.themes.find(t => t.id === store.activeTheme)
-  return t ? t.name : ''
-})
-
-/**
- * 当前主题描述（用于折叠面板显示）
- */
-const activeThemeDesc = computed(() => {
-  const t = store.themes.find(t => t.id === store.activeTheme)
-  return t ? t.desc : ''
-})
-
-/**
- * 非当前主题列表（用于展开后显示其他可选主题）
- * 过滤掉当前已选主题，避免重复显示
- */
-const otherThemes = computed(() => store.themes.filter(t => t.id !== store.activeTheme))
 
 const methodDescs = METHOD_DESCS
 
@@ -474,6 +439,59 @@ onBackPress(() => {
   }
 }
 
+/* === 界面风格切换（经典 + 多套新界面） === */
+.ui-style-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.ui-style-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: var(--theme-surface-muted);
+  border: 1rpx solid var(--theme-border);
+  border-radius: 18rpx;
+  transition: all 0.2s ease;
+
+  &.active {
+    border-color: var(--theme-primary);
+    background: var(--theme-surface);
+
+    .ui-style-name {
+      color: var(--theme-primary);
+    }
+  }
+}
+
+.ui-style-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.ui-style-name {
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $tcm-text;
+}
+
+.ui-style-desc {
+  font-size: $font-size-xs;
+  color: $tcm-text-hint;
+}
+
+.ui-style-check {
+  font-size: $font-size-md;
+  font-weight: 700;
+  color: var(--theme-primary);
+}
+
 .theme-copy {
   display: flex;
   flex-direction: column;
@@ -556,7 +574,7 @@ onBackPress(() => {
   font-size: 18px;
   font-weight: 600;
   color: var(--theme-primary);
-  font-family: 'KaitiGB2312', 'KaiTi', 'STKaiti', serif;
+  font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif;
 }
 
 .close-btn {
@@ -624,7 +642,7 @@ onBackPress(() => {
   font-size: 44rpx;
   font-weight: 700;
   color: var(--theme-primary);
-  font-family: 'KaitiGB2312', 'KaiTi', serif;
+  font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', serif;
 }
 
 .app-version {
