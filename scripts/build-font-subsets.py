@@ -111,7 +111,11 @@ def main() -> None:
     args = parser.parse_args()
 
     characters = collect_characters()
-    kaiti_characters = (FONT_DIR / "chars_kaiti_core.txt").read_text(encoding="utf-8").strip()
+    # 楷体会用于导航标题、方法标题、穴位名和说明正文。过去只打包一份
+    # 415 字的“核心字符表”，真机上其余汉字会逐字回退成宋体，导致同一句
+    # 字形、字宽和基线明显不一致。现在与宋体一样按项目实际可见字符裁剪；
+    # 原字体不含的字符仍由 CSS fallback 接管。
+    kaiti_characters = characters
     char_file = FONT_DIR / "chars_project_complete.txt"
     char_file.write_text(characters, encoding="utf-8")
 

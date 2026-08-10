@@ -2,8 +2,8 @@
     "name" : "子午流注取穴",
     "appid" : "__UNI__D99F77B",
     "description" : "中医子午流注取穴辅助工具 - 基于时间医学的智能化取穴系统",
-    "versionName" : "2.1.0",
-    "versionCode" : 360,
+    "versionName" : "2.1.1",
+    "versionCode" : 361,
     "transformPx" : false,
     "app-plus" : {
         "darkmode" : true,

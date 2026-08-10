@@ -437,6 +437,26 @@ onBackPress(() => {
   &.red {
     background: linear-gradient(135deg, #B83A2E 0%, #FFF1E5 100%);
   }
+
+  &.modern {
+    background: linear-gradient(145deg, #f7f9fc 8%, #c4cad3 92%);
+    box-shadow: inset 5rpx 5rpx 10rpx rgba(174, 181, 191, 0.55), inset -5rpx -5rpx 10rpx #ffffff;
+  }
+
+  &.ink {
+    background: radial-gradient(circle at 68% 30%, #f7f3ea 0 24%, #77736b 26% 43%, #242424 72%);
+  }
+
+  &.morandi {
+    background: linear-gradient(135deg, #b99a9a 0%, #d9c7bd 48%, #aeb9aa 100%);
+  }
+
+  &.watercolor {
+    background:
+      radial-gradient(circle at 25% 24%, rgba(232, 168, 124, 0.95), transparent 42%),
+      radial-gradient(circle at 76% 72%, rgba(133, 205, 202, 0.95), transparent 46%),
+      #faf8f5;
+  }
 }
 
 /* === 界面风格切换（经典 + 多套新界面） === */

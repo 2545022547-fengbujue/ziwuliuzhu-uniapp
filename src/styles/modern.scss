@@ -14,17 +14,17 @@
    ============================================ */
 
 // 现代界面设计令牌
-$modern-primary: #4F46E5;        // 靛蓝主色
-$modern-primary-dark: #4338CA;
-$modern-primary-soft: #EEF2FF;   // 靛蓝浅底
-$modern-bg: #F2F3F5;             // 冷灰页面底
-$modern-surface: #FFFFFF;
-$modern-muted: #F5F6F8;          // 浅灰填充
-$modern-track: #E9EBEF;          // 分段控件轨道灰
-$modern-text: #111827;           // 墨色主文字
-$modern-text-secondary: #4B5563;
-$modern-text-hint: #9CA3AF;
-$modern-border: rgba(17, 24, 39, 0.08);
+$modern-primary: #5965D8;        // 新拟物派克制靛蓝
+$modern-primary-dark: #4651BE;
+$modern-primary-soft: #D8DDF4;
+$modern-bg: #E0E5EC;             // StyleKit 新拟物统一基底
+$modern-surface: #E0E5EC;
+$modern-muted: #D9DEE6;
+$modern-track: #D7DCE4;
+$modern-text: #303642;
+$modern-text-secondary: #5F6878;
+$modern-text-hint: #8A93A2;
+$modern-border: rgba(255, 255, 255, 0.34);
 $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
 
 .ui-modern {
@@ -44,10 +44,17 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
   background-color: $modern-bg !important;
   color: $modern-text !important;
 
+  // 新拟物的层级全部来自同色基底上的明暗双向阴影。
+  // 阴影保持克制，避免移动端小屏出现“塑料按钮墙”。
+  &.page {
+    background: $modern-bg !important;
+  }
+
   /* === 导航栏：白底 + 深色标题 + 细分割线（覆盖内联渐变背景） === */
   .navbar {
-    background: $modern-surface !important;
-    border-bottom: 1rpx solid $modern-border !important;
+    background: $modern-bg !important;
+    border-bottom: none !important;
+    box-shadow: 0 8rpx 18rpx rgba(174, 181, 191, 0.42), 0 -6rpx 16rpx #ffffff !important;
     backdrop-filter: none !important;
   }
 
@@ -71,9 +78,10 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
   .fullscreen-panel,
   .date-picker-panel,
   .time-picker-panel {
-    background: $modern-surface !important;
-    box-shadow: 0 2rpx 12rpx rgba(17, 24, 39, 0.05) !important;
-    border: 1rpx solid $modern-border !important;
+    background: $modern-bg !important;
+    box-shadow: 12rpx 12rpx 24rpx #b8bec7, -12rpx -12rpx 24rpx rgba(255, 255, 255, 0.92) !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.30) !important;
+    border-radius: 30rpx !important;
     backdrop-filter: none !important;
   }
 
@@ -86,19 +94,20 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
 
   // 自动/手动切换：分段控件（灰轨道 + 白色滑块）
   .ganzhi-toggle {
-    background: $modern-track !important;
-    border: none !important;
+    background: $modern-bg !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.28) !important;
     border-radius: 999rpx !important;
     padding: 6rpx !important;
+    box-shadow: inset 7rpx 7rpx 14rpx #b8bec7, inset -7rpx -7rpx 14rpx #ffffff !important;
   }
 
   .toggle-btn {
     border-radius: 999rpx !important;
 
     &.active {
-      background: $modern-surface !important;
+      background: $modern-bg !important;
       border: none !important;
-      box-shadow: 0 2rpx 8rpx rgba(17, 24, 39, 0.10) !important;
+      box-shadow: 6rpx 6rpx 12rpx #b8bec7, -6rpx -6rpx 12rpx #ffffff !important;
 
       .toggle-text {
         color: $modern-primary !important;
@@ -143,7 +152,7 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
     background: $modern-primary !important;
     border: none !important;
     border-radius: 999rpx !important;
-    box-shadow: none !important;
+    box-shadow: 7rpx 7rpx 14rpx #b8bec7, -7rpx -7rpx 14rpx #ffffff !important;
   }
 
   .current-datetime {
@@ -190,20 +199,20 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
 
   /* === 方法切换栏：iOS 分段控件样式（去渐变去缩放） === */
   .method-tabs {
-    background: $modern-track !important;
+    background: $modern-bg !important;
     border: none !important;
     border-radius: 999rpx !important;
     padding: 8rpx !important;
-    box-shadow: none !important;
+    box-shadow: inset 7rpx 7rpx 14rpx #b8bec7, inset -7rpx -7rpx 14rpx #ffffff !important;
   }
 
   .method-tab {
     border-radius: 999rpx !important;
 
     &.active {
-      background: $modern-surface !important;
+      background: $modern-bg !important;
       border: none !important;
-      box-shadow: 0 2rpx 10rpx rgba(17, 24, 39, 0.10) !important;
+      box-shadow: 7rpx 7rpx 14rpx #b8bec7, -7rpx -7rpx 14rpx #ffffff !important;
       transform: none !important;
 
       .method-name {
@@ -767,5 +776,118 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
   .city-longitude,
   .empty-tip {
     color: $modern-text-hint !important;
+  }
+
+  /* === 新拟物派统一收口 ===
+     旧“现代简约”的局部扁平规则仍服务于颜色和排版，这里统一改写关键交互
+     表面的浮起/压入关系，确保首页、设置页和弹窗是一套完整语言。 */
+  .setting-content,
+  .content,
+  .page-content {
+    background: transparent !important;
+  }
+
+  .ui-style-option,
+  .theme-current,
+  .theme-option,
+  .city-picker-btn,
+  .picker-btn,
+  .point-btn,
+  .method-card,
+  .desc-card,
+  .info-card {
+    background: $modern-bg !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.32) !important;
+    box-shadow: 7rpx 7rpx 14rpx #b8bec7, -7rpx -7rpx 14rpx #ffffff !important;
+  }
+
+  .ui-style-option.active,
+  .theme-option.active,
+  .point-btn:active,
+  .picker-btn:active,
+  .city-picker-btn:active {
+    background: $modern-bg !important;
+    border-color: rgba(89, 101, 216, 0.22) !important;
+    box-shadow: inset 6rpx 6rpx 12rpx #b8bec7, inset -6rpx -6rpx 12rpx #ffffff !important;
+  }
+
+  .manual-controls,
+  .warning-box,
+  .fanke-merged,
+  .palace-box,
+  .bumu-tip,
+  .nazi-bumu-tip,
+  .location-box,
+  .info-item,
+  .method-item,
+  .disclaimer-card,
+  .province-header,
+  .search-input,
+  .confirm-value {
+    background: $modern-bg !important;
+    border: none !important;
+    box-shadow: inset 6rpx 6rpx 12rpx #b8bec7, inset -6rpx -6rpx 12rpx #ffffff !important;
+  }
+
+  .ganzhi-tag-item {
+    background: $modern-bg !important;
+    box-shadow: 6rpx 6rpx 12rpx #b8bec7, -6rpx -6rpx 12rpx #ffffff !important;
+
+    &.highlight {
+      background: $modern-bg !important;
+      box-shadow: inset 6rpx 6rpx 12rpx #b8bec7, inset -6rpx -6rpx 12rpx #ffffff !important;
+    }
+  }
+
+  .nazi-mode-switch {
+    background: $modern-bg !important;
+    box-shadow: inset 6rpx 6rpx 12rpx #b8bec7, inset -6rpx -6rpx 12rpx #ffffff !important;
+  }
+
+  .switch-option.active {
+    background: $modern-bg !important;
+    box-shadow: 5rpx 5rpx 10rpx #b8bec7, -5rpx -5rpx 10rpx #ffffff !important;
+  }
+
+  .query-btn,
+  .confirm-ok,
+  .action-btn.confirm,
+  .btn-confirm {
+    background: $modern-primary !important;
+    color: #ffffff !important;
+    box-shadow: 7rpx 7rpx 14rpx #b8bec7, -7rpx -7rpx 14rpx #ffffff !important;
+  }
+
+  .query-btn:active,
+  .confirm-ok:active,
+  .action-btn.confirm:active,
+  .btn-confirm:active {
+    box-shadow: inset 5rpx 5rpx 10rpx rgba(54, 64, 166, 0.72), inset -4rpx -4rpx 9rpx rgba(255, 255, 255, 0.22) !important;
+  }
+
+  .confirm-cancel,
+  .action-btn.cancel,
+  .btn-cancel {
+    background: $modern-bg !important;
+    box-shadow: 6rpx 6rpx 12rpx #b8bec7, -6rpx -6rpx 12rpx #ffffff !important;
+  }
+
+  .date-picker-panel,
+  .time-picker-panel,
+  .popup,
+  .confirm-popup,
+  .fullscreen-panel {
+    background: $modern-bg !important;
+  }
+
+  .day-item.selected,
+  .hour-item.selected {
+    background: $modern-primary !important;
+    color: #ffffff !important;
+    box-shadow: 5rpx 5rpx 10rpx #b8bec7, -5rpx -5rpx 10rpx #ffffff !important;
+  }
+
+  .theme-swatch {
+    box-shadow: inset 4rpx 4rpx 8rpx rgba(174, 181, 191, 0.45), inset -4rpx -4rpx 8rpx rgba(255, 255, 255, 0.75) !important;
   }
 }

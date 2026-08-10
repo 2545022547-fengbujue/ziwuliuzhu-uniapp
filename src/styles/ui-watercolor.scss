@@ -21,8 +21,8 @@ $wc-apricot: #E8A87C;            // Figma accent-1：杏橙
 $wc-teal: #85CDCA;               // Figma accent-2：青绿
 $wc-rose: #C38D94;               // Figma accent-3：豆沙粉
 $wc-ochre: #D4A373;              // Figma accent-4：赭金
-$wc-bg: #FAF8F5;                 // 水彩纸底（规范底色）
-$wc-surface: rgba(253, 251, 247, 0.86); // 半透明卡片纸面，让底层色洗透出
+$wc-bg: #FFFDF9;                 // 真机提亮后的水彩纸底
+$wc-surface: rgba(255, 254, 251, 0.94); // 提高纸面明度与不透明度
 $wc-muted: rgba(74, 111, 165, 0.07);
 $wc-text: #3E4450;
 $wc-text-secondary: #6E7686;
@@ -52,26 +52,26 @@ $wc-sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mic
 
   // 纸底 + 重叠色洗：用更大面积的低透明晕染模拟湿纸扩散。
   background:
-    radial-gradient(ellipse at 2% 6%, rgba(232, 168, 124, 0.20), transparent 42%),
-    radial-gradient(ellipse at 96% 18%, rgba(133, 205, 202, 0.20), transparent 44%),
-    radial-gradient(ellipse at 74% 94%, rgba(195, 141, 148, 0.17), transparent 42%),
-    radial-gradient(ellipse at 10% 88%, rgba(212, 163, 115, 0.13), transparent 36%),
+    radial-gradient(ellipse at 2% 6%, rgba(244, 190, 151, 0.22), transparent 42%),
+    radial-gradient(ellipse at 96% 18%, rgba(158, 222, 219, 0.22), transparent 44%),
+    radial-gradient(ellipse at 74% 94%, rgba(216, 166, 174, 0.18), transparent 42%),
+    radial-gradient(ellipse at 10% 88%, rgba(230, 189, 146, 0.15), transparent 36%),
     $wc-bg !important;
   color: $wc-text !important;
 
   // 页面组件自身有实色背景；在根容器重复纸面晕染，确保水彩特征可见。
   &.page {
     background:
-      radial-gradient(ellipse at 0% 6%, rgba(232, 168, 124, 0.22), transparent 40%),
-      radial-gradient(ellipse at 100% 30%, rgba(133, 205, 202, 0.22), transparent 42%),
-      radial-gradient(ellipse at 74% 100%, rgba(195, 141, 148, 0.18), transparent 42%),
-      radial-gradient(ellipse at 8% 92%, rgba(212, 163, 115, 0.14), transparent 34%),
+      radial-gradient(ellipse at 0% 6%, rgba(244, 190, 151, 0.24), transparent 40%),
+      radial-gradient(ellipse at 100% 30%, rgba(158, 222, 219, 0.24), transparent 42%),
+      radial-gradient(ellipse at 74% 100%, rgba(216, 166, 174, 0.20), transparent 42%),
+      radial-gradient(ellipse at 8% 92%, rgba(230, 189, 146, 0.16), transparent 34%),
       $wc-bg !important;
   }
 
   /* === 导航栏：纸面透明 + 细蓝线 + serif 标题 === */
   .navbar {
-    background: rgba(250, 248, 245, 0.92) !important;
+    background: rgba(255, 253, 249, 0.97) !important;
     border-bottom: 1rpx solid $wc-border !important;
     backdrop-filter: none !important;
   }

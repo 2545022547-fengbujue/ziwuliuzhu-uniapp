@@ -81,10 +81,10 @@ const THEME_CHROME = {
 // === 多套界面风格（uiStyle）===
 // classic = 原始界面（theme-* 主题体系）；其余为全新界面风格（ui-* class 体系）
 const UI_STYLE_OPTIONS = [
-  { id: 'modern', name: '现代简约', desc: '留白扁平，干净清爽' },
-  { id: 'ink', name: '水墨意境', desc: '宣纸墨色，东方留白' },
-  { id: 'morandi', name: '莫兰迪奶油', desc: '低饱和灰调，温柔治愈' },
-  { id: 'watercolor', name: '水彩画风', desc: '纸面晕染，柔和诗意' }
+  { id: 'modern', name: '现代简约', desc: '柔和浮雕，轻盈有序', swatch: 'modern' },
+  { id: 'ink', name: '水墨意境', desc: '宣纸墨色，东方留白', swatch: 'ink' },
+  { id: 'morandi', name: '莫兰迪奶油', desc: '低饱和灰调，温柔治愈', swatch: 'morandi' },
+  { id: 'watercolor', name: '水彩画风', desc: '纸面晕染，柔和诗意', swatch: 'watercolor' }
 ]
 
 // 每种新风格的主色（用于 switch 开关等原生组件着色）
@@ -252,6 +252,7 @@ export const useAppStore = defineStore('app', () => {
       id: `style-${item.id}`,
       name: item.name,
       desc: item.desc,
+      swatch: item.swatch,
       active: activeUiStyle.value === item.id
     }))
   ])

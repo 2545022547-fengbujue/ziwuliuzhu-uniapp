@@ -1,6 +1,6 @@
 {
   "name": "ziwuliuzhu-uniapp",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "子午流注取穴系统 - 基于中医时间医学的智能化取穴辅助工具",
   "private": true,
   "scripts": {
