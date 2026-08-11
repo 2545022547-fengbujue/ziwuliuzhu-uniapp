@@ -36,6 +36,8 @@ function makeGanZhi(date, hourIndex) {
 
 export function runCases() {
   const gengziWu = makeGanZhi(new Date(2026, 4, 26), 6)
+  // 庚为阳日，奇数索引的巳时属于真正闭穴时辰，用于验证合日互用开关。
+  const gengziClosed = makeGanZhi(new Date(2026, 4, 26), 5)
   const wuyinSi = makeGanZhi(new Date(2026, 4, 4), 5)
 
   return {
@@ -46,6 +48,11 @@ export function runCases() {
       nazi: calculateNazi(gengziWu, 0),
       najia: calculateNajia(gengziWu, 6),
       fanke: calculateFanke(gengziWu, 6)
+    },
+    gengziClosed: {
+      ganzhi: gengziClosed,
+      najia: calculateNajia(gengziClosed, 5, { enableHeRiHuYong: true }),
+      najiaDefault: calculateNajia(gengziClosed, 5)
     },
     wuyinSi: {
       ganzhi: wuyinSi,
@@ -131,10 +138,13 @@ async function main() {
     () => assertEqual(cases.gengziWu.nazi.ziPoint.code, 'GB38', '胆经子穴'),
 
     () => assertEqual(cases.gengziWu.najia.dailySequence.length, 12, '纳甲每日流注序列长度'),
-    () => assertTruthy(cases.gengziWu.najia.dailySequence.some(item => item.isOpen), '纳甲当天应有开穴时辰'),
-    () => assertEqual(cases.gengziWu.najia.isClosed, true, '庚子日壬午时纳甲为闭穴'),
-    () => assertTruthy(cases.gengziWu.najia.alternativePoints, '纳甲闭穴应提供合日互用'),
-    () => assertEqual(cases.gengziWu.najia.alternativePoints.heLabel, '庚合乙', '庚日合日互用标签')
+    () => assertEqual(cases.gengziWu.najia.dailySequence.filter(item => item.isOpen).length, 6, '纳甲每天六个对应阴阳时辰均应稳定开穴'),
+    () => assertEqual(cases.gengziWu.najia.isClosed, false, '修复去重键后庚子日壬午时应正常开穴'),
+    () => assertEqual(cases.gengziClosed.najia.isClosed, true, '庚子日辛巳时纳甲本法为闭穴'),
+    () => assertTruthy(cases.gengziClosed.najia.alternativePoints, '开启开关后纳甲闭穴应提供合日互用'),
+    () => assertTruthy(cases.gengziClosed.najia.alternativePoints.openPoints.length, '开启合日互用后闭穴时必须得到合日穴位'),
+    () => assertEqual(cases.gengziClosed.najia.alternativePoints.heLabel, '庚合乙', '庚日合日互用标签'),
+    () => assertEqual(cases.gengziClosed.najiaDefault.alternativePoints, null, '合日互用默认关闭时不返回替代穴位')
   ]
 
   let passed = 0

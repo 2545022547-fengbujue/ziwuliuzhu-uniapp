@@ -1,5 +1,5 @@
 diff --git a/node_modules/@dcloudio/uni-mp-weixin/dist/uni.api.esm.js b/node_modules/@dcloudio/uni-mp-weixin/dist/uni.api.esm.js
-index f51b33c..ae6d059 100644
+index bcedb05..4bf2281 100644
 --- a/node_modules/@dcloudio/uni-mp-weixin/dist/uni.api.esm.js
 +++ b/node_modules/@dcloudio/uni-mp-weixin/dist/uni.api.esm.js
 @@ -7,7 +7,8 @@ function getLocaleLanguage() {
@@ -7,7 +7,7 @@ index f51b33c..ae6d059 100644
      let localeLanguage = '';
      {
 -        const appBaseInfo = ((_a = wx.getAppBaseInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || wx.getSystemInfoSync();
-+        // 直接使用新API，不调用废弃的getSystemInfoSync
++        // 优先使用拆分后的新 API；极旧基础库缺失时使用安全默认值，避免触发废弃 API 告警。
 +        const appBaseInfo = ((_a = wx.getAppBaseInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || { language: LOCALE_EN };
          const language = appBaseInfo && appBaseInfo.language ? appBaseInfo.language : LOCALE_EN;
          localeLanguage = normalizeLocale(language) || LOCALE_EN;
@@ -18,17 +18,15 @@ index f51b33c..ae6d059 100644
      {
 -        const windowInfo = ((_a = wx.getWindowInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || wx.getSystemInfoSync();
 -        const deviceInfo = ((_b = wx.getDeviceInfo) === null || _b === void 0 ? void 0 : _b.call(wx)) || wx.getSystemInfoSync();
-+        // 直接使用新API，不调用废弃的getSystemInfoSync
++        // 不再回退到已废弃的 getSystemInfoSync；默认值只用于极旧基础库兜底。
 +        const windowInfo = ((_a = wx.getWindowInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || { windowWidth: 375, pixelRatio: 2 };
 +        const deviceInfo = ((_b = wx.getDeviceInfo) === null || _b === void 0 ? void 0 : _b.call(wx)) || { platform: 'android' };
          windowWidth = windowInfo.windowWidth;
          pixelRatio = windowInfo.pixelRatio;
          platform = deviceInfo.platform;
-@@ -1416,18 +1418,19 @@ function createSelectorQuery() {
-     return query;
+@@ -1486,17 +1488,17 @@ function createSelectorQuery() {
  }
  const wx$2 = initWx();
-+// 不使用废弃API作为fallback，直接返回空对象
  if (!wx$2.getAppBaseInfo || !wx$2.getAppBaseInfo()) {
 -    wx$2.getAppBaseInfo = wx$2.getSystemInfoSync;
 +    wx$2.getAppBaseInfo = () => ({});
@@ -49,7 +47,7 @@ index f51b33c..ae6d059 100644
  const host = baseInfo ? baseInfo.host : null;
  const shareVideoMessage = host && host.env === 'SAAASDK'
 diff --git a/node_modules/@dcloudio/uni-mp-weixin/dist/uni.mp.esm.js b/node_modules/@dcloudio/uni-mp-weixin/dist/uni.mp.esm.js
-index 19ea174..da993a7 100644
+index 92d0103..9c0d75a 100644
 --- a/node_modules/@dcloudio/uni-mp-weixin/dist/uni.mp.esm.js
 +++ b/node_modules/@dcloudio/uni-mp-weixin/dist/uni.mp.esm.js
 @@ -98,7 +98,8 @@ function getLocaleLanguage() {
@@ -57,7 +55,7 @@ index 19ea174..da993a7 100644
      let localeLanguage = '';
      {
 -        const appBaseInfo = ((_a = wx.getAppBaseInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || wx.getSystemInfoSync();
-+        // 直接使用新API，不调用废弃的getSystemInfoSync
++        // 优先使用拆分后的新 API；极旧基础库缺失时使用安全默认值，避免触发废弃 API 告警。
 +        const appBaseInfo = ((_a = wx.getAppBaseInfo) === null || _a === void 0 ? void 0 : _a.call(wx)) || { language: LOCALE_EN };
          const language = appBaseInfo && appBaseInfo.language ? appBaseInfo.language : LOCALE_EN;
          localeLanguage = normalizeLocale(language) || LOCALE_EN;

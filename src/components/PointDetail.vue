@@ -1,11 +1,12 @@
 <template>
   <view v-if="!point" class="overlay" @tap="handleClose">
-    <view class="popup" :class="`watercolor-wash-${watercolorWash}`" @tap.stop>
+    <view class="popup" :class="[store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`, `watercolor-wash-${watercolorWash}`]" @tap.stop>
       <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-primary"></view>
       <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-secondary"></view>
       <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-paper-texture"></view>
       <view class="popup-header">
-        <view class="close-btn" @tap="handleClose">
+        <!-- 统一保留文字叉号作为非水墨主题的可见图形；水墨主题通过 CSS 双笔画重绘，避免字体基线偏移。 -->
+        <view class="close-btn" role="button" aria-label="关闭穴位详情" @tap="handleClose">
           <text class="close-icon">✕</text>
         </view>
       </view>
@@ -15,7 +16,7 @@
     </view>
   </view>
   <view v-else class="overlay" @tap="handleClose">
-    <view class="popup" :class="`watercolor-wash-${watercolorWash}`" @tap.stop>
+    <view class="popup" :class="[store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`, `watercolor-wash-${watercolorWash}`]" @tap.stop>
       <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-primary"></view>
       <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-secondary"></view>
       <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-paper-texture"></view>
@@ -24,17 +25,19 @@
         <view class="header-icon-wrap">
           <text class="header-icon">📍</text>
         </view>
-        <view class="close-btn" @tap="handleClose">
+        <!-- close-btn 保持 44px 左右触控面积；各主题只改视觉，不缩小可点击区域。 -->
+        <view class="close-btn" role="button" aria-label="关闭穴位详情" @tap="handleClose">
           <text class="close-icon">✕</text>
         </view>
         <!-- 穴位名称+编码：绝对定位，独立于图标和关闭按钮 -->
         <view class="header-name-layer">
-          <text class="point-name">{{ point?.name }}</text>
-          <text class="point-code">{{ point?.code }}</text>
+          <text class="point-name" :class="{ 'point-name-code-hidden': !store.showPointCode }">{{ point?.name }}</text>
+          <text v-if="store.showPointCode" class="point-code">{{ point?.code }}</text>
         </view>
       </view>
 
       <scroll-view scroll-y class="popup-body">
+        <view class="popup-body-content">
         <!-- 基本信息 -->
         <view class="info-section">
           <view class="section-title">
@@ -101,8 +104,24 @@
         <view v-if="naziBumuTip" class="nazi-bumu-tip">
           <text class="nazi-bumu-tip-text">{{ naziBumuTip }}</text>
         </view>
+        </view>
 
-        <view style="height: 80rpx;"></view>
+        <!-- 动物岛主题底部场景：角色固定在详情卡右下角，草地与海浪补足原来的空白。 -->
+        <view v-if="store.activeUiStyle === 'animal'" class="animal-detail-scene" aria-hidden="true">
+          <view class="animal-scene-cloud cloud-one"></view>
+          <view class="animal-scene-cloud cloud-two"></view>
+          <view class="animal-scene-sun"></view>
+          <view class="animal-scene-tree tree-left"><view></view><view></view><text></text></view>
+          <view class="animal-scene-tree tree-mid"><view></view><view></view><text></text></view>
+          <view class="animal-scene-wave wave-back"></view>
+          <view class="animal-scene-wave wave-front"></view>
+          <view class="animal-scene-grass"></view>
+          <view class="animal-mascot-corner">
+            <AnimalMascot :variant="animalMascot.id" />
+          </view>
+        </view>
+
+        <view v-else style="height: 80rpx;"></view>
       </scroll-view>
     </view>
   </view>
@@ -129,6 +148,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { getWuxingColor } from '@/utils/wuxing.js'
+import AnimalMascot from '@/components/AnimalMascot.vue'
 
 const store = useAppStore()
 const point = computed(() => store.selectedPoint)
@@ -162,30 +182,25 @@ function getSecureRandomIndex(length) {
 
 const watercolorWash = ref(watercolorWashes[getSecureRandomIndex(watercolorWashes.length)])
 
-function applyRandomValue(value) {
-  const range = 0x100000000
-  const unbiasedLimit = range - (range % watercolorWashes.length)
-  if (value < unbiasedLimit) {
-    watercolorWash.value = watercolorWashes[value % watercolorWashes.length]
-    return true
-  }
-  return false
-}
+/**
+ * 动物主题守护角色池。
+ *
+ * - 组件只在 App/H5 独立外观生效，小程序会回退经典主题，不承担兼容成本；
+ * - 随机值在 PointDetail 创建时确定，因此同一次弹窗滚动或响应式重绘不会换角色；
+ * - 角色仅作右下角静态装饰，不承载穴位语义，也不加入循环动画，避免干扰正文阅读。
+ */
+const animalMascots = [
+  { id: 'rabbit' },
+  { id: 'cat' },
+  { id: 'dog' },
+  { id: 'deer' },
+  { id: 'squirrel' },
+  { id: 'owl' }
+]
+const animalMascot = ref(animalMascots[getSecureRandomIndex(animalMascots.length)])
 
 // TabBar 位于页面根节点之外，详情弹窗显示时须单独隐藏，避免破坏模态焦点。
 onMounted(() => {
-  // #ifdef MP-WEIXIN
-  wx.getRandomValues({
-    length: 16,
-    success: ({ randomValues }) => {
-      const values = new Uint32Array(randomValues)
-      for (const value of values) {
-        if (applyRandomValue(value)) break
-      }
-    }
-  })
-  // #endif
-
   uni.hideTabBar({ animation: false })
 })
 
@@ -358,11 +373,110 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .popup-body {
   flex: 1;
-  padding: 40rpx;
+  padding: 0;
   max-height: 65vh;
   width: 100%;
   box-sizing: border-box;
   overflow-y: auto;
+}
+
+.popup-body-content {
+  width: 100%;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+/* === 动物主题：详情底部岛屿场景与右下角随机守护动物 === */
+.animal-detail-scene {
+  position: relative;
+  height: 300rpx;
+  width: 100%;
+  margin: 16rpx 0 0;
+  overflow: hidden;
+}
+
+.animal-mascot-corner {
+  position: absolute;
+  right: 18rpx;
+  bottom: 12rpx;
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;
+}
+
+.animal-scene-sun {
+  position: absolute;
+  top: 30rpx;
+  right: 80rpx;
+  width: 74rpx;
+  height: 74rpx;
+  border-radius: 50%;
+}
+
+.animal-scene-cloud {
+  position: absolute;
+  z-index: 1;
+  width: 92rpx;
+  height: 28rpx;
+  border-radius: 999rpx;
+}
+.animal-scene-cloud::before,
+.animal-scene-cloud::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  border-radius: 50%;
+  background: inherit;
+}
+.animal-scene-cloud::before { left: 16rpx; width: 42rpx; height: 42rpx; }
+.animal-scene-cloud::after { right: 12rpx; width: 32rpx; height: 32rpx; }
+.cloud-one { top: 42rpx; left: 52rpx; }
+.cloud-two { top: 100rpx; left: 230rpx; transform: scale(.72); opacity: .72; }
+
+.animal-scene-tree {
+  position: absolute;
+  z-index: 3;
+  bottom: 64rpx;
+  width: 98rpx;
+  height: 134rpx;
+}
+.animal-scene-tree view {
+  position: absolute;
+  left: 50%;
+  width: 86rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+.animal-scene-tree view:first-child { top: 0; }
+.animal-scene-tree view:nth-child(2) { top: 38rpx; width: 98rpx; }
+.animal-scene-tree text {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 18rpx;
+  height: 58rpx;
+  transform: translateX(-50%);
+}
+.tree-left { left: 26rpx; transform: scale(.88); }
+.tree-mid { left: 142rpx; bottom: 56rpx; transform: scale(.62); }
+
+.animal-scene-wave {
+  position: absolute;
+  left: -5%;
+  width: 110%;
+  border-radius: 50% 50% 0 0;
+}
+.wave-back { z-index: 2; bottom: 34rpx; height: 112rpx; }
+.wave-front { z-index: 4; bottom: -28rpx; height: 94rpx; }
+.animal-scene-grass {
+  position: absolute;
+  left: -4%;
+  bottom: 38rpx;
+  z-index: 5;
+  width: 108%;
+  height: 70rpx;
+  border-radius: 52% 48% 20% 18%;
 }
 
 /* === 信息区块 === */

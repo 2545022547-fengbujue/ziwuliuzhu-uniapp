@@ -2,7 +2,7 @@
   <view v-if="show" class="overlay" @tap="handleOverlayTap">
     <view
       class="popup"
-      :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '']"
+      :class="store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`"
       @tap="handlePopupTap"
     >
       <!-- 头部 -->

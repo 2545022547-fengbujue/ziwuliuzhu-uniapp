@@ -1,10 +1,11 @@
 /* ============================================
    水墨意境（ui-ink）
 
-   设计语言：宣纸底 + 墨色 + 印章红点缀
-   - 无阴影无渐变，靠细墨线分割层次
-   - 小圆角（方正含蓄），楷体标题，大量留白
-   - 印章红仅用于关键强调（时辰、选中态）
+   设计语言：白宣纸 + 时段山水 + 墨色笔触 + 少量印色
+   - 页面、日期弹窗和时辰弹窗按设备当地时间切换同一组山水背景
+   - 卡片保持宣纸半透明感，以淡墨线和轻微纸面层次区分内容
+   - 标题使用真楷字体，选中态使用真实笔触素材，避免规则矩形色块
+   - 印色只用于关闭、提示等小面积点睛，不把大块红色冒充水墨
 
    级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
    ============================================ */
@@ -124,6 +125,47 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
     --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(248,250,249,0.08));
     --ink-scene-filter: none;
   }
+
+  // 日期、时辰弹窗不再使用固定纸色：它们与页面共用同一套时段判断，
+  // 但独立设置背景图，避免弹窗脱离页面后看起来像另一套主题。
+  .date-picker-panel,
+  .time-picker-panel {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-night.jpg');
+  }
+
+  .date-picker-panel.ink-bg-sunrise,
+  .date-picker-panel.ink-bg-morning,
+  .time-picker-panel.ink-bg-sunrise,
+  .time-picker-panel.ink-bg-morning {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-sunrise-morning.jpg');
+  }
+
+  .date-picker-panel.ink-bg-forenoon,
+  .date-picker-panel.ink-bg-noon,
+  .time-picker-panel.ink-bg-forenoon,
+  .time-picker-panel.ink-bg-noon {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-forenoon.jpg');
+  }
+
+  .date-picker-panel.ink-bg-afternoon,
+  .time-picker-panel.ink-bg-afternoon {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-afternoon.jpg');
+  }
+
+  .date-picker-panel.ink-bg-sunset,
+  .time-picker-panel.ink-bg-sunset {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-sunset.jpg');
+  }
+
+  .date-picker-panel.ink-bg-dusk,
+  .time-picker-panel.ink-bg-dusk {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-dusk.jpg');
+  }
+
+  .date-picker-panel.ink-bg-night,
+  .time-picker-panel.ink-bg-night {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-night.jpg');
+  }
   /* #endif */
 
   &::after {
@@ -181,6 +223,52 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
     border: 1rpx solid rgba(42, 49, 48, 0.13) !important;
     border-radius: 10rpx 26rpx 13rpx 22rpx !important;
     backdrop-filter: none !important;
+    overflow: hidden;
+  }
+
+  // 选择器单独叠加时段山水。原素材上方留白较多，因此这里放大并向下锚定，
+  // 让山水从面板中段开始出现；文字仍以深墨色显示，不牺牲可读性。
+  .date-picker-panel {
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 253, 0.82) 0%, rgba(255, 255, 253, 0.56) 38%, rgba(255, 255, 253, 0.24) 70%, rgba(255, 255, 253, 0.10) 100%),
+      var(--ink-picker-scene) !important;
+    background-color: #FFFFFF !important;
+    background-size: 100% 100%, 100% 100% !important;
+    background-position: center, center bottom !important;
+    background-repeat: no-repeat !important;
+  }
+
+  // 真正承载山水的图片层。CSS 背景仍作为降级方案；图片层确保 Android
+  // WebView、H5 和 uni-app 自定义组件都能稳定显示，而不是退化成纯白。
+  .ink-picker-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.62;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  // 时辰列表文字更密，适当降低山水浓度；日期网格留白较多，可保留更清楚的景物。
+  .time-picker-panel .ink-picker-bg {
+    opacity: 0.42;
+  }
+
+  .date-picker-panel > :not(.ink-picker-bg),
+  .time-picker-panel > :not(.ink-picker-bg) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .time-picker-panel {
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 253, 0.86) 0%, rgba(255, 255, 253, 0.64) 34%, rgba(255, 255, 253, 0.32) 70%, rgba(255, 255, 253, 0.14) 100%),
+      var(--ink-picker-scene) !important;
+    background-color: #FFFFFF !important;
+    background-size: 100% 100%, cover !important;
+    background-position: center, center bottom !important;
+    background-repeat: no-repeat !important;
   }
 
   /* === 干支卡片 === */
@@ -302,9 +390,10 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
     font-size: 34rpx !important;
   }
 
-  /* === 方法切换栏：墨线夹心 + 选中填墨 === */
+  /* === 方法切换栏：宣纸留白 + 选中墨笔 === */
   .method-tabs {
-    background: transparent !important;
+    // 保留一点背景气息，但隔开山水图中容易误读成控件的硬轮廓。
+    background: rgba(255, 255, 252, 0.82) !important;
     border: none !important;
     border-top: 1rpx solid $ink-border !important;
     border-bottom: 1rpx solid $ink-border !important;
@@ -315,13 +404,18 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
   .method-tab {
     position: relative;
-    border-radius: 2rpx 14rpx 4rpx 12rpx !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: visible;
 
     &.active {
-      background-color: rgba(26, 33, 34, 0.97) !important;
-      background-image: url('@/assets/ink/shuimo-brush-bg.webp') !important;
-      background-size: 100% 100% !important;
+      // 不再用实心矩形垫底；使用真实干笔裁出的透明墨迹。
+      background-color: transparent !important;
+      background-image: url('@/assets/ink/shuimo-method-brush.png') !important;
+      background-size: 148% auto !important;
       background-position: center !important;
+      background-repeat: no-repeat !important;
       border: none !important;
       box-shadow: none !important;
       transform: none !important;
@@ -329,12 +423,19 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
       .method-name {
         color: $ink-surface !important;
         font-weight: 500;
+        font-family: $ink-kaiti !important;
       }
 
       .method-icon {
         color: $ink-surface !important;
         transform: none !important;
       }
+    }
+
+    .method-icon,
+    .method-name {
+      position: relative;
+      z-index: 1;
     }
 
     &:not(.active) {
@@ -363,6 +464,10 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
       linear-gradient(90deg, rgba(31, 38, 39, 0.06), transparent 34%),
       rgba(255,255,252,0.84) !important;
     border-bottom: 1rpx solid rgba(36, 43, 43, 0.14) !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: none !important;
   }
 
   .header-title {
@@ -807,23 +912,57 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
     color: $ink-text !important;
   }
 
-  .close-icon {
-    color: $ink-seal !important;
-    font-family: $ink-song !important;
-    font-weight: 700;
-  }
-
+  /*
+   * 水墨详情关闭按钮：朱砂泼墨印记。
+   * 不直接依赖“✕”字形居中，因为不同系统字体的基线和字面框差异会让叉号偏右/偏下。
+   * 背景使用原创 close-brush.svg，按用户参考图重绘中心厚墨、外圈干笔与飞白层次；
+   * 同时隐藏原字形，用两个绝对定位的白色笔画绘制叉号，按钮仍保留完整触控尺寸与语义标签。
+   */
   .popup .close-btn {
-    background:
-      radial-gradient(circle at 48% 46%, rgba(155, 51, 40, 0.13) 0 52%, transparent 55%),
-      transparent !important;
-    border: 2rpx solid rgba(155, 51, 40, 0.52) !important;
-    border-radius: 48% 54% 46% 52% !important;
+    position: relative;
+    width: 78rpx;
+    height: 78rpx;
+    overflow: visible;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: url('@/static/themes/ink/close-brush.svg') center / contain no-repeat !important;
+    filter: drop-shadow(0 5rpx 4rpx rgba(86, 29, 25, .20));
     box-shadow: none !important;
   }
 
+  .popup .close-icon {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    z-index: 1;
+  }
+
+  .popup .close-icon::before,
+  .popup .close-icon::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 37rpx;
+    height: 6rpx;
+    border-radius: 4rpx;
+    background: #FFFFFF;
+    box-shadow: 0 1rpx 1rpx rgba(91, 25, 21, .18);
+    transform-origin: center;
+  }
+
+  .popup .close-icon::before { transform: translate(-50%, -50%) rotate(45deg); }
+  .popup .close-icon::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
   .popup .close-btn:active {
-    background: rgba(176, 58, 46, 0.22) !important;
+    transform: scale(.92);
+    filter: saturate(1.08) brightness(.94);
+    box-shadow: none !important;
   }
 
   .popup {

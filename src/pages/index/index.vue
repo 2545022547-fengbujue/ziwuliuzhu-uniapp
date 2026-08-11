@@ -7,12 +7,27 @@
     - 中间：可滚动区域（干支卡片、方法切换、结果面板）
     - 底部：弹窗（PointDetail）
   -->
-  <view class="page" :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '', store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : '']">
+  <view class="page" :class="[store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`, store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : '']">
     <!-- 导航栏 -->
     <AppNavbar title="子午流注取穴" />
     <view :style="{ height: navHeight + 'px' }" class="nav-placeholder"></view>
 
     <scroll-view scroll-y class="page-scroll" :show-scrollbar="false">
+      <view v-if="store.activeUiStyle === 'animal'" class="animal-friends-hero" aria-hidden="true">
+        <image
+          class="animal-friends-image"
+          src="/static/themes/animal/animal-friends.png"
+          mode="widthFix"
+        />
+      </view>
+      <view v-if="store.activeUiStyle === 'pixel'" class="pixel-hero" aria-hidden="true">
+        <view class="pixel-hero-icon">✚</view>
+        <view class="pixel-hero-copy">
+          <text class="pixel-hero-kicker">MERIDIAN QUEST</text>
+          <text class="pixel-hero-title">经络冒险日志</text>
+        </view>
+        <view class="pixel-hero-hearts"><text>♥</text><text>♥</text><text>♥</text></view>
+      </view>
       <!-- 干支信息卡片：显示年/月/日/时干支标签 -->
       <view class="ganzhi-card">
         <view class="ganzhi-header">
@@ -136,7 +151,7 @@
 
     <!-- 手动查询确认弹窗 -->
     <view v-if="showQueryConfirm" class="confirm-overlay" @tap="showQueryConfirm = false">
-      <view class="confirm-popup" :class="`theme-${store.activeTheme}`" @tap.stop>
+      <view class="confirm-popup" :class="store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`" @tap.stop>
         <text class="confirm-title">确认查询</text>
         <view class="confirm-info">
           <text class="confirm-label">日期</text>
@@ -728,16 +743,17 @@ onBackPress(() => {
   }
 
   :deep(.point-btn) {
-    padding: 20rpx 36rpx;
+    min-height: 82rpx;
+    padding: 12rpx 10rpx;
     border-radius: 24rpx;
   }
 
   :deep(.point-name) {
-    font-size: 32rpx;
+    font-size: 26rpx;
   }
 
   :deep(.point-code) {
-    font-size: 26rpx;
+    font-size: 18rpx;
   }
 
   :deep(.suggestion-title) {

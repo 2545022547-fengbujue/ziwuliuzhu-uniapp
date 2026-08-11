@@ -34,14 +34,14 @@
       {
         "pagePath": "pages/index/index",
         "text": "取穴",
-        "iconPath": "static/tabbar/home.png",
-        "selectedIconPath": "static/tabbar/home-active.png"
+        "iconPath": "static/tabbar/home-yellow.png",
+        "selectedIconPath": "static/tabbar/home-yellow-active.png"
       },
       {
         "pagePath": "pages/setting/setting",
         "text": "设置",
-        "iconPath": "static/tabbar/setting.png",
-        "selectedIconPath": "static/tabbar/setting-active.png"
+        "iconPath": "static/tabbar/setting-yellow.png",
+        "selectedIconPath": "static/tabbar/setting-yellow-active.png"
       }
     ]
   }

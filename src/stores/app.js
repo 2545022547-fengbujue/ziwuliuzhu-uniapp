@@ -13,7 +13,7 @@
  *
  * 持久化：
  *   使用 pinia-plugin-persist-uni 将部分状态持久化到 uni.storage
- *   持久化字段：useTrueSolarTime、longitude、selectedCity、activeMethod、theme
+ *   持久化字段：真太阳时设置、城市、取穴方法、传统主题和新增外观风格等
  *
  * 算法层调用：
  *   - najia.js → calculateNajia()   纳甲法
@@ -49,50 +49,69 @@ const THEME_CHROME = {
     color: '#999999',
     selectedColor: '#8B4513',
     borderStyle: 'white',
-    homeSelectedIconPath: '/static/tabbar/home-active.png',
-    settingSelectedIconPath: '/static/tabbar/setting-active.png'
+    homeIconPath: '/static/tabbar/home-yellow.png',
+    homeSelectedIconPath: '/static/tabbar/home-yellow-active.png',
+    settingIconPath: '/static/tabbar/setting-yellow.png',
+    settingSelectedIconPath: '/static/tabbar/setting-yellow-active.png'
   },
   black: {
     backgroundColor: '#000000',
     color: '#9B9B9B',
     selectedColor: '#0080FF',
     borderStyle: 'white',
-    homeSelectedIconPath: '/static/tabbar/home-active-black.png',
-    settingSelectedIconPath: '/static/tabbar/setting-active-black.png'
+    homeIconPath: '/static/tabbar/home-black.png',
+    homeSelectedIconPath: '/static/tabbar/home-black-active.png',
+    settingIconPath: '/static/tabbar/setting-black.png',
+    settingSelectedIconPath: '/static/tabbar/setting-black-active.png'
   },
   green: {
     backgroundColor: '#F7FBF8',
     color: '#71827B',
     selectedColor: '#2F7D73',
     borderStyle: 'white',
-    homeSelectedIconPath: '/static/tabbar/home-active-green.png',
-    settingSelectedIconPath: '/static/tabbar/setting-active-green.png'
+    homeIconPath: '/static/tabbar/home-green.png',
+    homeSelectedIconPath: '/static/tabbar/home-green-active.png',
+    settingIconPath: '/static/tabbar/setting-green.png',
+    settingSelectedIconPath: '/static/tabbar/setting-green-active.png'
   },
   red: {
     backgroundColor: '#FFF8F2',
     color: '#8A756B',
     selectedColor: '#B83A2E',
     borderStyle: 'white',
-    homeSelectedIconPath: '/static/tabbar/home-active-red.png',
-    settingSelectedIconPath: '/static/tabbar/setting-active-red.png'
+    homeIconPath: '/static/tabbar/home-red.png',
+    homeSelectedIconPath: '/static/tabbar/home-red-active.png',
+    settingIconPath: '/static/tabbar/setting-red.png',
+    settingSelectedIconPath: '/static/tabbar/setting-red-active.png'
   }
 }
 
-// === 多套界面风格（uiStyle）===
-// classic = 原始界面（theme-* 主题体系）；其余为全新界面风格（ui-* class 体系）
+// === 新增的四套界面风格（uiStyle）===
+// classic 沿用传统配色主题；下面四套风格各自拥有完整的排版、组件和交互样式。
+// 注释统一说明设计意图，避免把“主色替换”误当成一套完整风格。
 const UI_STYLE_OPTIONS = [
+  // 现代简约：实际采用柔和新拟物语言，通过明暗双阴影塑造轻浮雕层次。
   { id: 'modern', name: '现代简约', desc: '柔和浮雕，轻盈有序', swatch: 'modern' },
+  // 水墨意境：白宣纸、墨色笔触与克制的印色点睛，并按时段切换山水背景。
   { id: 'ink', name: '水墨意境', desc: '宣纸墨色，东方留白', swatch: 'ink' },
+  // 莫兰迪奶油：以低饱和灰粉、灰绿和奶油纸色形成安静柔和的观感。
   { id: 'morandi', name: '莫兰迪奶油', desc: '低饱和灰调，温柔治愈', swatch: 'morandi' },
-  { id: 'watercolor', name: '水彩画风', desc: '纸面晕染，柔和诗意', swatch: 'watercolor' }
+  // 水彩画风：使用透明色层与纸面晕染，不使用生硬的纯色矩形堆叠。
+  { id: 'watercolor', name: '水彩画风', desc: '纸面晕染，柔和诗意', swatch: 'watercolor' },
+  // 动物岛露营：参考 Animal Island UI 的奶油纸面、岛屿青绿和暖黄木牌语言。
+  { id: 'animal', name: '动物森友会', desc: '双狸迎宾，轻松岛居', swatch: 'animal' },
+  // 复古像素：遵循 Pixelium Design 的硬边轮廓、有限色板和 4px 像素节奏。
+  { id: 'pixel', name: '复古像素', desc: '掌机像素，怀旧冒险', swatch: 'pixel' }
 ]
 
 // 每种新风格的主色（用于 switch 开关等原生组件着色）
 const UI_STYLE_PRIMARY = {
   modern: '#4F46E5',
   ink: '#2F4A48',
-  morandi: '#B08D8D',
-  watercolor: '#4A6FA5'
+  morandi: '#A98282',
+  watercolor: '#4A6FA5',
+  animal: '#19AFA2',
+  pixel: '#5B6EE1'
 }
 
 // 每种新风格的 TabBar 配色；可按风格同时覆盖普通与选中图标。
@@ -102,24 +121,30 @@ const UI_STYLE_CHROME = {
     color: '#9CA3AF',
     selectedColor: '#4F46E5',
     borderStyle: 'white',
-    homeSelectedIconPath: '/static/tabbar/home.png',
-    settingSelectedIconPath: '/static/tabbar/setting.png'
+    homeIconPath: '/static/tabbar/home-modern.png',
+    homeSelectedIconPath: '/static/tabbar/home-modern-active.png',
+    settingIconPath: '/static/tabbar/setting-modern.png',
+    settingSelectedIconPath: '/static/tabbar/setting-modern-active.png'
   },
   ink: {
     backgroundColor: '#FDFDFA',
     color: '#7A817D',
     selectedColor: '#2F4A48',
     borderStyle: 'white',
-    homeSelectedIconPath: '/static/tabbar/home.png',
-    settingSelectedIconPath: '/static/tabbar/setting.png'
+    homeIconPath: '/static/tabbar/home-ink.png',
+    homeSelectedIconPath: '/static/tabbar/home-ink-active.png',
+    settingIconPath: '/static/tabbar/setting-ink.png',
+    settingSelectedIconPath: '/static/tabbar/setting-ink-active.png'
   },
   morandi: {
-    backgroundColor: '#F7F4EE',
-    color: '#A8A196',
-    selectedColor: '#B08D8D',
+    backgroundColor: '#F6F1EB',
+    color: '#8F8880',
+    selectedColor: '#A98282',
     borderStyle: 'white',
-    homeSelectedIconPath: '/static/tabbar/home.png',
-    settingSelectedIconPath: '/static/tabbar/setting.png'
+    homeIconPath: '/static/tabbar/home-morandi.png',
+    homeSelectedIconPath: '/static/tabbar/home-morandi-active.png',
+    settingIconPath: '/static/tabbar/setting-morandi.png',
+    settingSelectedIconPath: '/static/tabbar/setting-morandi-active.png'
   },
   watercolor: {
     backgroundColor: '#FAF8F5',
@@ -130,6 +155,26 @@ const UI_STYLE_CHROME = {
     homeSelectedIconPath: '/static/tabbar/home-watercolor-active.png',
     settingIconPath: '/static/tabbar/setting-watercolor.png',
     settingSelectedIconPath: '/static/tabbar/setting-watercolor-active.png'
+  },
+  animal: {
+    backgroundColor: '#F7F3DF',
+    color: '#8A7B66',
+    selectedColor: '#19AFA2',
+    borderStyle: 'white',
+    homeIconPath: '/static/tabbar/home-animal.png',
+    homeSelectedIconPath: '/static/tabbar/home-animal-active.png',
+    settingIconPath: '/static/tabbar/setting-animal.png',
+    settingSelectedIconPath: '/static/tabbar/setting-animal-active.png'
+  },
+  pixel: {
+    backgroundColor: '#F7E7B7',
+    color: '#6B5B53',
+    selectedColor: '#5B6EE1',
+    borderStyle: 'black',
+    homeIconPath: '/static/tabbar/home-pixel.png',
+    homeSelectedIconPath: '/static/tabbar/home-pixel-active.png',
+    settingIconPath: '/static/tabbar/setting-pixel.png',
+    settingSelectedIconPath: '/static/tabbar/setting-pixel-active.png'
   }
 }
 
@@ -174,6 +219,10 @@ export const useAppStore = defineStore('app', () => {
 
   // === 反克法显示模式 ===
   const fankeDisplayMode = ref('merged') // 默认合并到纳甲法 | 'separate'=单独显示
+  // 合日互用默认关闭：只有用户明确启用后，纳甲法闭穴才计算并展示合日穴位。
+  const useHeRiHuYong = ref(false)
+  // 穴位编码默认显示；关闭后各主题使用独立的中文名排版。
+  const showPointCode = ref(true)
 
   // === 计算属性 ===
 
@@ -217,7 +266,7 @@ export const useAppStore = defineStore('app', () => {
     }
     try {
       return {
-        najia: calculateNajia(ganzhi, hourIndex),
+        najia: calculateNajia(ganzhi, hourIndex, { enableHeRiHuYong: useHeRiHuYong.value }),
         nazi: calculateNazi(ganzhi, hourIndex),
         lingui: calculateLingui(ganzhi, hourIndex),
         feiteng: calculateFeiteng(ganzhi, hourIndex),
@@ -238,7 +287,7 @@ export const useAppStore = defineStore('app', () => {
 
   // 兜底校验：持久化值非法（如风格已下架）时回退经典界面
   const activeUiStyle = computed(() => {
-    return isKnownUiStyle(uiStyle.value) ? uiStyle.value : 'classic'
+    return supportsThemeSwitch && isKnownUiStyle(uiStyle.value) ? uiStyle.value : 'classic'
   })
 
   // 设置页只展示一套“外观风格”，避免 theme 与 uiStyle 两套概念互相覆盖。
@@ -359,6 +408,18 @@ export const useAppStore = defineStore('app', () => {
     naziMode.value = mode
   }
 
+  function togglePointCode(enabled) {
+    showPointCode.value = Boolean(enabled)
+  }
+
+  /**
+   * 控制纳甲法闭穴时是否启用合日互用。
+   * 该状态参与 results 计算依赖，切换后无需手动刷新，纳甲结果会立即重新计算。
+   */
+  function toggleHeRiHuYong(enabled) {
+    useHeRiHuYong.value = Boolean(enabled)
+  }
+
   function setTheme(nextTheme) {
     if (!supportsThemeSwitch) {
       theme.value = 'yellow'
@@ -452,6 +513,8 @@ export const useAppStore = defineStore('app', () => {
     longitude,
     selectedCity,
     fankeDisplayMode,
+    useHeRiHuYong,
+    showPointCode,
     // Getters
     currentResults,
     currentGanZhi,
@@ -467,6 +530,8 @@ export const useAppStore = defineStore('app', () => {
     toggleTrueSolarTime,
     setActiveMethod,
     setNaziMode,
+    toggleHeRiHuYong,
+    togglePointCode,
     setTheme,
     setUiStyle,
     setAppearance,
@@ -495,7 +560,7 @@ export const useAppStore = defineStore('app', () => {
             }
           }
         },
-        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'theme', 'uiStyle']
+        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'useHeRiHuYong', 'showPointCode', 'theme', 'uiStyle']
       }
     ]
   }

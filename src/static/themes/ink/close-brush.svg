@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="朱砂泼墨圆形">
+  <!--
+    原创朱砂干笔纹理：依据用户提供参考图的“中心厚墨、外圈多层干笔、少量飞白”结构重绘。
+    SVG 仅作为按钮背景，不包含关闭叉号；叉号由 CSS 几何笔画绘制，确保各平台严格居中。
+  -->
+  <defs>
+    <filter id="rough" x="-18%" y="-18%" width="136%" height="136%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035 0.07" numOctaves="2" seed="17" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <radialGradient id="ink" cx="44%" cy="39%" r="68%">
+      <stop offset="0" stop-color="#c33d32"/>
+      <stop offset="0.62" stop-color="#ac3029"/>
+      <stop offset="1" stop-color="#86221e"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 外圈分段笔锋：不闭合且粗细不一，缩小时仍能看到干笔破口。 -->
+  <g fill="none" stroke-linecap="round" filter="url(#rough)">
+    <path d="M31 154C12 91 55 31 119 19c47-9 94 13 115 53" stroke="#a92b25" stroke-width="12" stroke-dasharray="94 10 21 13 45 18"/>
+    <path d="M225 62c28 47 21 102-14 140-31 34-83 48-130 30" stroke="#b7352c" stroke-width="14" stroke-dasharray="76 12 34 9 22 18"/>
+    <path d="M57 221c-41-27-54-83-36-126 13-31 38-56 71-68" stroke="#90231f" stroke-width="9" stroke-dasharray="48 8 17 10 56 13" opacity=".94"/>
+    <path d="M48 76c24-38 72-58 116-47 34 8 59 27 76 55" stroke="#c03a30" stroke-width="7" stroke-dasharray="31 7 65 13 18 11" opacity=".9"/>
+    <path d="M28 182c23 46 79 69 129 53 34-11 61-36 76-68" stroke="#9d2822" stroke-width="7" stroke-dasharray="67 9 26 11 38 15" opacity=".86"/>
+  </g>
+
+  <!-- 中心厚墨：轮廓有轻微偏心和凹凸，避免呈现规则矢量圆。 -->
+  <path d="M54 84c14-31 50-50 86-48 38 2 72 23 84 58 12 34 4 75-22 101-25 25-66 36-101 27-37-9-67-37-73-72-4-24 8-47 26-66Z" fill="url(#ink)" filter="url(#rough)"/>
+  <path d="M73 75c25-24 69-31 102-14 30 15 50 48 46 82-4 31-26 60-57 70-33 10-73 0-94-27-25-31-24-81 3-111Z" fill="#b6322a" opacity=".78"/>
+
+  <!-- 飞白与刮痕只分布在外缘，中心保留足够实色承托白色叉号。 -->
+  <g fill="none" stroke="#f8eee5" stroke-linecap="round" opacity=".58">
+    <path d="M45 108c14-31 40-54 72-63" stroke-width="4" stroke-dasharray="28 8 13 7"/>
+    <path d="M56 194c23 20 57 28 88 21" stroke-width="5" stroke-dasharray="34 10 18 8"/>
+    <path d="M181 48c20 10 36 27 46 46" stroke-width="3" stroke-dasharray="15 7 24 9"/>
+    <path d="M213 173c-10 18-25 33-43 43" stroke-width="4" stroke-dasharray="19 8 12 6"/>
+  </g>
+
+  <!-- 克制的墨点，避免小尺寸下变成噪点团。 -->
+  <g fill="#a72c26">
+    <circle cx="30" cy="66" r="5"/><circle cx="218" cy="38" r="4"/><circle cx="239" cy="121" r="5"/>
+    <circle cx="24" cy="207" r="3.5"/><circle cx="199" cy="232" r="4"/><circle cx="73" cy="24" r="3"/>
+  </g>
+</svg>

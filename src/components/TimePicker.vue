@@ -21,9 +21,19 @@
   <view class="time-picker-overlay" @tap="close">
     <view
       class="time-picker-panel"
-      :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '']"
+      :class="[
+        store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`,
+        store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : ''
+      ]"
       @tap.stop
     >
+      <!-- 与日期面板共用时段背景；真实 image 层在 Android WebView 中更可靠。 -->
+      <image
+        v-if="store.activeUiStyle === 'ink'"
+        class="ink-picker-bg"
+        :src="inkPickerBackground"
+        mode="aspectFill"
+      />
       <!-- 标题 -->
       <view class="picker-title">
         <text class="picker-title-text">选择时辰</text>
@@ -69,11 +79,13 @@
  * - HOUR_OPTIONS 定义在 src/utils/date.js
  * - 格式：[{ label: '子时（23:00-01:00）', value: 0 }, ...]
  */
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { HOUR_OPTIONS } from '@/utils/date.js'
+import { getInkPickerBackground } from '@/utils/ink-backgrounds.js'
 
 const store = useAppStore()
+const inkPickerBackground = computed(() => getInkPickerBackground(store.inkBackgroundPeriod))
 
 /**
  * 接收父组件传入的当前时辰索引
@@ -121,8 +133,8 @@ function confirm() {
  * TimePicker 样式说明
  *
  * 主题适配：
- * - 通过 :class="`theme-${store.activeTheme}`" 动态切换主题
- * - 默认主题使用 CSS 变量（--theme-*）
+ * - 经典外观使用 theme-* 类，新增外观使用 ui-* 类
+ * - 所有主题共享 CSS 变量（--theme-*），再由对应风格补充组件细节
  * - 暗夜幽光主题（theme-black）需要特殊处理：
  *   - 毛玻璃效果（微信小程序不支持）
  *   - 选中项使用电蓝色边框提高对比度

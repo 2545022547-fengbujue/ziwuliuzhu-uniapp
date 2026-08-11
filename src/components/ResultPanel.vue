@@ -39,10 +39,11 @@
               v-for="point in fankeResult.openPoints"
               :key="'fanke-' + point.code"
               class="point-btn"
+              :class="{ 'point-btn-code-hidden': !store.showPointCode }"
               @tap="handlePointClick(point)"
             >
               <text class="point-name">{{ point.name }}</text>
-              <text class="point-code">{{ point.code }}</text>
+              <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
               <view v-if="point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
                 <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
               </view>
@@ -51,7 +52,7 @@
         </view>
       </template>
 
-      <!-- 合日互用穴位（闭穴时） -->
+      <!-- 合日互用穴位：只有设置开关开启、纳甲法本身闭穴且合日计算有结果时才渲染。 -->
       <view v-if="result?.isClosed && result?.alternativePoints?.openPoints?.length" class="section">
         <view class="section-title">
           <view class="dot secondary"></view>
@@ -62,10 +63,11 @@
             v-for="point in result.alternativePoints.openPoints"
             :key="'alt-' + point.code"
             class="point-btn"
+            :class="{ 'point-btn-code-hidden': !store.showPointCode }"
             @tap="handlePointClick(point)"
           >
             <text class="point-name">{{ point.name }}</text>
-            <text class="point-code">{{ point.code }}</text>
+            <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
             <view v-if="point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
               <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
             </view>
@@ -98,16 +100,16 @@
           <view class="dot primary"></view>
           <text>当前开穴</text>
         </view>
-        <view class="points-grid" :style="gridStyle">
+        <view class="points-grid">
           <view
             v-for="bp in bumuPoints"
             :key="'bumu-' + bp.point.code"
             class="point-btn"
-            :style="getPointStyle(bp.point)"
+            :class="{ 'point-btn-code-hidden': !store.showPointCode }"
             @tap="handlePointClick(bp.point)"
           >
             <text class="point-name">{{ bp.point.name }}</text>
-            <text class="point-code">{{ bp.point.code }}</text>
+            <text v-if="store.showPointCode" class="point-code">{{ bp.point.code }}</text>
             <view v-if="bp.point.wuxing" class="wuxing-tag" :style="getWuxingStyle(bp.point.wuxing)">
               <text class="wuxing-text" :style="{ color: getWuxingColor(bp.point.wuxing) }">{{ bp.point.wuxing }}</text>
             </view>
@@ -121,16 +123,16 @@
           <view class="dot primary"></view>
           <text>当前开穴</text>
         </view>
-        <view class="points-grid" :style="gridStyle">
+        <view class="points-grid">
           <view
             v-for="point in displayPoints"
             :key="'open-' + point.code"
             class="point-btn"
-            :style="getPointStyle(point)"
+            :class="{ 'point-btn-code-hidden': !store.showPointCode }"
             @tap="handlePointClick(point)"
           >
             <text class="point-name">{{ point.name }}</text>
-            <text class="point-code">{{ point.code }}</text>
+            <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
             <view v-if="point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
               <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
             </view>
@@ -229,6 +231,8 @@ const fankeHasOpenPoints = computed(() => {
 })
 
 const alternativeHasOpenPoints = computed(() => {
+  // alternativePoints 在开关关闭时固定为 null；这里不直接读取开关，
+  // 让结果对象成为唯一渲染依据，避免 Store 状态和旧计算结果短暂不同步。
   return Boolean(result.value?.alternativePoints?.openPoints?.length)
 })
 
@@ -273,12 +277,6 @@ const displayPoints = computed(() => {
   return [...points].sort((a, b) => (a.name?.length || 0) - (b.name?.length || 0))
 })
 
-// 网格容器样式：纳子法缩小间距
-const gridStyle = computed(() => {
-  if (props.method !== 'nazi') return null
-  return { gap: '10rpx' }
-})
-
 // 方法中文名映射
 const methodName = computed(() => METHOD_NAMES[props.method] || props.method)
 
@@ -287,18 +285,6 @@ const methodIcon = computed(() => {
   const icons = { najia: '☰', nazi: '☷', lingui: '☯', feiteng: '⚡', fanke: '⇄' }
   return icons[props.method] || '•'
 })
-
-/**
- * 穴位按钮样式：纳子法缩小 padding 让一行放三个
- */
-function getPointStyle(point) {
-  if (props.method !== 'nazi') return null
-  const isLong = point.name && point.name.length > 2
-  return {
-    padding: isLong ? '14rpx 20rpx' : '14rpx 16rpx',
-    gap: '6rpx'
-  }
-}
 
 /**
  * 穴位点击处理：打开穴位详情弹窗
@@ -451,18 +437,29 @@ function handlePointClick(point) {
   border-radius: $radius-md;
 }
 
-/* === 穴位网格 === */
+/* === 穴位网格 ===
+ * 主面板和纵向对比面板统一使用三列，不再让 flex 根据文字宽度自行换行。
+ * minmax(0, 1fr) 很重要：允许包含三字穴位名、编码和五行标签的网格项真正收缩，
+ * 避免某个按钮的内容宽度把整列撑开，重新形成“2 + 2 + 1”的不规则排列。
+ */
 .points-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-sm;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12rpx;
+  align-items: stretch;
 }
 
 .point-btn {
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  padding: 14rpx 28rpx;
+  justify-content: center;
+  gap: 6rpx;
+  width: 100%;
+  min-width: 0;
+  min-height: 84rpx;
+  padding: 12rpx 10rpx;
+  box-sizing: border-box;
+  overflow: hidden;
   border-radius: 20rpx;
   background: var(--theme-surface-muted);
   transition: all 0.25s ease;
@@ -474,24 +471,31 @@ function handlePointClick(point) {
 }
 
 .point-name {
-  font-size: 28rpx;
+  flex-shrink: 0;
+  font-size: 26rpx;
   font-weight: 700;
   color: var(--theme-primary);
   font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .point-code {
-  font-size: 24rpx;
+  min-width: 0;
+  font-size: 18rpx;
   color: $tcm-text-hint;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .wuxing-tag {
-  padding: 2rpx 10rpx;
+  flex-shrink: 0;
+  padding: 2rpx 7rpx;
   border-radius: $radius-sm;
 }
 
 .wuxing-text {
-  font-size: $font-size-xs;
+  font-size: 20rpx;
   font-weight: 500;
   font-family: 'WenYuanSerifSC-Bold', 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }

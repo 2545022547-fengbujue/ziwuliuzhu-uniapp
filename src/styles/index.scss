@@ -13,12 +13,15 @@
    ============================================ */
 @use 'variables' as *;
 @use 'themes';
-// 新界面风格（ui-modern / ui-ink / ui-morandi / ui-watercolor）：
+// 新界面风格（ui-modern / ui-ink / ui-morandi / ui-watercolor / ui-animal / ui-pixel）：
 // 必须在 themes 之后引入，同特异性 !important 规则靠顺序取胜
 @use 'modern';
 @use 'ui-ink';
 @use 'ui-morandi';
 @use 'ui-watercolor';
+@use 'ui-animal';
+@use 'ui-pixel';
+@use 'ui-point-code';
 
 /* === 楷体字体 === */
 /* App端（Android）：打包内置字体，解决系统无楷体问题 */

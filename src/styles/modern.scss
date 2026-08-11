@@ -1,16 +1,16 @@
 /* ============================================
-   现代界面（ui-modern）
+   现代简约（ui-modern，新拟物实现）
 
-   与原UI完全并存的第二套界面：
-   - 页面根节点绑定 ui-modern class 后整体生效
-   - 第一步：重定义 --theme-* 变量，所有引用变量的组件自动换色
-   - 第二步：结构化覆盖（去渐变、去重阴影、细分割线、大圆角、扁平化）
+   设计语言：冷灰蓝基底 + 柔和浮雕层次
+   - 页面根节点绑定 ui-modern 后整体生效，不影响其他七套外观
+   - 明暗双阴影模拟轻微凸起和内凹，不使用刺眼高光或厚重阴影
+   - 交互控件保留清楚的选中态，正文采用系统无衬线字体保证易读
 
    级联说明：
    - 组件 scoped 样式不带 !important，本文件用 !important 稳赢
    - themes.scss 的黑/绿/红主题 !important 规则与本文件同特异性时，
      靠 index.scss 中 @use 顺序（modern 在 themes 之后）取胜
-   - 全平台安全：不使用 backdrop-filter 等小程序不支持的特性
+   - 微信小程序端不启用这套复杂外观；H5 与 App 共用同一份样式
    ============================================ */
 
 // 现代界面设计令牌
@@ -270,14 +270,14 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
     color: $modern-primary !important;
   }
 
-  // 闭穴提示：现代琥珀色警告条
+  // 闭穴提示：沿用新拟物靛蓝体系，避免突兀的琥珀黄色串入主题。
   .warning-box {
-    background: #FFFBEB !important;
-    border: 1rpx solid #FDE68A !important;
+    background: $modern-primary-soft !important;
+    border: 1rpx solid rgba(89, 101, 216, 0.18) !important;
   }
 
   .warning-text {
-    color: #92400E !important;
+    color: $modern-primary-dark !important;
   }
 
   .section-title {

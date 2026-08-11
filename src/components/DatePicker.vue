@@ -23,9 +23,19 @@
   <view class="date-picker-overlay" @tap="close">
     <view
       class="date-picker-panel"
-      :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '']"
+      :class="[
+        store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`,
+        store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : ''
+      ]"
       @tap.stop
     >
+      <!-- 使用真实 image 层，避免部分 App WebView 对多重 CSS 背景图渲染不稳定。 -->
+      <image
+        v-if="store.activeUiStyle === 'ink'"
+        class="ink-picker-bg"
+        :src="inkPickerBackground"
+        mode="aspectFill"
+      />
       <!-- 年份标题（左上角）：◀2026▶ -->
       <view class="year-header">
         <view class="year-nav" @tap="prevYear">
@@ -107,8 +117,10 @@
  */
 import { ref, computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
+import { getInkPickerBackground } from '@/utils/ink-backgrounds.js'
 
 const store = useAppStore()
+const inkPickerBackground = computed(() => getInkPickerBackground(store.inkBackgroundPeriod))
 
 // 接收父组件传入的当前日期值（格式：YYYY-MM-DD）
 const props = defineProps({
@@ -269,8 +281,8 @@ function confirm() {
  * DatePicker 样式说明
  *
  * 主题适配：
- * - 通过 :class="`theme-${store.activeTheme}`" 动态切换主题
- * - 默认主题使用 CSS 变量（--theme-*）
+ * - 经典外观使用 theme-* 类，新增外观使用 ui-* 类
+ * - 所有主题共享 CSS 变量（--theme-*），再由对应风格补充组件细节
  * - 暗夜幽光主题（theme-black）需要特殊处理：毛玻璃效果
  *
  * 已知坑：

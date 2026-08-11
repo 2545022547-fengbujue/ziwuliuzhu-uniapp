@@ -1,27 +1,33 @@
 /* ============================================
    莫兰迪奶油（ui-morandi）
 
-   设计语言：低饱和莫兰迪色系 + 奶油质感
-   - 灰玫瑰主色 + 灰豆绿/奶茶点缀，全部低饱和
-   - 大圆角 + 弥散柔光阴影，几乎不用硬边框
-   - 整体温柔松弛，与古典/水墨/经络风完全不同气质
+   设计语言：低饱和莫兰迪色层 + 哑光奶油质感
+   - 不做单一灰粉换皮：同时使用粉笔米、尘粉、暖灰、褪色蓝、柔赭和鼠尾草绿
+   - 色彩采用相近明度、低对比的分层组合，让页面安静但不扁平
+   - 卡片模拟陶器和织物的哑光表面，阴影柔和扩散，不使用镜面高光
+   - 标题用文渊宋体增加克制的书卷感，正文保留清晰的系统无衬线字体
 
    级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
    ============================================ */
 
-$mor-primary: #B08D8D;           // 灰玫瑰
-$mor-primary-dark: #967474;
-$mor-sage: #96A894;              // 灰豆绿
-$mor-caramel: #C89B7B;           // 奶茶
-$mor-bg: #F1ECE6;                // 奶油灰粉底
-$mor-surface: #FBF8F3;           // 奶油卡片
-$mor-muted: #EAE2DB;             // 浅灰粉填充
-$mor-text: #504A47;              // 暖灰文字
-$mor-text-secondary: #665F55;
-$mor-text-hint: #8E8679;
-$mor-border: rgba(74, 70, 64, 0.08);
-$mor-shadow: 0 8rpx 28rpx rgba(120, 108, 92, 0.14);
+$mor-primary: #A98282;           // 尘粉灰玫瑰
+$mor-primary-dark: #7F6262;
+$mor-sage: #8E9F93;              // 鼠尾草灰绿
+$mor-caramel: #B99176;           // 柔赭陶土
+$mor-blue: #9CAAB2;              // 褪色雾蓝
+$mor-oat: #E9E0D3;               // 燕麦奶油
+$mor-mushroom: #DED4CA;          // 蘑菇暖灰
+$mor-blush: #E6D7D5;             // 蒙灰尘粉
+$mor-bg: #F2EDE7;                // 暖灰奶油底
+$mor-surface: #FBF8F2;           // 粉笔白陶器面
+$mor-muted: #E9E1D8;             // 浅蘑菇填充
+$mor-text: #494744;               // 深暖灰，避免使用纯黑
+$mor-text-secondary: #655F59;
+$mor-text-hint: #888078;
+$mor-border: rgba(101, 91, 82, 0.11);
+$mor-shadow: 0 12rpx 34rpx rgba(105, 92, 82, 0.11);
 $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+$mor-serif: 'WenYuanSerifSC', 'STSong', 'Songti SC', 'SimSun', serif;
 
 .ui-morandi {
   /* === 主题变量重定义 === */
@@ -38,9 +44,10 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   --theme-shadow: rgba(120, 108, 92, 0.10);
 
   background:
-    radial-gradient(circle at 8% 4%, rgba(176, 141, 141, 0.16) 0%, transparent 30%),
-    radial-gradient(circle at 94% 38%, rgba(150, 168, 148, 0.13) 0%, transparent 28%),
-    linear-gradient(180deg, #F8F4EF 0%, $mor-bg 100%) !important;
+    radial-gradient(ellipse at 6% 8%, rgba(169, 130, 130, 0.14) 0%, transparent 34%),
+    radial-gradient(ellipse at 96% 34%, rgba(142, 159, 147, 0.13) 0%, transparent 30%),
+    radial-gradient(ellipse at 18% 82%, rgba(156, 170, 178, 0.11) 0%, transparent 34%),
+    linear-gradient(180deg, #F8F4EF 0%, $mor-bg 58%, #EEE8E2 100%) !important;
   color: $mor-text !important;
 
   /* === 导航栏：奶油底 + 暖灰标题 === */
@@ -52,9 +59,9 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
   .navbar-title {
     color: $mor-text !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
     font-weight: 600;
-    letter-spacing: 4rpx !important;
+    letter-spacing: 6rpx !important;
   }
 
   /* === 卡片通用：奶油面 + 大圆角 + 弥散柔光（无边框） === */
@@ -70,18 +77,18 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   .fullscreen-panel,
   .date-picker-panel,
   .time-picker-panel {
-    background: rgba(251, 248, 243, 0.94) !important;
-    box-shadow: 0 12rpx 36rpx rgba(112, 96, 88, 0.11) !important;
-    border: 1rpx solid rgba(176, 141, 141, 0.10) !important;
-    border-radius: 28rpx !important;
+    background: linear-gradient(145deg, rgba(253, 250, 245, 0.97), rgba(248, 244, 237, 0.95)) !important;
+    box-shadow: $mor-shadow !important;
+    border: 1rpx solid $mor-border !important;
+    border-radius: 32rpx !important;
     backdrop-filter: none !important;
   }
 
   /* === 干支卡片 === */
   .ganzhi-title {
     color: $mor-text-hint !important;
-    font-family: $mor-font !important;
-    letter-spacing: 4rpx;
+    font-family: $mor-serif !important;
+    letter-spacing: 5rpx;
   }
 
   // 自动/手动切换：驼色轨道 + 奶油滑块
@@ -143,7 +150,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
     background: $mor-primary !important;
     border: none !important;
     border-radius: 999rpx !important;
-    box-shadow: 0 6rpx 18rpx rgba(176, 141, 141, 0.35) !important;
+    box-shadow: 0 6rpx 18rpx rgba(169, 130, 130, 0.30) !important;
   }
 
   .current-datetime {
@@ -158,7 +165,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
     color: $mor-text-secondary !important;
   }
 
-  // 干支标签：两行两列圆胖卡片，日/时奶茶色
+  // 干支标签使用相近明度的燕麦、雾蓝、陶土和尘粉，安静但不单调。
   .ganzhi-display {
     flex-wrap: wrap;
     justify-content: space-between;
@@ -169,12 +176,24 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
     width: calc(50% - 8rpx);
     box-sizing: border-box;
     padding: 24rpx 0 !important;
-    background: $mor-muted !important;
+    background: $mor-oat !important;
     border: none !important;
     border-radius: 20rpx !important;
 
-    &.highlight {
-      background: $mor-caramel !important;
+    &:nth-child(2) {
+      background: #DEE4E2 !important;
+    }
+
+    &:nth-child(3).highlight {
+      background: #C6A189 !important;
+
+      .ganzhi-tag-text {
+        color: #FFF9F2 !important;
+      }
+    }
+
+    &:nth-child(4).highlight {
+      background: #AF8D8D !important;
 
       .ganzhi-tag-text {
         color: #FFF9F2 !important;
@@ -184,15 +203,15 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
   .ganzhi-tag-text {
     color: $mor-text-secondary !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
     font-weight: 600;
     font-size: 30rpx !important;
   }
 
   /* === 方法切换栏：驼色轨道 + 奶油圆胖滑块 === */
   .method-tabs {
-    background: $mor-muted !important;
-    border: none !important;
+    background: linear-gradient(90deg, $mor-oat, #E6DEDA, #DFE4E1) !important;
+    border: 1rpx solid rgba(101, 91, 82, 0.07) !important;
     border-radius: 999rpx !important;
     box-shadow: none !important;
     padding: 10rpx !important;
@@ -203,8 +222,8 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
     &.active {
       background: $mor-surface !important;
-      border: none !important;
-      box-shadow: 0 4rpx 14rpx rgba(120, 108, 92, 0.20) !important;
+      border: 1rpx solid rgba(169, 130, 130, 0.18) !important;
+      box-shadow: 0 6rpx 18rpx rgba(112, 96, 88, 0.15) !important;
       transform: none !important;
 
       .method-name {
@@ -235,13 +254,14 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
   /* === 结果面板 === */
   .panel-header {
-    background: $mor-surface !important;
+    background: linear-gradient(90deg, rgba(230, 215, 213, 0.58), rgba(251, 248, 242, 0.88) 42%, rgba(222, 228, 226, 0.44)) !important;
     border-bottom: 1rpx solid $mor-border !important;
   }
 
   .header-title {
     color: $mor-text !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
+    letter-spacing: 3rpx;
   }
 
   .header-icon {
@@ -254,7 +274,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   }
 
   .result-ganzhi-hour-tag {
-    background: $mor-caramel !important;
+    background: #B9947B !important;
     border: none !important;
     border-radius: 999rpx !important;
   }
@@ -264,18 +284,18 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   }
 
   .warning-box {
-    background: #F5E9D6 !important;
+    background: rgba(169, 130, 130, 0.13) !important;
     border: none !important;
     border-radius: 16rpx !important;
   }
 
   .warning-text {
-    color: #9C7A3C !important;
+    color: $mor-primary-dark !important;
   }
 
   .section-title {
     color: $mor-text-secondary !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
   }
 
   .dot.primary,
@@ -295,13 +315,13 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
   // 穴位按钮：浅驼圆胖药片
   .point-btn {
-    background: $mor-muted !important;
-    border: none !important;
+    background: linear-gradient(145deg, #F2EAE2, #E7DDDA) !important;
+    border: 1rpx solid rgba(169, 130, 130, 0.10) !important;
     border-radius: 999rpx !important;
     backdrop-filter: none !important;
 
     &:active {
-      background: rgba(176, 141, 141, 0.25) !important;
+      background: rgba(169, 130, 130, 0.22) !important;
     }
   }
 
@@ -315,7 +335,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   }
 
   .tag-primary {
-    background: rgba(150, 168, 148, 0.22) !important;
+    background: rgba(142, 159, 147, 0.20) !important;
     border: none !important;
     border-radius: 999rpx !important;
 
@@ -344,7 +364,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   }
 
   .palace-box {
-    background: $mor-muted !important;
+    background: #E3E7E5 !important;
     border: none !important;
     border-radius: 16rpx !important;
   }
@@ -362,7 +382,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   }
 
   .suggestion-box {
-    background: rgba(150, 168, 148, 0.18) !important;
+    background: rgba(142, 159, 147, 0.18) !important;
     border: none !important;
     border-radius: 16rpx !important;
   }
@@ -412,14 +432,14 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
   .divider-text {
     color: $mor-text-hint !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
     letter-spacing: 4rpx;
   }
 
   /* === 确认弹窗 === */
   .confirm-title {
     color: $mor-text !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
   }
 
   .confirm-info {
@@ -450,7 +470,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
     background: $mor-primary !important;
     border: none !important;
     border-radius: 999rpx !important;
-    box-shadow: 0 6rpx 18rpx rgba(176, 141, 141, 0.35) !important;
+    box-shadow: 0 6rpx 18rpx rgba(169, 130, 130, 0.30) !important;
   }
 
   /* === 设置页 === */
@@ -467,7 +487,8 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
   .card-title {
     color: $mor-text !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
+    letter-spacing: 2rpx;
   }
 
   .setting-label,
@@ -492,8 +513,8 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
   .theme-current,
   .ui-style-option {
-    background: $mor-muted !important;
-    border: none !important;
+    background: linear-gradient(145deg, $mor-oat, #E5DEDA) !important;
+    border: 1rpx solid rgba(101, 91, 82, 0.08) !important;
   }
 
   .ui-style-name {
@@ -518,14 +539,14 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
     border: none !important;
 
     &.active {
-      background: rgba(176, 141, 141, 0.15) !important;
-      border: 1rpx solid rgba(176, 141, 141, 0.40) !important;
+      background: rgba(169, 130, 130, 0.14) !important;
+      border: 1rpx solid rgba(169, 130, 130, 0.34) !important;
     }
   }
 
   .city-picker-btn {
-    background: $mor-surface !important;
-    border: none !important;
+    background: linear-gradient(145deg, #FCF9F4, #EFE7DE) !important;
+    border: 1rpx solid rgba(101, 91, 82, 0.08) !important;
     box-shadow: 0 2rpx 8rpx rgba(120, 108, 92, 0.10) !important;
   }
 
@@ -544,12 +565,12 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
   .fullscreen-title {
     color: $mor-text !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
   }
 
   .app-name {
     color: $mor-text !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
   }
 
   .logo-icon {
@@ -577,7 +598,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
   .popup-title {
     color: $mor-text !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
   }
 
   .header-icon-wrap {
@@ -601,8 +622,8 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   .info-item,
   .location-box,
   .method-item {
-    background: $mor-muted !important;
-    border: none !important;
+    background: linear-gradient(145deg, #F2EBE3, #E5DEDA) !important;
+    border: 1rpx solid rgba(101, 91, 82, 0.08) !important;
     backdrop-filter: none !important;
   }
 
@@ -661,7 +682,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   .month-text,
   .picker-title-text {
     color: $mor-text !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
   }
 
   .week-item {
@@ -671,7 +692,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   .day-item {
     &.selected {
       background: $mor-primary !important;
-      box-shadow: 0 4rpx 12rpx rgba(176, 141, 141, 0.40) !important;
+      box-shadow: 0 4rpx 12rpx rgba(169, 130, 130, 0.30) !important;
     }
   }
 
@@ -679,7 +700,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
     &.selected {
       background: $mor-primary !important;
       border: none !important;
-      box-shadow: 0 4rpx 12rpx rgba(176, 141, 141, 0.40) !important;
+      box-shadow: 0 4rpx 12rpx rgba(169, 130, 130, 0.30) !important;
     }
   }
 
@@ -709,7 +730,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   }
 
   .tip-box {
-    background: rgba(150, 168, 148, 0.18) !important;
+    background: rgba(142, 159, 147, 0.18) !important;
     border: none !important;
   }
 
@@ -722,7 +743,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   }
 
   .province-header {
-    background: $mor-muted !important;
+    background: linear-gradient(90deg, $mor-oat, #E4DEDA) !important;
 
     &:active {
       background: $mor-border !important;
@@ -739,13 +760,13 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   }
 
   .province-cities {
-    background: $mor-surface !important;
+    background: #F8F4EE !important;
     border: none !important;
   }
 
   .city-item {
     &.selected {
-      background: rgba(176, 141, 141, 0.15) !important;
+      background: rgba(169, 130, 130, 0.14) !important;
     }
   }
 
@@ -770,9 +791,9 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 .date-picker-panel.ui-morandi,
 .time-picker-panel.ui-morandi,
 .popup.ui-morandi {
-  background: #FBF8F3 !important;
+  background: linear-gradient(145deg, #FCF9F4, #F4EEE7) !important;
   color: $mor-text !important;
-  border: 1px solid rgba(176, 141, 141, 0.14) !important;
+  border: 1px solid rgba(169, 130, 130, 0.14) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -780,7 +801,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 .popup.ui-morandi {
   .province-group {
     margin-bottom: 8px !important;
-    border: 1px solid rgba(176, 141, 141, 0.12) !important;
+    border: 1px solid rgba(169, 130, 130, 0.12) !important;
     border-radius: 14px !important;
     overflow: hidden;
   }
@@ -798,7 +819,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
   .city-item-indented {
     padding: 12px !important;
     min-width: 0;
-    border-right: 1px solid rgba(176, 141, 141, 0.10) !important;
+    border-right: 1px solid rgba(169, 130, 130, 0.10) !important;
   }
 
   .city-item-indented:nth-child(2n) {
@@ -826,17 +847,17 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
     box-shadow: none !important;
 
     .day-text {
-      background: rgba(176, 141, 141, 0.22) !important;
-      color: $mor-primary-dark !important;
-      border: 1px solid rgba(176, 141, 141, 0.34) !important;
-      border-radius: 12px !important;
-      box-shadow: 0 4px 12px rgba(176, 141, 141, 0.14) !important;
+      background: $mor-primary !important;
+      color: #FFF9F2 !important;
+      border: 1px solid rgba(127, 98, 98, 0.18) !important;
+      border-radius: 50% !important;
+      box-shadow: 0 5px 14px rgba(127, 98, 98, 0.18) !important;
     }
   }
 
   .hour-item.selected {
-    background: rgba(176, 141, 141, 0.20) !important;
-    border: 1px solid rgba(176, 141, 141, 0.34) !important;
+    background: rgba(169, 130, 130, 0.18) !important;
+    border: 1px solid rgba(169, 130, 130, 0.30) !important;
     box-shadow: none !important;
 
     .hour-text {
@@ -848,7 +869,7 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 .ui-morandi switch .uni-switch-input,
 .ui-morandi .uni-switch-input {
   background-color: #E8DDD7 !important;
-  border-color: rgba(176, 141, 141, 0.30) !important;
+  border-color: rgba(169, 130, 130, 0.26) !important;
 }
 
 .ui-morandi switch .uni-switch-input::before,
@@ -858,6 +879,24 @@ $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mi
 
 .ui-morandi switch .uni-switch-input::after,
 .ui-morandi .uni-switch-input::after {
+  background-color: $mor-surface !important;
+  box-shadow: 0 2px 8px rgba(105, 92, 82, 0.18) !important;
+}
+
+.ui-morandi switch .uni-switch-input.uni-switch-input-checked::after,
+.ui-morandi .uni-switch-input.uni-switch-input-checked::after {
   background-color: $mor-primary !important;
-  box-shadow: 0 2px 8px rgba(120, 96, 96, 0.22) !important;
+}
+
+/* 设置卡片使用轻微不同的底色倾向，体现莫兰迪“层叠而非整页同色”的原则。 */
+.ui-morandi .setting-content > .setting-card:nth-child(1) {
+  background: linear-gradient(145deg, rgba(251, 248, 242, 0.98), rgba(229, 233, 229, 0.92)) !important;
+}
+
+.ui-morandi .setting-content > .setting-card:nth-child(2) {
+  background: linear-gradient(145deg, rgba(251, 248, 242, 0.98), rgba(232, 217, 215, 0.72)) !important;
+}
+
+.ui-morandi .setting-content > .setting-card:nth-child(3) {
+  background: linear-gradient(145deg, rgba(251, 248, 242, 0.98), rgba(233, 224, 211, 0.78)) !important;
 }

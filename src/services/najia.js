@@ -62,9 +62,12 @@ function getDayMeridianChain(dayMeridian) {
  * 
  * @param {Object} ganzhi - 干支信息（包含年、月、日、时的天干地支）
  * @param {number} hourIndex - 时辰索引 (0-11)
+ * @param {Object} options - 可选行为开关
+ * @param {boolean} options.enableHeRiHuYong - 闭穴时是否计算合日互用，默认关闭
  * @returns {Object} 取穴结果
  */
-export function calculateNajia(ganzhi, hourIndex) {
+export function calculateNajia(ganzhi, hourIndex, options = {}) {
+  const { enableHeRiHuYong = false } = options
   // 参数验证：防止 null/undefined 导致运行时错误
   if (!ganzhi || !ganzhi.day || !ganzhi.hour) {
     console.warn('[纳甲法] 无效的干支参数')
@@ -115,9 +118,10 @@ export function calculateNajia(ganzhi, hourIndex) {
   // 4. 检查是否闭穴
   const isClosed = openPoints.length === 0
   
-  // 5. 闭穴时合日互用（使用合日的开穴）
+  // 5. 合日互用是用户可选的闭穴补充方案。默认关闭时不计算、不返回替代穴位，
+  // 避免用户把合日穴误认为本日原法开穴；开启后仅在纳甲法本身闭穴时计算。
   let alternativePoints = null
-  if (isClosed) {
+  if (isClosed && enableHeRiHuYong) {
     alternativePoints = getHeRiHuYong(dayStem, ganzhi, hourIndex)
   }
   
@@ -195,6 +199,19 @@ function calculateDailySequence(dayStem, dayMeridian, openedPoints = new Set()) 
 }
 
 /**
+ * 返回穴位在一轮流注计算中的稳定去重键。
+ *
+ * 特定穴数据长期以 code 作为唯一标识，部分记录没有 id。旧实现直接使用 point.id，
+ * 第一个无 id 穴位会把 undefined 放进 Set，之后所有同样无 id 的穴位都被误判为重复，
+ * 造成同一天后续时辰随机般“消失”，合日互用也因此时有时无。现在优先使用 code，
+ * 仅在兼容外部扩展数据时回退 id；两者都缺失时返回 null，并跳过去重而不是污染 Set。
+ */
+function getPointDedupKey(point) {
+  if (!point) return null
+  return point.code || point.id || null
+}
+
+/**
  * 计算开井穴的时辰（阳进阴退）
  * 甲日戌时(10)，乙日酉时(9)，丙日申时(8)，丁日未时(7)，戊日午时(6)，
  * 己日巳时(5)，庚日辰时(4)，辛日卯时(3)，壬日寅时(2)，癸日亥时(11)
@@ -247,7 +264,8 @@ function calculateDayPoints(dayType, dayStem, dayMeridian, hour, openedPoints, j
     if (!wushuPoints || wushuPoints.length === 0) return points
     
     const point = wushuPoints[stepIndex]
-    if (point && !openedPoints.has(point.id)) {
+    const pointKey = getPointDedupKey(point)
+    if (point && (!pointKey || !openedPoints.has(pointKey))) {
       const typeNames = ['井穴', '荥穴', '输穴', '经穴', '合穴']
       points.push({
         ...point,
@@ -256,7 +274,7 @@ function calculateDayPoints(dayType, dayStem, dayMeridian, hour, openedPoints, j
         isGu: false,
         type: typeNames[stepIndex]
       })
-      openedPoints.add(point.id)
+      if (pointKey) openedPoints.add(pointKey)
     }
     
     // 步骤 2（输穴）：返本还原（阳日）/ 遇输过原（阴日）
@@ -264,7 +282,8 @@ function calculateDayPoints(dayType, dayStem, dayMeridian, hour, openedPoints, j
     if (stepIndex === 2) {
       const yuanLabel = dayType === '阳' ? '返本还原' : '遇输过原'
       const yuanPoint = getYuanPointFull(dayMeridian.code)
-      if (yuanPoint && !openedPoints.has(yuanPoint.id)) {
+      const yuanPointKey = getPointDedupKey(yuanPoint)
+      if (yuanPoint && (!yuanPointKey || !openedPoints.has(yuanPointKey))) {
         points.push({
           ...yuanPoint,
           isOpen: true,
@@ -272,13 +291,14 @@ function calculateDayPoints(dayType, dayStem, dayMeridian, hour, openedPoints, j
           isGu: false,
           type: `原穴（${yuanLabel}）`
         })
-        openedPoints.add(yuanPoint.id)
+        if (yuanPointKey) openedPoints.add(yuanPointKey)
       }
       
       // 特殊处理：阳日壬日同时开三焦经原穴（阳池 TE4）
       if (dayType === '阳' && dayStem === '壬') {
         const sanziaoYuanPoint = getYuanPointFull('TE')
-        if (sanziaoYuanPoint && !openedPoints.has(sanziaoYuanPoint.id)) {
+        const sanziaoYuanPointKey = getPointDedupKey(sanziaoYuanPoint)
+        if (sanziaoYuanPoint && (!sanziaoYuanPointKey || !openedPoints.has(sanziaoYuanPointKey))) {
           points.push({
             ...sanziaoYuanPoint,
             meridian: '手少阳三焦经',
@@ -287,14 +307,15 @@ function calculateDayPoints(dayType, dayStem, dayMeridian, hour, openedPoints, j
             isGu: false,
             type: '原穴（三焦寄穴）'
           })
-          openedPoints.add(sanziaoYuanPoint.id)
+          if (sanziaoYuanPointKey) openedPoints.add(sanziaoYuanPointKey)
         }
       }
       
       // 特殊处理：阴日癸日同时开心包经原穴（大陵 PC7）
       if (dayType === '阴' && dayStem === '癸') {
         const baoluoYuanPoint = getYuanPointFull('PC')
-        if (baoluoYuanPoint && !openedPoints.has(baoluoYuanPoint.id)) {
+        const baoluoYuanPointKey = getPointDedupKey(baoluoYuanPoint)
+        if (baoluoYuanPoint && (!baoluoYuanPointKey || !openedPoints.has(baoluoYuanPointKey))) {
           points.push({
             ...baoluoYuanPoint,
             meridian: '手厥阴心包经',
@@ -303,7 +324,7 @@ function calculateDayPoints(dayType, dayStem, dayMeridian, hour, openedPoints, j
             isGu: false,
             type: '原穴（包络寄穴）'
           })
-          openedPoints.add(baoluoYuanPoint.id)
+          if (baoluoYuanPointKey) openedPoints.add(baoluoYuanPointKey)
         }
       }
     }

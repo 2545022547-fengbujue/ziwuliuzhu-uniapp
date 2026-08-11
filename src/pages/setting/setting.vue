@@ -1,9 +1,22 @@
 <template>
-  <view class="page" :class="[`theme-${store.activeTheme}`, store.activeUiStyle !== 'classic' ? `ui-${store.activeUiStyle}` : '', store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : '']">
+  <view class="page" :class="[store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`, store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : '']">
     <AppNavbar title="设置" />
     <view :style="{ height: navHeight + 'px' }" class="nav-placeholder"></view>
     <scroll-view scroll-y class="page-scroll" :show-scrollbar="false">
       <view class="setting-content">
+        <view v-if="store.activeUiStyle === 'animal'" class="animal-friends-setting" aria-hidden="true">
+          <image
+            class="animal-friends-setting-image"
+            src="/static/themes/animal/animal-friends.png"
+            mode="widthFix"
+          />
+          <text class="animal-friends-setting-label">欢迎来到动物岛</text>
+        </view>
+        <view v-if="store.activeUiStyle === 'pixel'" class="pixel-setting-banner" aria-hidden="true">
+          <text class="pixel-setting-icon">⚙</text>
+          <view><text>OPTIONS</text><text>冒险者设置</text></view>
+          <text class="pixel-setting-cursor">▶</text>
+        </view>
         <!-- ========== 真太阳时设置区域 ========== -->
         <view class="setting-card">
           <view class="card-title">
@@ -47,13 +60,26 @@
             <text class="card-icon">✦</text>
             <text>外观风格</text>
           </view>
-          <view class="ui-style-list">
+          <!-- 默认只呈现当前风格，避免八个选项把设置页拉得过长。 -->
+          <view
+            v-if="currentAppearance"
+            class="ui-style-option ui-style-current active"
+            @tap="appearanceExpanded = !appearanceExpanded"
+          >
+            <view v-if="currentAppearance.swatch" class="theme-swatch" :class="currentAppearance.swatch"></view>
+            <view class="ui-style-copy">
+              <text class="ui-style-name">{{ currentAppearance.name }}</text>
+              <text class="ui-style-desc">{{ currentAppearance.desc }}</text>
+            </view>
+            <text class="appearance-expand-icon" :class="{ expanded: appearanceExpanded }">⌄</text>
+          </view>
+          <view v-if="appearanceExpanded" class="ui-style-list theme-options">
             <view
               v-for="style in store.appearanceOptions"
               :key="style.id"
               class="ui-style-option"
               :class="{ active: style.active }"
-              @tap="store.setAppearance(style.id)"
+              @tap="selectAppearance(style.id)"
             >
               <view v-if="style.swatch" class="theme-swatch" :class="style.swatch"></view>
               <view class="ui-style-copy">
@@ -90,6 +116,57 @@
           </view>
         </view>
 
+        <!-- ========== 合日互用开穴 ==========
+             默认关闭。它只影响纳甲法闭穴后的替代穴位，不改变纳甲法本身的开穴结果。 -->
+        <view class="setting-card">
+          <view class="setting-row">
+            <view class="setting-copy">
+              <text class="setting-label">合日互用开穴</text>
+              <text class="setting-hint">开启后纳甲法无开穴时取合日互用穴位</text>
+            </view>
+            <view
+              v-if="store.activeUiStyle === 'ink'"
+              class="ink-switch"
+              :class="{ active: store.useHeRiHuYong }"
+              @tap="onHeRiHuYongToggle({ detail: { value: !store.useHeRiHuYong } })"
+            >
+              <view class="ink-switch-track"></view>
+              <view class="ink-switch-knob"></view>
+            </view>
+            <switch
+              v-else
+              :checked="store.useHeRiHuYong"
+              @change="onHeRiHuYongToggle"
+              :color="store.themeSwitchColor"
+            />
+          </view>
+        </view>
+
+        <!-- ========== 穴位编码显示 ========== -->
+        <view class="setting-card">
+          <view class="setting-row">
+            <view class="setting-copy">
+              <text class="setting-label">显示穴位编码</text>
+              <text class="setting-hint">关闭后仅显示穴位中文名，并按当前主题重新排版</text>
+            </view>
+            <view
+              v-if="store.activeUiStyle === 'ink'"
+              class="ink-switch"
+              :class="{ active: store.showPointCode }"
+              @tap="onPointCodeToggle({ detail: { value: !store.showPointCode } })"
+            >
+              <view class="ink-switch-track"></view>
+              <view class="ink-switch-knob"></view>
+            </view>
+            <switch
+              v-else
+              :checked="store.showPointCode"
+              @change="onPointCodeToggle"
+              :color="store.themeSwitchColor"
+            />
+          </view>
+        </view>
+
         <!-- ========== 取穴方法说明入口 ========== -->
         <view class="setting-card" @tap="goMethods">
           <view class="setting-row">
@@ -110,6 +187,12 @@
       </view>
     </scroll-view>
     <CityPicker ref="cityPickerRef" />
+
+    <ThemeTransitionOverlay
+      v-if="themeTransitionVisible"
+      :theme="themeTransitionKind"
+      :closing="themeTransitionClosing"
+    />
 
     <!-- 取穴方法说明弹窗 -->
     <view v-if="showMethods" class="fullscreen-overlay" @tap="showMethods = false">
@@ -192,12 +275,13 @@
  * 城市选择：
  *   复用 CityPicker 弹窗组件，选择后更新 store 的经度和城市名
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { onShow, onHide, onBackPress } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import CityPicker from '@/components/CityPicker.vue'
+import ThemeTransitionOverlay from '@/components/ThemeTransitionOverlay.vue'
 import manifest from '@/manifest.json'
 import { METHOD_DESCS } from '@/data/constants.js'
 
@@ -208,10 +292,20 @@ const safeBottom = computed(() => safeAreaBottom.value)
 const cityPickerRef = ref(null)
 const showMethods = ref(false)
 const showAbout = ref(false)
+const appearanceExpanded = ref(false)
+const themeTransitionVisible = ref(false)
+const themeTransitionClosing = ref(false)
+const themeTransitionKind = ref('animal')
 const version = manifest.versionName || '1.0.0'
 
 const methodDescs = METHOD_DESCS
+const currentAppearance = computed(() => {
+  return store.appearanceOptions.find(item => item.active) || store.appearanceOptions[0]
+})
 let visualClockTimer = null
+let themeTransitionApplyTimer = null
+let themeTransitionCloseTimer = null
+let themeTransitionEndTimer = null
 
 function startVisualClockTimer() {
   if (visualClockTimer) clearInterval(visualClockTimer)
@@ -225,6 +319,15 @@ function stopVisualClockTimer() {
   }
 }
 
+function clearThemeTransitionTimers() {
+  if (themeTransitionApplyTimer) clearTimeout(themeTransitionApplyTimer)
+  if (themeTransitionCloseTimer) clearTimeout(themeTransitionCloseTimer)
+  if (themeTransitionEndTimer) clearTimeout(themeTransitionEndTimer)
+  themeTransitionApplyTimer = null
+  themeTransitionCloseTimer = null
+  themeTransitionEndTimer = null
+}
+
 onShow(() => {
   store.refreshVisualClock()
   store.applyThemeChrome()
@@ -233,6 +336,11 @@ onShow(() => {
 
 onHide(() => {
   stopVisualClockTimer()
+})
+
+onUnmounted(() => {
+  clearThemeTransitionTimers()
+  if (themeTransitionVisible.value) uni.showTabBar({ animation: false })
 })
 
 /** 真太阳时开关变化回调，开启时自动弹出城市选择 */
@@ -249,6 +357,53 @@ function onSolarTimeToggle(e) {
 /** 反克法显示模式切换 */
 function onFankeModeChange(e) {
   store.fankeDisplayMode = e.detail.value ? 'separate' : 'merged'
+}
+
+/** 合日互用开关；切换后 store.results 会基于同一日期时辰立即重新计算。 */
+function onHeRiHuYongToggle(e) {
+  store.toggleHeRiHuYong(e.detail.value)
+}
+
+/** 穴位编码显示开关；状态持久化后同时作用于列表和详情标题。 */
+function onPointCodeToggle(e) {
+  store.togglePointCode(e.detail.value)
+}
+
+/** 选择外观后立即收起列表，让用户清楚看到当前生效项。 */
+function selectAppearance(optionId) {
+  appearanceExpanded.value = false
+
+  const targetStyle = optionId.startsWith('style-') ? optionId.slice(6) : ''
+  const needsTransition = targetStyle === 'animal' || targetStyle === 'ink'
+  const isAlreadyActive = store.appearanceOptions.some(item => item.id === optionId && item.active)
+
+  if (!needsTransition || isAlreadyActive || themeTransitionVisible.value) {
+    if (!isAlreadyActive) store.setAppearance(optionId)
+    return
+  }
+
+  clearThemeTransitionTimers()
+  themeTransitionKind.value = targetStyle
+  themeTransitionClosing.value = false
+  themeTransitionVisible.value = true
+  uni.hideTabBar({ animation: false })
+
+  // 遮罩先完整出现，再切换底层主题，避免页面颜色在动画开始前闪变。
+  themeTransitionApplyTimer = setTimeout(() => {
+    store.setAppearance(optionId)
+  }, 120)
+
+  themeTransitionCloseTimer = setTimeout(() => {
+    themeTransitionClosing.value = true
+  }, 1380)
+
+  themeTransitionEndTimer = setTimeout(() => {
+    themeTransitionVisible.value = false
+    themeTransitionClosing.value = false
+    store.applyThemeChrome()
+    uni.showTabBar({ animation: false })
+    clearThemeTransitionTimers()
+  }, 1720)
 }
 
 /** 打开城市选择弹窗（复用 CityPicker 组件） */
@@ -487,7 +642,10 @@ onBackPress(() => {
   }
 
   &.morandi {
-    background: linear-gradient(135deg, #b99a9a 0%, #d9c7bd 48%, #aeb9aa 100%);
+    background:
+      radial-gradient(circle at 28% 28%, #a98282 0 24%, transparent 26%),
+      radial-gradient(circle at 72% 70%, #8e9f93 0 24%, transparent 26%),
+      linear-gradient(135deg, #e9e0d3, #9caab2);
   }
 
   &.watercolor {
@@ -496,6 +654,23 @@ onBackPress(() => {
       radial-gradient(circle at 76% 72%, rgba(133, 205, 202, 0.95), transparent 46%),
       #faf8f5;
   }
+
+  &.animal {
+    background:
+      radial-gradient(circle at 28% 26%, #F7CD67 0 22%, transparent 24%),
+      radial-gradient(circle at 72% 72%, #82D5BB 0 24%, transparent 26%),
+      linear-gradient(135deg, #F7F3DF 0%, #19AFA2 100%);
+    box-shadow: inset 0 0 0 2rpx rgba(114, 93, 66, 0.10);
+  }
+
+  &.pixel {
+    border-radius: 0;
+    background:
+      linear-gradient(90deg, transparent 0 25%, #5B6EE1 25% 50%, transparent 50% 75%, #E76E55 75%) 0 0 / 16rpx 16rpx,
+      #F7E7B7;
+    box-shadow: 0 0 0 4rpx #3F3A4B, 6rpx 6rpx 0 #9A7B4F;
+    image-rendering: pixelated;
+  }
 }
 
 /* === 界面风格切换（经典 + 多套新界面） === */
@@ -503,6 +678,7 @@ onBackPress(() => {
   display: flex;
   flex-direction: column;
   gap: $spacing-sm;
+  margin-top: $spacing-sm;
 }
 
 .ui-style-option {
@@ -532,6 +708,23 @@ onBackPress(() => {
   gap: 4rpx;
   flex: 1;
   min-width: 0;
+}
+
+.ui-style-current {
+  cursor: pointer;
+}
+
+.appearance-expand-icon {
+  flex-shrink: 0;
+  font-size: 34rpx;
+  line-height: 1;
+  color: var(--theme-primary);
+  transform: rotate(0deg);
+  transition: transform 0.22s ease;
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
 }
 
 .ui-style-name {

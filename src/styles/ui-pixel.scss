@@ -1,0 +1,299 @@
+/* ============================================
+   复古像素（ui-pixel）
+
+   依据 Pixelium Design：4rpx 像素节奏、硬边轮廓、有限调色板、阶梯阴影，
+   不依赖 Web 专用组件库，确保 uni-app 的 App/H5 WebView 表现一致。
+   ============================================ */
+
+$px-ink: #3F3A4B;
+$px-brown: #6B5B53;
+$px-paper: #FFF4D6;
+$px-sand: #F7E7B7;
+$px-gold: #F6C85F;
+$px-blue: #5B6EE1;
+$px-blue-dark: #3949A0;
+$px-cyan: #6FC2C0;
+$px-green: #6ABE70;
+$px-red: #E76E55;
+$px-shadow: #9A7B4F;
+$px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang SC', monospace;
+
+.ui-pixel {
+  --theme-primary: #{$px-blue};
+  --theme-primary-dark: #{$px-blue-dark};
+  --theme-secondary: #{$px-gold};
+  --theme-bg: #{$px-sand};
+  --theme-surface: #{$px-paper};
+  --theme-surface-muted: #F1D69A;
+  --theme-text: #{$px-ink};
+  --theme-text-secondary: #{$px-brown};
+  --theme-text-hint: #877568;
+  --theme-border: #{$px-ink};
+  --theme-shadow: rgba(63, 58, 75, .22);
+
+  color: $px-ink !important;
+  font-family: $px-font !important;
+  background-color: $px-sand !important;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,.24) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.24) 75%),
+    linear-gradient(45deg, rgba(91,110,225,.06) 25%, transparent 25%, transparent 75%, rgba(91,110,225,.06) 75%) !important;
+  background-position: 0 0, 16rpx 16rpx !important;
+  background-size: 32rpx 32rpx !important;
+
+  text,
+  view { font-family: $px-font; }
+
+  .navbar {
+    background: $px-ink !important;
+    border-bottom: 8rpx solid $px-gold !important;
+    box-shadow: 0 8rpx 0 $px-shadow !important;
+    backdrop-filter: none !important;
+  }
+
+  .navbar-title { color: $px-paper !important; text-shadow: 4rpx 4rpx 0 $px-blue-dark; letter-spacing: 4rpx; }
+
+  .pixel-hero,
+  .pixel-setting-banner {
+    margin: 18rpx 32rpx 24rpx;
+    padding: 20rpx 24rpx;
+    display: flex;
+    align-items: center;
+    gap: 20rpx;
+    color: $px-paper !important;
+    background: $px-blue !important;
+    border: 6rpx solid $px-ink !important;
+    border-radius: 0 !important;
+    box-shadow: 8rpx 8rpx 0 $px-shadow !important;
+  }
+
+  .pixel-hero-icon,
+  .pixel-setting-icon {
+    width: 68rpx;
+    height: 68rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: $px-paper !important;
+    background: $px-red !important;
+    border: 4rpx solid $px-ink;
+    box-shadow: inset -6rpx -6rpx 0 rgba(63,58,75,.28);
+    font-size: 38rpx;
+  }
+
+  .pixel-hero-copy,
+  .pixel-setting-banner > view { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .pixel-hero-kicker,
+  .pixel-setting-banner > view text:first-child { color: $px-gold !important; font-size: 18rpx; letter-spacing: 3rpx; }
+  .pixel-hero-title,
+  .pixel-setting-banner > view text:last-child { color: $px-paper !important; font-size: 30rpx; font-weight: 800; letter-spacing: 3rpx; }
+  .pixel-hero-hearts { display: flex; gap: 4rpx; }
+  .pixel-hero-hearts text { color: $px-red !important; font-size: 28rpx; text-shadow: 2rpx 2rpx 0 $px-ink; }
+  .pixel-setting-cursor { color: $px-gold !important; animation: pixel-cursor 1s steps(2, end) infinite; }
+
+  .ganzhi-card,
+  .result-panel,
+  .setting-card,
+  .fanke-supplement,
+  .confirm-popup,
+  .method-card,
+  .desc-card,
+  .disclaimer-card {
+    background: $px-paper !important;
+    border: 6rpx solid $px-ink !important;
+    border-radius: 0 !important;
+    box-shadow: 8rpx 8rpx 0 $px-shadow !important;
+  }
+
+  .ganzhi-card,
+  .setting-card,
+  .fanke-supplement { margin-left: 32rpx !important; margin-right: 32rpx !important; }
+
+  .ganzhi-title,
+  .header-title,
+  .card-title,
+  .section-title,
+  .fullscreen-title,
+  .confirm-title,
+  .method-name,
+  .app-name {
+    color: $px-ink !important;
+    font-family: $px-font !important;
+    font-weight: 800 !important;
+    letter-spacing: 2rpx;
+    text-shadow: 2rpx 2rpx 0 rgba(246,200,95,.72);
+  }
+
+  .ganzhi-toggle,
+  .nazi-mode-switch,
+  .theme-current,
+  .ui-style-option,
+  .theme-option,
+  .city-picker-btn,
+  .picker-btn {
+    background: #F1D69A !important;
+    border: 4rpx solid $px-ink !important;
+    border-radius: 0 !important;
+    box-shadow: 4rpx 4rpx 0 $px-shadow !important;
+  }
+
+  .toggle-btn,
+  .switch-option,
+  .method-tab {
+    border-radius: 0 !important;
+    transition: none !important;
+  }
+
+  .toggle-btn.active,
+  .switch-option.active,
+  .method-tab.active {
+    color: $px-paper !important;
+    background: $px-blue !important;
+    box-shadow: inset -6rpx -6rpx 0 $px-blue-dark !important;
+  }
+
+  .method-tabs {
+    margin-left: 32rpx !important;
+    margin-right: 32rpx !important;
+    padding: 8rpx !important;
+    background: $px-ink !important;
+    border-radius: 0 !important;
+    box-shadow: 6rpx 6rpx 0 $px-shadow !important;
+  }
+
+  .method-tab { color: $px-paper !important; }
+  .method-indicator { height: 6rpx !important; border-radius: 0 !important; background: $px-gold !important; }
+
+  .ganzhi-tag-item,
+  .result-ganzhi-hour-tag,
+  .tag-primary,
+  .wuxing-tag {
+    border: 4rpx solid $px-ink !important;
+    border-radius: 0 !important;
+    box-shadow: 4rpx 4rpx 0 rgba(107,91,83,.36) !important;
+  }
+
+  .ganzhi-tag-item { background: $px-cyan !important; }
+  .ganzhi-tag-item.highlight { background: $px-gold !important; }
+
+  .query-btn,
+  .confirm-ok,
+  .action-btn.confirm,
+  .btn-confirm {
+    color: $px-paper !important;
+    background: $px-blue !important;
+    border: 6rpx solid $px-ink !important;
+    border-radius: 0 !important;
+    box-shadow: 0 8rpx 0 $px-blue-dark !important;
+  }
+
+  .query-btn:active,
+  .confirm-ok:active,
+  .point-btn:active {
+    transform: translateY(6rpx) !important;
+    box-shadow: 0 2rpx 0 $px-blue-dark !important;
+  }
+
+  .point-btn {
+    color: $px-ink !important;
+    background: $px-gold !important;
+    border: 4rpx solid $px-ink !important;
+    border-radius: 0 !important;
+    box-shadow: 0 6rpx 0 $px-shadow !important;
+    image-rendering: pixelated;
+    transition: none !important;
+  }
+
+  .point-name { color: $px-ink !important; font-family: $px-font !important; }
+  .point-code { color: $px-blue-dark !important; font-family: $px-font !important; font-weight: 800; }
+
+  .info-item,
+  .location-box,
+  .method-item,
+  .palace-box,
+  .suggestion-box,
+  .warning-box,
+  .nazi-bumu-tip {
+    background: #E8D29A !important;
+    border: 4rpx solid $px-ink !important;
+    border-radius: 0 !important;
+    box-shadow: 4rpx 4rpx 0 rgba(107,91,83,.32) !important;
+  }
+
+  .section-title .title-dot,
+  .title-dot,
+  .dot { width: 12rpx !important; border-radius: 0 !important; background: $px-red !important; }
+
+  .divider-line { height: 4rpx !important; background: $px-ink !important; }
+  .divider-text { color: $px-ink !important; background: $px-gold !important; padding: 2rpx 12rpx; }
+  .appearance-expand-icon,
+  .ui-style-check,
+  .city-name-text { color: $px-blue !important; }
+
+  .fullscreen-overlay { background: $px-sand !important; }
+  .fullscreen-panel { background: $px-sand !important; }
+  .fullscreen-header { background: $px-ink !important; border-bottom: 8rpx solid $px-gold !important; }
+  .fullscreen-header .fullscreen-title,
+  .fullscreen-header .close-icon { color: $px-paper !important; text-shadow: 2rpx 2rpx 0 $px-blue-dark; }
+
+  .close-btn,
+  .year-nav,
+  .month-nav {
+    background: $px-red !important;
+    border: 4rpx solid $px-ink !important;
+    border-radius: 0 !important;
+    box-shadow: 4rpx 4rpx 0 $px-shadow !important;
+  }
+
+  .close-icon,
+  .year-arrow,
+  .month-arrow { color: $px-paper !important; }
+}
+
+.date-picker-panel.ui-pixel,
+.time-picker-panel.ui-pixel,
+.popup.ui-pixel {
+  color: $px-ink !important;
+  font-family: $px-font !important;
+  background: $px-paper !important;
+  border: 8rpx solid $px-ink !important;
+  border-radius: 0 !important;
+  box-shadow: 12rpx 12rpx 0 rgba(63,58,75,.34) !important;
+}
+
+.date-picker-panel.ui-pixel,
+.time-picker-panel.ui-pixel {
+  .day-item,
+  .hour-item { border-radius: 0 !important; }
+  .day-item.selected,
+  .hour-item.selected {
+    color: $px-paper !important;
+    background: $px-blue !important;
+    border: 4rpx solid $px-ink !important;
+    box-shadow: 4rpx 4rpx 0 $px-blue-dark !important;
+  }
+}
+
+.ui-pixel switch .uni-switch-input,
+.ui-pixel .uni-switch-input {
+  border: 4rpx solid $px-ink !important;
+  border-radius: 0 !important;
+  background: #D6C08D !important;
+  box-shadow: 4rpx 4rpx 0 $px-shadow !important;
+}
+
+.ui-pixel switch .uni-switch-input::before,
+.ui-pixel .uni-switch-input::before { border-radius: 0 !important; background: #D6C08D !important; }
+.ui-pixel switch .uni-switch-input::after,
+.ui-pixel .uni-switch-input::after { border-radius: 0 !important; background: $px-paper !important; box-shadow: none !important; }
+.ui-pixel switch .uni-switch-input.uni-switch-input-checked::after,
+.ui-pixel .uni-switch-input.uni-switch-input-checked::after { background: $px-gold !important; }
+
+@keyframes pixel-cursor {
+  0%, 45% { opacity: 1; transform: translateX(0); }
+  50%, 100% { opacity: .25; transform: translateX(4rpx); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-pixel .pixel-setting-cursor { animation: none !important; }
+}
