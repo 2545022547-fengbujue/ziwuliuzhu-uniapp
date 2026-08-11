@@ -74,8 +74,40 @@
             <text class="appearance-expand-icon" :class="{ expanded: appearanceExpanded }">⌄</text>
           </view>
           <view v-if="appearanceExpanded" class="ui-style-list theme-options">
+            <!--
+              经典配色以二级分组承载：一级列表只占一行，展开后才显示四色。
+              这样保留原有配色能力，同时避免它们与六套完整 UI 风格平铺在同一层。
+            -->
             <view
-              v-for="style in store.appearanceOptions"
+              class="ui-style-option classic-style-group"
+              :class="{ active: store.activeUiStyle === 'classic' }"
+              @tap="classicThemesExpanded = !classicThemesExpanded"
+            >
+              <view class="theme-swatch classic"></view>
+              <view class="ui-style-copy">
+                <text class="ui-style-name">经典四色</text>
+                <text class="ui-style-desc">{{ classicGroupDescription }}</text>
+              </view>
+              <text class="appearance-expand-icon" :class="{ expanded: classicThemesExpanded }">⌄</text>
+            </view>
+            <view v-if="classicThemesExpanded" class="classic-theme-list">
+              <view
+                v-for="style in classicAppearanceOptions"
+                :key="style.id"
+                class="ui-style-option classic-theme-option"
+                :class="{ active: style.active }"
+                @tap="selectAppearance(style.id)"
+              >
+                <view class="theme-swatch" :class="style.swatch"></view>
+                <view class="ui-style-copy">
+                  <text class="ui-style-name">{{ style.name }}</text>
+                  <text class="ui-style-desc">{{ style.desc }}</text>
+                </view>
+                <text v-if="style.active" class="ui-style-check">✓</text>
+              </view>
+            </view>
+            <view
+              v-for="style in standaloneAppearanceOptions"
               :key="style.id"
               class="ui-style-option"
               :class="{ active: style.active }"
@@ -91,38 +123,38 @@
           </view>
         </view>
 
-        <!-- ========== 反克法显示模式 ========== -->
+        <!-- ========== 纳甲法设置 ========== -->
         <view class="setting-card">
+          <view class="card-title">
+            <text class="card-icon">☯</text>
+            <text>纳甲法设置</text>
+          </view>
           <view class="setting-row">
             <view class="setting-copy">
-              <text class="setting-label">单独显示反克法</text>
-              <text class="setting-hint">开启后，反克法有取穴结果时会单独显示</text>
+              <text class="setting-label">反克法</text>
+              <text class="setting-hint">开启后将会显示反克法取穴（如有）</text>
             </view>
             <view
               v-if="store.activeUiStyle === 'ink'"
               class="ink-switch"
-              :class="{ active: store.fankeDisplayMode === 'separate' }"
-              @tap="onFankeModeChange({ detail: { value: store.fankeDisplayMode !== 'separate' } })"
+              :class="{ active: store.showFanke }"
+              @tap="onFankeToggle({ detail: { value: !store.showFanke } })"
             >
               <view class="ink-switch-track"></view>
               <view class="ink-switch-knob"></view>
             </view>
             <switch
               v-else
-              :checked="store.fankeDisplayMode === 'separate'"
-              @change="onFankeModeChange"
+              :checked="store.showFanke"
+              @change="onFankeToggle"
               :color="store.themeSwitchColor"
             />
           </view>
-        </view>
-
-        <!-- ========== 合日互用开穴 ==========
-             默认关闭。它只影响纳甲法闭穴后的替代穴位，不改变纳甲法本身的开穴结果。 -->
-        <view class="setting-card">
-          <view class="setting-row">
+          <!-- 默认关闭，只在纳甲法闭穴时补充合日穴位，不改变原始纳甲结果。 -->
+          <view class="setting-row no-border">
             <view class="setting-copy">
-              <text class="setting-label">合日互用开穴</text>
-              <text class="setting-hint">开启后纳甲法无开穴时取合日互用穴位</text>
+              <text class="setting-label">合日互用</text>
+              <text class="setting-hint">开启后将会显示合日互用取穴（如有）</text>
             </view>
             <view
               v-if="store.activeUiStyle === 'ink'"
@@ -146,8 +178,8 @@
         <view class="setting-card">
           <view class="setting-row">
             <view class="setting-copy">
-              <text class="setting-label">显示穴位编码</text>
-              <text class="setting-hint">关闭后仅显示穴位中文名，并按当前主题重新排版</text>
+              <text class="setting-label">穴位编码</text>
+              <text class="setting-hint">开启后将显示穴位编码</text>
             </view>
             <view
               v-if="store.activeUiStyle === 'ink'"
@@ -293,6 +325,7 @@ const cityPickerRef = ref(null)
 const showMethods = ref(false)
 const showAbout = ref(false)
 const appearanceExpanded = ref(false)
+const classicThemesExpanded = ref(false)
 const themeTransitionVisible = ref(false)
 const themeTransitionClosing = ref(false)
 const themeTransitionKind = ref('animal')
@@ -301,6 +334,13 @@ const version = manifest.versionName || '1.0.0'
 const methodDescs = METHOD_DESCS
 const currentAppearance = computed(() => {
   return store.appearanceOptions.find(item => item.active) || store.appearanceOptions[0]
+})
+/** 经典主题与独立 UI 风格拆成两层，仅改变设置页信息架构，不改变 Store 的持久化键。 */
+const classicAppearanceOptions = computed(() => store.appearanceOptions.filter(item => item.id.startsWith('theme-')))
+const standaloneAppearanceOptions = computed(() => store.appearanceOptions.filter(item => item.id.startsWith('style-')))
+const classicGroupDescription = computed(() => {
+  const activeClassic = classicAppearanceOptions.value.find(item => item.active)
+  return activeClassic ? `当前：${activeClassic.name}` : '古典宣纸、暗夜幽光、青瓷天青、朱砂丹霞'
 })
 let visualClockTimer = null
 let themeTransitionApplyTimer = null
@@ -340,7 +380,6 @@ onHide(() => {
 
 onUnmounted(() => {
   clearThemeTransitionTimers()
-  if (themeTransitionVisible.value) uni.showTabBar({ animation: false })
 })
 
 /** 真太阳时开关变化回调，开启时自动弹出城市选择 */
@@ -354,9 +393,9 @@ function onSolarTimeToggle(e) {
   }
 }
 
-/** 反克法显示模式切换 */
-function onFankeModeChange(e) {
-  store.fankeDisplayMode = e.detail.value ? 'separate' : 'merged'
+/** 反克法显示开关；关闭后不再把结果合并到纳甲法面板。 */
+function onFankeToggle(e) {
+  store.toggleFanke(e.detail.value)
 }
 
 /** 合日互用开关；切换后 store.results 会基于同一日期时辰立即重新计算。 */
@@ -386,9 +425,9 @@ function selectAppearance(optionId) {
   themeTransitionKind.value = targetStyle
   themeTransitionClosing.value = false
   themeTransitionVisible.value = true
-  uni.hideTabBar({ animation: false })
 
   // 遮罩先完整出现，再切换底层主题，避免页面颜色在动画开始前闪变。
+  // 不隐藏原生 TabBar：App 端可能延迟执行显隐，导致动画进行中底栏突然消失。
   themeTransitionApplyTimer = setTimeout(() => {
     store.setAppearance(optionId)
   }, 120)
@@ -401,7 +440,6 @@ function selectAppearance(optionId) {
     themeTransitionVisible.value = false
     themeTransitionClosing.value = false
     store.applyThemeChrome()
-    uni.showTabBar({ animation: false })
     clearThemeTransitionTimers()
   }, 1720)
 }
@@ -643,9 +681,17 @@ onBackPress(() => {
 
   &.morandi {
     background:
-      radial-gradient(circle at 28% 28%, #a98282 0 24%, transparent 26%),
-      radial-gradient(circle at 72% 70%, #8e9f93 0 24%, transparent 26%),
-      linear-gradient(135deg, #e9e0d3, #9caab2);
+      radial-gradient(circle at 28% 28%, #d8bfc0 0 24%, transparent 26%),
+      radial-gradient(circle at 72% 70%, #c4d0c8 0 24%, transparent 26%),
+      linear-gradient(135deg, #faf5ed, #dce5e7);
+    border: 2rpx solid rgba(169, 130, 130, 0.12);
+    box-shadow: 0 4rpx 12rpx rgba(142, 128, 116, 0.10);
+  }
+
+  &.classic {
+    background: conic-gradient(from 45deg, #F1D8C7 0 25%, #BFD8D0 0 50%, #C9D6E8 0 75%, #E5C5C0 0);
+    border: 4rpx solid rgba(255, 255, 255, 0.86);
+    box-shadow: 0 0 0 1rpx rgba(89, 78, 68, 0.10);
   }
 
   &.watercolor {
@@ -679,6 +725,20 @@ onBackPress(() => {
   flex-direction: column;
   gap: $spacing-sm;
   margin-top: $spacing-sm;
+}
+
+.classic-theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-left: 28rpx;
+  padding-left: 20rpx;
+  border-left: 2rpx solid var(--theme-border);
+}
+
+.classic-theme-option {
+  padding-top: 20rpx;
+  padding-bottom: 20rpx;
 }
 
 .ui-style-option {

@@ -46,17 +46,17 @@
 }
 
 .theme-green {
-  --theme-primary: #2F7D73;           /* 青瓷主色 */
-  --theme-primary-dark: #225E58;      /* 深青 */
-  --theme-secondary: #789262;         /* 竹青 - 点缀色 */
-  --theme-bg: #E8F4EC;                /* 青瓷釉面底色 - 更柔和 */
-  --theme-surface: #F5FAF7;           /* 卡片底色 - 温润白 */
-  --theme-surface-muted: #DCF0E4;     /* 次背景 - 淡青 */
-  --theme-text: #14302C;              /* 主文字 - 深青 */
-  --theme-text-secondary: #4A635D;    /* 次文字 */
-  --theme-text-hint: #85A097;         /* 提示文字 - 提亮 */
-  --theme-border: rgba(47, 125, 115, 0.18);
-  --theme-shadow: rgba(47, 125, 115, 0.12);
+  --theme-primary: #287B72;           /* 天青釉主色：保留清润感，同时保证白底可读性 */
+  --theme-primary-dark: #1E625C;      /* 深青描边，用于激活态和关键操作 */
+  --theme-secondary: #718D78;         /* 灰竹青点缀，避免跳成鲜绿色 */
+  --theme-bg: #EAF5F0;                /* 带少量蓝相的天青底釉 */
+  --theme-surface: #F8FCF9;           /* 温润瓷白，而非生硬纯白 */
+  --theme-surface-muted: #DCEEE7;     /* 次级信息块的淡釉层 */
+  --theme-text: #173D38;              /* 墨青主文字 */
+  --theme-text-secondary: #506C66;    /* 提高正文和说明文字对比度 */
+  --theme-text-hint: #78928C;         /* 提示文字仍柔和，但不再发灰模糊 */
+  --theme-border: rgba(43, 116, 106, 0.20);
+  --theme-shadow: rgba(48, 105, 95, 0.13);
 }
 
 .theme-red {
@@ -511,6 +511,15 @@
    设计理念：宋代青瓷釉面光泽感，柔和通透
 */
 .theme-green {
+  /*
+   * 页面底釉采用多层低对比渐变：上方偏瓷白、两侧轻微聚青、底部回到天青。
+   * 仅使用 CSS 色层，不增加图片资源，App 与 H5 均可稳定渲染。
+   */
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.72) 0 14%, transparent 36%),
+    radial-gradient(circle at 92% 34%, rgba(183, 220, 211, 0.28) 0 12%, transparent 38%),
+    linear-gradient(180deg, #F1F8F4 0%, #E7F3EE 46%, #DDEDE7 100%) !important;
+
   /* 导航栏标题：楷体 */
   .navbar-title {
     color: #14302C !important;
@@ -519,8 +528,9 @@
 
   /* 导航栏：青瓷渐变 */
   .navbar {
-    background: linear-gradient(180deg, #E8F4EC 0%, #F0F8F4 100%) !important;
-    border-bottom: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+    background: linear-gradient(180deg, rgba(248, 252, 249, 0.97) 0%, rgba(233, 245, 240, 0.94) 100%) !important;
+    border-bottom: 1rpx solid rgba(43, 116, 106, 0.16) !important;
+    box-shadow: 0 6rpx 18rpx rgba(51, 103, 94, 0.06) !important;
   }
 
   /* 卡片：温润青瓷质感 + 柔和阴影 */
@@ -533,23 +543,26 @@
   .popup,
   .confirm-popup,
   .fullscreen-panel {
-    background: linear-gradient(135deg, #F5FAF7 0%, #F0F6F2 100%) !important;
-    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.82) 0%, rgba(246, 251, 248, 0.94) 38%, rgba(236, 246, 241, 0.96) 100%) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.18) !important;
     box-shadow:
-      0 4rpx 16rpx rgba(47, 125, 115, 0.08),
-      0 1rpx 4rpx rgba(255, 255, 255, 0.60) inset !important;  /* 内阴影模拟釉面光泽 */
+      0 10rpx 26rpx rgba(48, 105, 95, 0.09),
+      0 2rpx 0 rgba(255, 255, 255, 0.90) inset,
+      1rpx 0 0 rgba(255, 255, 255, 0.45) inset !important;
   }
 
   /* 方法切换栏：通透感 */
   .method-tabs {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.90) 0%, rgba(240, 248, 244, 0.95) 100%) !important;
-    border: 1rpx solid rgba(47, 125, 115, 0.15) !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(240, 248, 244, 0.97) 100%) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.16) !important;
+    box-shadow: 0 10rpx 24rpx rgba(48, 105, 95, 0.09) !important;
   }
 
   /* 结果面板头部：浅色青瓷渐变 + 深色标题 */
   .panel-header {
-    background: linear-gradient(180deg, rgba(47, 125, 115, 0.25) 0%, rgba(47, 125, 115, 0.15) 100%) !important;
-    border-bottom: 1rpx solid rgba(47, 125, 115, 0.35) !important;
+    background: linear-gradient(135deg, rgba(190, 222, 214, 0.82) 0%, rgba(217, 237, 231, 0.72) 100%) !important;
+    border-bottom: 1rpx solid rgba(43, 116, 106, 0.22) !important;
   }
 
   .header-title,
@@ -652,8 +665,9 @@
 
   /* 穴位按钮 */
   .point-btn {
-    background: linear-gradient(135deg, #DCF0E4 0%, #D0E8DC 100%) !important;
-    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+    background: linear-gradient(145deg, #E6F3EE 0%, #D4EAE2 100%) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.22) !important;
+    box-shadow: 0 3rpx 8rpx rgba(48, 105, 95, 0.06), 0 1rpx 0 rgba(255, 255, 255, 0.80) inset !important;
   }
 
   /* 干支标签 */
@@ -669,13 +683,15 @@
 
   /* 穴位弹窗标题区域 */
   .header-icon-wrap {
-    background: rgba(47, 125, 115, 0.10) !important;
-    border: 1rpx solid rgba(47, 125, 115, 0.35) !important;
+    background: linear-gradient(145deg, rgba(239, 248, 244, 0.96), rgba(214, 235, 227, 0.92)) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.25) !important;
+    box-shadow: 0 4rpx 12rpx rgba(48, 105, 95, 0.08) !important;
   }
 
   .close-btn {
-    background: #DCF0E4 !important;
-    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+    background: linear-gradient(145deg, #E7F4EF, #D4EAE2) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.22) !important;
+    box-shadow: 0 4rpx 12rpx rgba(48, 105, 95, 0.08) !important;
   }
 
   .close-icon {
@@ -701,8 +717,8 @@
 
   /* 补泻建议区域 */
   .suggestion-box {
-    background: rgba(47, 125, 115, 0.08) !important;
-    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+    background: linear-gradient(135deg, rgba(224, 241, 234, 0.88), rgba(210, 233, 224, 0.76)) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.22) !important;
   }
 
   /* 九宫信息 */

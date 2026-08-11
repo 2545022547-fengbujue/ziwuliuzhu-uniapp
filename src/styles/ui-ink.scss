@@ -62,7 +62,9 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
     inset: 0;
     opacity: 1;
     background-image: var(--ink-paper-wash), var(--ink-scene);
-    background-size: 100% 100%, 100% auto;
+    // 第二层山水必须 cover 整个页面。原来的 100% auto 只保证横向铺满，
+    // 横屏或较矮图片在设置页滚到底部时会提前结束，露出一整条纯色纸面。
+    background-size: 100% 100%, cover;
     background-position: center, var(--ink-scene-position);
     background-repeat: no-repeat;
     filter: var(--ink-scene-filter);
@@ -72,56 +74,56 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   // 七时段背景仅用于 H5/App。所有图片都保持比例 cover 裁切，不做变形拉伸。
   &.ink-bg-sunrise {
     --ink-scene: url('@/assets/ink/ink-portrait-sunrise-morning.jpg');
-    --ink-scene-position: center -160rpx;
+    --ink-scene-position: center center;
     --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(255,255,252,0.08));
     --ink-scene-filter: none;
   }
 
   &.ink-bg-morning {
     --ink-scene: url('@/assets/ink/ink-portrait-sunrise-morning.jpg');
-    --ink-scene-position: center -160rpx;
+    --ink-scene-position: center center;
     --ink-paper-wash: linear-gradient(rgba(255,255,252,0.04), rgba(255,255,252,0.10));
     --ink-scene-filter: saturate(0.82);
   }
 
   &.ink-bg-forenoon {
     --ink-scene: url('@/assets/ink/ink-portrait-forenoon.jpg');
-    --ink-scene-position: center -160rpx;
+    --ink-scene-position: center center;
     --ink-paper-wash: linear-gradient(rgba(255,255,252,0.03), rgba(255,255,252,0.09));
     --ink-scene-filter: none;
   }
 
   &.ink-bg-noon {
     --ink-scene: url('@/assets/ink/ink-portrait-forenoon.jpg');
-    --ink-scene-position: center -160rpx;
+    --ink-scene-position: center center;
     --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(255,255,252,0.07));
     --ink-scene-filter: brightness(1.03);
   }
 
   &.ink-bg-afternoon {
     --ink-scene: url('@/assets/ink/ink-portrait-afternoon.jpg');
-    --ink-scene-position: center -160rpx;
+    --ink-scene-position: center center;
     --ink-paper-wash: linear-gradient(rgba(255,255,252,0.03), rgba(255,255,252,0.09));
     --ink-scene-filter: none;
   }
 
   &.ink-bg-sunset {
     --ink-scene: url('@/assets/ink/ink-portrait-sunset.jpg');
-    --ink-scene-position: center -160rpx;
+    --ink-scene-position: center center;
     --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(255,255,252,0.07));
     --ink-scene-filter: saturate(0.88);
   }
 
   &.ink-bg-dusk {
     --ink-scene: url('@/assets/ink/ink-portrait-dusk.jpg');
-    --ink-scene-position: center -160rpx;
+    --ink-scene-position: center center;
     --ink-paper-wash: linear-gradient(rgba(255,255,252,0.03), rgba(255,255,252,0.10));
     --ink-scene-filter: saturate(0.84);
   }
 
   &.ink-bg-night {
     --ink-scene: url('@/assets/ink/ink-portrait-night.jpg');
-    --ink-scene-position: center -160rpx;
+    --ink-scene-position: center center;
     --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(248,250,249,0.08));
     --ink-scene-filter: none;
   }
@@ -530,11 +532,6 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   .dot.fanke {
     background: $ink-seal !important;
     border-radius: 2rpx !important;
-  }
-
-  .fanke-merged {
-    background: $ink-muted !important;
-    border-color: $ink-border !important;
   }
 
   // 穴位按钮：墨线框 + 楷体墨字

@@ -27,7 +27,7 @@ $mor-text-hint: #888078;
 $mor-border: rgba(101, 91, 82, 0.11);
 $mor-shadow: 0 12rpx 34rpx rgba(105, 92, 82, 0.11);
 $mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-$mor-serif: 'WenYuanSerifSC', 'STSong', 'Songti SC', 'SimSun', serif;
+$mor-serif: 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'STSong', 'Songti SC', 'SimSun', serif;
 
 .ui-morandi {
   /* === 主题变量重定义 === */
@@ -49,6 +49,8 @@ $mor-serif: 'WenYuanSerifSC', 'STSong', 'Songti SC', 'SimSun', serif;
     radial-gradient(ellipse at 18% 82%, rgba(156, 170, 178, 0.11) 0%, transparent 34%),
     linear-gradient(180deg, #F8F4EF 0%, $mor-bg 58%, #EEE8E2 100%) !important;
   color: $mor-text !important;
+  // 与水墨主题共用已内置的霞鹜臻楷；莫兰迪降低对比与字重后更像温润手账。
+  font-family: $mor-serif !important;
 
   /* === 导航栏：奶油底 + 暖灰标题 === */
   .navbar {
@@ -308,11 +310,6 @@ $mor-serif: 'WenYuanSerifSC', 'STSong', 'Songti SC', 'SimSun', serif;
     background: $mor-caramel !important;
   }
 
-  .fanke-merged {
-    background: $mor-muted !important;
-    border: none !important;
-  }
-
   // 穴位按钮：浅驼圆胖药片
   .point-btn {
     background: linear-gradient(145deg, #F2EAE2, #E7DDDA) !important;
@@ -494,6 +491,7 @@ $mor-serif: 'WenYuanSerifSC', 'STSong', 'Songti SC', 'SimSun', serif;
   .setting-label,
   .theme-name {
     color: $mor-text !important;
+    font-family: $mor-serif !important;
   }
 
   .setting-value,
@@ -519,6 +517,7 @@ $mor-serif: 'WenYuanSerifSC', 'STSong', 'Songti SC', 'SimSun', serif;
 
   .ui-style-name {
     color: $mor-text !important;
+    font-family: $mor-serif !important;
   }
 
   .ui-style-desc {
@@ -612,7 +611,7 @@ $mor-serif: 'WenYuanSerifSC', 'STSong', 'Songti SC', 'SimSun', serif;
 
   .popup .point-name {
     color: $mor-text !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
   }
 
   .close-icon {

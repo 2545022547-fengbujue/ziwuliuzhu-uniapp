@@ -27,31 +27,6 @@
         <text class="warning-text">当前时辰为闭穴</text>
       </view>
 
-      <!-- 反克法合并显示（仅在纳甲法闭穴且合并模式下） -->
-      <template v-if="isNajia && result?.isClosed && store.fankeDisplayMode === 'merged'">
-        <view v-if="fankeHasOpenPoints" class="section fanke-merged">
-          <view class="section-title">
-            <view class="dot fanke"></view>
-            <text>反克法开穴（纳甲法闭穴时的特殊方案）</text>
-          </view>
-          <view class="points-grid">
-            <view
-              v-for="point in fankeResult.openPoints"
-              :key="'fanke-' + point.code"
-              class="point-btn"
-              :class="{ 'point-btn-code-hidden': !store.showPointCode }"
-              @tap="handlePointClick(point)"
-            >
-              <text class="point-name">{{ point.name }}</text>
-              <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
-              <view v-if="point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
-                <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
-              </view>
-            </view>
-          </view>
-        </view>
-      </template>
-
       <!-- 合日互用穴位：只有设置开关开启、纳甲法本身闭穴且合日计算有结果时才渲染。 -->
       <view v-if="result?.isClosed && result?.alternativePoints?.openPoints?.length" class="section">
         <view class="section-title">
@@ -223,13 +198,6 @@ const isNazi = computed(() => props.method === 'nazi')
 // 是否纳甲法
 const isNajia = computed(() => props.method === 'najia')
 
-// 反克法结果（纳甲法合并模式使用）
-const fankeResult = computed(() => store.results?.fanke || null)
-
-const fankeHasOpenPoints = computed(() => {
-  return Boolean(fankeResult.value?.openPoints?.length)
-})
-
 const alternativeHasOpenPoints = computed(() => {
   // alternativePoints 在开关关闭时固定为 null；这里不直接读取开关，
   // 让结果对象成为唯一渲染依据，避免 Store 状态和旧计算结果短暂不同步。
@@ -239,12 +207,9 @@ const alternativeHasOpenPoints = computed(() => {
 const showClosedWarning = computed(() => {
   if (!result.value?.isClosed) return false
   if (isNajia.value) {
-    // 单独显示反克法时，只看纳甲法本身和合日互用，不看反克法
-    if (store.fankeDisplayMode === 'separate') {
-      return !alternativeHasOpenPoints.value
-    }
-    // 合并模式时，看反克法+合日互用
-    return !(fankeHasOpenPoints.value || alternativeHasOpenPoints.value)
+    // 反克法由首页独立补充区按开关控制，不参与纳甲面板的闭穴提示判断。
+    // 合日互用仍属于纳甲法替代结果，有结果时无需再显示纯闭穴提示。
+    return !alternativeHasOpenPoints.value
   }
   return true
 })
@@ -426,15 +391,6 @@ function handlePointClick(point) {
   &.primary { background: $tcm-secondary; }
   &.secondary { background: $tcm-secondary; }
   &.fanke { background: $tcm-red; }
-}
-
-// 反克法合并显示区域
-.fanke-merged {
-  padding: $spacing-md;
-  margin-bottom: $spacing-md;
-  background: var(--theme-surface-muted);
-  border: 1rpx solid var(--theme-border);
-  border-radius: $radius-md;
 }
 
 /* === 穴位网格 ===

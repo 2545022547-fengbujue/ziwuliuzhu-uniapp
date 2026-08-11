@@ -116,7 +116,7 @@
         <ResultPanel :method="store.activeMethod" />
       </view>
 
-      <!-- 纳甲法闭穴时显示反克法补充 -->
+      <!-- 反克法开关开启后，纳甲法闭穴且确有结果时才显示独立补充区。 -->
       <view v-if="showFankeSupplement" class="fanke-supplement">
         <view class="fanke-header">
           <text class="fanke-icon">⇄</text>
@@ -206,7 +206,7 @@
  *   2. 自动模式：每分钟更新时间显示，当时辰变动时才重新计算取穴结果
  *   3. 手动模式：用户选择日期和时辰查询，需确认后才更新结果
  *   4. 取穴方法切换（纳甲法、纳子法、灵龟八法、飞腾八法）
- *   5. 反克法补充（纳甲法闭穴时自动显示）
+ *   5. 反克法补充（用户开启开关、纳甲法闭穴且反克法有结果时显示）
  *   6. 其他方法对比（底部显示其他3种方法的结果）
  *
  * 核心逻辑：
@@ -306,12 +306,12 @@ const confirmedHourIdx = ref(-1)
 // 分钟时间戳（自动模式下每分钟递增一次，驱动 currentDateTimeStr 时间字符串刷新，节省电量）
 const minuteTick = ref(0)
 
-// 是否显示反克法补充（独立模式下纳甲法闭穴时显示）
+// 是否显示反克法补充：关闭开关后完全隐藏，不再回退为纳甲面板内的合并展示。
 const showFankeSupplement = computed(() => {
   return store.activeMethod === 'najia' &&
     store.results.najia?.isClosed &&
     store.results.fanke?.openPoints?.length &&
-    store.fankeDisplayMode === 'separate'
+    store.showFanke
 })
 
 // 其他方法对比列表（排除当前选中的方法）

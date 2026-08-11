@@ -145,7 +145,7 @@
  *     font-family fallback 'KaiTi', '楷体', 'STKaiti' 只是兜底，非主方案。
  *   - 单位统一使用 rpx（2026-05-25 从 px 迁移，确保全App单位一致）
  */
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { getWuxingColor } from '@/utils/wuxing.js'
 import AnimalMascot from '@/components/AnimalMascot.vue'
@@ -199,14 +199,14 @@ const animalMascots = [
 ]
 const animalMascot = ref(animalMascots[getSecureRandomIndex(animalMascots.length)])
 
-// TabBar 位于页面根节点之外，详情弹窗显示时须单独隐藏，避免破坏模态焦点。
-onMounted(() => {
-  uni.hideTabBar({ animation: false })
-})
-
-onUnmounted(() => {
-  uni.showTabBar({ animation: false })
-})
+/**
+ * 不在详情弹窗生命周期中调用 uni.hideTabBar / uni.showTabBar。
+ *
+ * App 原生 TabBar 与 WebView 并非同一渲染层，部分 Android 设备会在弹窗动画
+ * 已经开始后才完成 hideTabBar，表现为“弹窗先出现，底栏过一会儿才突然消失”，
+ * 容易被误认为动画卡顿。详情遮罩本身已能阻止页面内容交互，因此保持 TabBar
+ * 状态不变，避免原生异步显隐破坏动画的连续性。
+ */
 
 // 纳子法补母泻子说明文字
 const naziBumuTip = computed(() => {

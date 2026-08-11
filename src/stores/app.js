@@ -99,7 +99,7 @@ const UI_STYLE_OPTIONS = [
   // 水彩画风：使用透明色层与纸面晕染，不使用生硬的纯色矩形堆叠。
   { id: 'watercolor', name: '水彩画风', desc: '纸面晕染，柔和诗意', swatch: 'watercolor' },
   // 动物森友会：参考 Animal Island UI 的奶油纸面、岛屿青绿和暖黄木牌语言。
-  { id: 'animal', name: '动物森友会', desc: '双狸迎宾，轻松岛居', swatch: 'animal' },
+  { id: 'animal', name: '动物森友会', desc: '双狸迎宾，悠闲岛屿生活', swatch: 'animal' },
   // 复古像素：遵循 Pixelium Design 的硬边轮廓、有限色板和 4px 像素节奏。
   { id: 'pixel', name: '复古像素', desc: '掌机像素，怀旧冒险', swatch: 'pixel' }
 ]
@@ -208,7 +208,9 @@ export const useAppStore = defineStore('app', () => {
   const showDetail = ref(false)
   const selectedPoint = ref(null)
   const naziMode = ref('daily')  // 纳子法模式：'daily'(一日六十六穴) | 'bumu'(补母泻子)
-  const theme = ref('yellow')
+  // 新安装用户默认进入“青瓷天青”。Pinia 持久化会在已有设置存在时覆盖该初值，
+  // 因此升级用户继续沿用自己的主题选择，不会被本次默认值调整强制切换。
+  const theme = ref('green')
   // 外观风格内部状态：classic 使用传统配色主题，其余使用独立视觉方案
   const uiStyle = ref('classic')
 
@@ -217,8 +219,11 @@ export const useAppStore = defineStore('app', () => {
   const longitude = ref(APP_CONFIG.defaultLongitude) // 默认北京经度
   const selectedCity = ref('北京')
 
-  // === 反克法显示模式 ===
-  const fankeDisplayMode = ref('merged') // 默认合并到纳甲法 | 'separate'=单独显示
+  // === 反克法显示开关 ===
+  // 继续保存历史字段 fankeDisplayMode，避免已有用户升级后丢失设置：
+  // 'separate' 现在表示“开启显示”，'merged' 仅作为旧值兼容并表示“关闭隐藏”。
+  // 新逻辑不再把反克法结果合并进纳甲法面板。
+  const fankeDisplayMode = ref('merged')
   // 合日互用默认关闭：只有用户明确启用后，纳甲法闭穴才计算并展示合日穴位。
   const useHeRiHuYong = ref(false)
   // 穴位编码默认显示；关闭后各主题使用独立的中文名排版。
@@ -282,13 +287,17 @@ export const useAppStore = defineStore('app', () => {
   const currentResults = computed(() => results.value[activeMethod.value])
 
   const activeTheme = computed(() => {
-    return supportsThemeSwitch && isKnownTheme(theme.value) ? theme.value : 'yellow'
+    // H5/App 遇到空值或已下架的历史主题时同样回退青瓷，保证首次状态与异常兜底一致。
+    return supportsThemeSwitch && isKnownTheme(theme.value) ? theme.value : 'green'
   })
 
   // 兜底校验：持久化值非法（如风格已下架）时回退经典界面
   const activeUiStyle = computed(() => {
     return supportsThemeSwitch && isKnownUiStyle(uiStyle.value) ? uiStyle.value : 'classic'
   })
+
+  /** 反克法是否允许显示；隔离历史持久化枚举与当前布尔开关语义。 */
+  const showFanke = computed(() => fankeDisplayMode.value === 'separate')
 
   // 设置页只展示一套“外观风格”，避免 theme 与 uiStyle 两套概念互相覆盖。
   const appearanceOptions = computed(() => [
@@ -313,7 +322,7 @@ export const useAppStore = defineStore('app', () => {
     if (activeUiStyle.value !== 'classic' && UI_STYLE_PRIMARY[activeUiStyle.value]) {
       return UI_STYLE_PRIMARY[activeUiStyle.value]
     }
-    return THEME_CHROME[activeTheme.value]?.selectedColor || THEME_CHROME.yellow.selectedColor
+    return THEME_CHROME[activeTheme.value]?.selectedColor || THEME_CHROME.green.selectedColor
   })
 
   const themeSwitchColor = computed(() => {
@@ -446,6 +455,14 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  /**
+   * 切换反克法显示状态。
+   * 内部仍写入旧枚举值以兼容已有持久化数据，但关闭后不会再以“合并模式”展示。
+   */
+  function toggleFanke(value) {
+    fankeDisplayMode.value = value ? 'separate' : 'merged'
+  }
+
   function applyThemeChrome() {
     if (!supportsThemeSwitch) return
     const chrome = activeUiStyle.value === 'classic'
@@ -513,6 +530,7 @@ export const useAppStore = defineStore('app', () => {
     longitude,
     selectedCity,
     fankeDisplayMode,
+    showFanke,
     useHeRiHuYong,
     showPointCode,
     // Getters
@@ -528,6 +546,7 @@ export const useAppStore = defineStore('app', () => {
     switchToManualMode,
     updateLongitude,
     toggleTrueSolarTime,
+    toggleFanke,
     setActiveMethod,
     setNaziMode,
     toggleHeRiHuYong,

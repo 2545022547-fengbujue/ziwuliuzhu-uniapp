@@ -295,11 +295,6 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
     background: #F59E0B !important;
   }
 
-  .fanke-merged {
-    background: $modern-muted !important;
-    border-color: $modern-border !important;
-  }
-
   // 穴位按钮：浅灰扁平药片
   .point-btn {
     background: $modern-muted !important;
@@ -813,7 +808,6 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
 
   .manual-controls,
   .warning-box,
-  .fanke-merged,
   .palace-box,
   .bumu-tip,
   .nazi-bumu-tip,

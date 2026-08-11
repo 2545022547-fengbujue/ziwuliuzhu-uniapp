@@ -415,11 +415,6 @@ $wc-sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mic
     background: $wc-rose !important;
   }
 
-  .fanke-merged {
-    background: $wc-muted !important;
-    border-color: $wc-border !important;
-  }
-
   // 穴位按钮：纸面细蓝边药片
   .point-btn {
     background: rgba(255, 255, 255, 0.60) !important;
@@ -948,17 +943,24 @@ $wc-sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mic
 
 .ui-watercolor switch .uni-switch-input,
 .ui-watercolor .uni-switch-input {
-  background-color: #E4EFED !important;
-  border-color: rgba(133, 205, 202, 0.55) !important;
+  background: linear-gradient(135deg, rgba(195, 141, 148, 0.20), rgba(232, 168, 124, 0.18)) !important;
+  border-color: rgba(195, 141, 148, 0.38) !important;
 }
 
 .ui-watercolor switch .uni-switch-input::before,
 .ui-watercolor .uni-switch-input::before {
-  background-color: #E4EFED !important;
+  background: transparent !important;
 }
 
 .ui-watercolor switch .uni-switch-input::after,
 .ui-watercolor .uni-switch-input::after {
-  background-color: #4F9995 !important;
-  box-shadow: 0 2px 8px rgba(79, 153, 149, 0.20) !important;
+  background: #FFFDF9 !important;
+  box-shadow: 0 2px 8px rgba(74, 111, 165, 0.18) !important;
+}
+
+/* 选中态改用水彩蓝色洗，保留杏橙高光，不再沿用统一绿色开关。 */
+.ui-watercolor switch .uni-switch-input.uni-switch-input-checked,
+.ui-watercolor .uni-switch-input.uni-switch-input-checked {
+  background: linear-gradient(135deg, #6F96C5, #4A6FA5 68%, #D7A37F) !important;
+  border-color: rgba(74, 111, 165, 0.42) !important;
 }
