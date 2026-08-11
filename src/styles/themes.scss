@@ -341,6 +341,26 @@
     border: 1rpx solid rgba(0, 128, 255, 0.40) !important;
   }
 
+  /*
+   * 外观列表的文字样式定义在设置页 scoped 样式中，原先不会完整继承暗夜主题变量，
+   * 因而未选主题名称会落回接近黑色。这里同时覆盖一级风格、经典四色和当前风格卡片。
+   */
+  .ui-style-option .ui-style-name {
+    color: #F2F5F7 !important;
+  }
+
+  .ui-style-option .ui-style-desc {
+    color: #B8C0C8 !important;
+  }
+
+  .ui-style-option.active .ui-style-name {
+    color: #168BFF !important;
+  }
+
+  .ui-style-option.active .ui-style-desc {
+    color: #D5DCE3 !important;
+  }
+
   /* Switch开关 */
   switch .uni-switch-input,
   .uni-switch-input {
