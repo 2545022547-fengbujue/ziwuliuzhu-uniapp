@@ -1,11 +1,17 @@
 /* ============================================
    动物森友会（ui-animal）
 
-   视觉来源：Animal Island UI 的自然系配色与有机组件语言。
-   适配原则：使用参考项目作者自绘、以 MIT 发布的双狸角色素材，配合奶油纸面、
-   岛屿青绿、暖黄木牌、圆润不规则轮廓和细点纹理，并保持取穴信息可读性。
+   设计语言：岛屿青绿 + 奶油纸面 + 暖黄木牌 + 圆润有机轮廓
+   - 页面根节点绑定 ui-animal 后整体生效，不影响其他外观
+   - 背景叠加岛屿纸纹、点状纹理和青绿/奶黄环境色洗，营造轻松岛居氛围
+   - 卡片使用四角不同的不规则圆角，模拟手作木牌的柔和轮廓，避免机械感
+   - 双狸角色与岛屿纸纹来自 Animal Island UI（MIT），许可见 THIRD_PARTY_NOTICES.md
+   - 交互参考 Animal Island Button：悬浮轻抬、按下回落，形成柔和木牌手感
+
+   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
    ============================================ */
 
+// 动物岛调色板：青绿主色系 + 暖黄木牌 + 奶油纸面，全部取自 Animal Island 的自然系配色
 $animal-teal: #19AFA2;
 $animal-teal-dark: #117D75;
 $animal-mint: #82D5BB;
@@ -35,6 +41,9 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
   --theme-border: #{$animal-border};
   --theme-shadow: rgba(92, 122, 105, 0.12);
 
+  /* === 页面背景：岛屿纸纹 + 点状纹理 + 青绿/奶黄环境色洗 === */
+  // 第一层径向渐变模拟纸张纤维点；后两层是青绿与薄荷的大范围环境色；
+  // island-paper.webp 为 MIT 来源的岛屿纸纹，竖向平铺；整体仍以奶油色收底。
   color: $animal-text !important;
   background:
     radial-gradient(circle at 18rpx 18rpx, rgba(255,255,255,0.58) 0 4rpx, transparent 5rpx) 0 0 / 58rpx 58rpx,
@@ -43,6 +52,9 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     url('@/static/themes/animal/island-paper.webp') center top / 100% auto repeat-y,
     linear-gradient(180deg, #CDEBDD 0%, #E8F1D7 24%, $animal-cream 56%, #F3E9CB 100%) !important;
 
+  /* === 首页双狸迎宾区：角色位于干支卡上方，不遮挡信息 === */
+  // hero 下缘负 margin 与干支卡重叠，让角色像从卡片后方探出；
+  // ::before 椭圆阴影模拟草坡落点，双狸图带轻微 drop-shadow 增加体积感。
   .animal-friends-hero {
     position: relative;
     z-index: 0;
@@ -75,6 +87,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     animation: animal-hero-arrive .58s cubic-bezier(.2,1.25,.35,1) both;
   }
 
+  /* === 设置页欢迎木牌：小号角色图 + 主题标签，快速识别当前外观 === */
   .animal-friends-setting {
     display: flex;
     align-items: center;
@@ -101,6 +114,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     letter-spacing: 2rpx;
   }
 
+  // 动物主题详情内的角色承载行：虚线边框 + 点状底纹，与普通信息行区分
   .animal-mascot-row {
     background:
       radial-gradient(circle, rgba(255,255,255,.42) 2rpx, transparent 3rpx) 0 0 / 26rpx 26rpx,
@@ -108,6 +122,8 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     border: 2rpx dashed rgba(25,175,162,.24);
   }
 
+  /* === 穴位详情底部岛屿场景：透明天空渐变 + 草地 + 树木 + 双层海浪 === */
+  // 场景铺满弹窗宽度、无矩形边框，顶部由透明渐变过渡到纸面，只作装饰不遮正文。
   .animal-detail-scene {
     background: linear-gradient(
       180deg,
@@ -137,12 +153,14 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
 
   .animal-mascot-corner > .mascot-shell { width: 188rpx; height: 188rpx; }
 
+  /* === 导航栏：半透明奶油底 + 虚线分隔 + 毛玻璃 === */
   .navbar {
     background: rgba(255, 252, 237, 0.92) !important;
     border-bottom: 2rpx dashed rgba(114, 93, 66, 0.18) !important;
     backdrop-filter: blur(16rpx) !important;
   }
 
+  // 所有标题统一 800 字重与圆润字体栈，保持「手写木牌」的一致感
   .navbar-title,
   .ganzhi-title,
   .header-title,
@@ -160,6 +178,9 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     letter-spacing: 2rpx !important;
   }
 
+  /* === 卡片通用：奶油纸面 + 点状纹理 + 不规则圆角 + 柔和实体阴影 === */
+  // 圆角故意做成四角不同（34/42/32/40rpx），避免千篇一律的机械感；
+  // backdrop-filter 置 none，避免毛玻璃与纸纹叠加后发灰。
   .ganzhi-card,
   .method-tabs,
   .result-panel,
@@ -169,6 +190,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
   .info-card,
   .popup,
   .confirm-popup,
+  // 弹窗放大进入，配合底部阴影增强「浮起」感
   .fullscreen-panel,
   .date-picker-panel,
   .time-picker-panel {
@@ -181,6 +203,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     backdrop-filter: none !important;
   }
 
+  // 卡片入场依次升起；设置卡按顺序延迟，形成错峰出现的轻快节奏
   .ganzhi-card,
   .result-wrapper > .result-panel,
   .setting-card {
@@ -191,6 +214,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
   .setting-card:nth-of-type(3) { animation-delay: .08s; }
   .setting-card:nth-of-type(4) { animation-delay: .12s; }
 
+  /* === 分段控件（自动/手动、纳子模式）：深奶色轨道 + 圆形滑块 === */
   .ganzhi-toggle,
   .nazi-mode-switch {
     padding: 6rpx !important;
@@ -295,6 +319,8 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     box-shadow: 0 2rpx 0 rgba(114,93,66,.08) !important;
   }
 
+  /* === 主操作按钮：青绿渐变胶囊 + 底部厚实体阴影 === */
+  // 底部 8rpx 阴影模拟木牌厚度，按下时整体下移 5rpx、阴影收窄，按压感来自阴影位移。
   .query-btn,
   .confirm-ok,
   .action-btn.confirm,
@@ -361,6 +387,8 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     gap: 14rpx;
   }
 
+  /* === 干支卡：两行两列，奶黄/薄荷交替 + 日时高亮 === */
+  // 年、月用奶黄与薄荷区分；日、时高亮使用更饱和的暖黄与薄荷绿。
   .ganzhi-tag-item {
     width: calc(50% - 7rpx);
     box-sizing: border-box;
@@ -390,6 +418,8 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     font-weight: 800 !important;
   }
 
+  /* === 方法切换栏：薄荷底轨道 + 奶油浮起选中项 === */
+  // 激活项像纸卡浮起（上移 2rpx + 底部阴影），图标轻弹、标签淡入。
   .method-tabs {
     padding: 10rpx !important;
     background:
@@ -418,6 +448,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     &:not(.active) .method-name { color: #3E7166 !important; }
   }
 
+  // 方法指示小点：暖黄圆点 + 缓慢叶片摆动动画，只作氛围点缀，不抢信息
   .method-indicator {
     width: 12rpx !important;
     height: 12rpx !important;
@@ -427,6 +458,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     border-radius: 50% !important;
   }
 
+  /* === 结果/弹窗面板头：薄荷到奶油的渐变 + 虚线分隔 === */
   .panel-header,
   .popup-header,
   .fullscreen-header {
@@ -479,6 +511,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
   .title-dot { background: $animal-teal !important; }
   .dot.fanke { background: $animal-yellow !important; }
 
+  /* === 穴位按钮：奶油药片 + 青绿细边 + 按压回落 === */
   .point-btn {
     background: $animal-paper !important;
     border: 2rpx solid rgba(25,175,162,0.22) !important;
@@ -502,6 +535,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
 
   .point-name { color: $animal-teal-dark !important; font-weight: 800 !important; }
 
+  /* === 次级信息块：淡绿底 + 虚线框，与主卡片拉开层次 === */
   .palace-box,
   .suggestion-box,
   .info-item,
@@ -514,6 +548,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     border-radius: 24rpx !important;
   }
 
+  /* === 反克法补充面板：暖黄虚线框强调 === */
   .fanke-supplement {
     background: $animal-paper !important;
     border: 3rpx dashed $animal-yellow !important;
@@ -532,6 +567,8 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     color: $animal-brown !important;
   }
 
+  /* === 外观/主题选项：奶油卡 + 错峰入场 === */
+  // 展开列表按 25ms 递增延迟，形成短促的入场队列，仅动画不阻塞交互。
   .theme-current,
   .ui-style-option,
   .theme-option {
@@ -613,6 +650,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
   .city-item.selected .city-abbr { background: $animal-teal !important; color: #FFFDF2 !important; }
 }
 
+/* === 日历/时辰面板（px 单位组件）：纸面 + 点纹 + 不规则圆角 === */
 .date-picker-panel.ui-animal,
 .time-picker-panel.ui-animal,
 .popup.ui-animal {
@@ -654,6 +692,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
   .day-text,
   .hour-text { color: $animal-text !important; }
 
+  // 选中日采用不规则圆形（48%/52%…），贴合手作质感；时辰选中直接白字加粗。
   .day-item.selected {
     background: transparent !important;
     box-shadow: none !important;
@@ -669,6 +708,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
   .hour-item.selected .hour-text { color: #FFFDF2 !important; font-weight: 800 !important; }
 }
 
+/* === 原生开关：奶油轨道 + 暖黄开启滑块 === */
 .ui-animal switch .uni-switch-input,
 .ui-animal .uni-switch-input {
   background-color: $animal-paper-deep !important;
@@ -687,6 +727,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
 .ui-animal switch .uni-switch-input.uni-switch-input-checked::after,
 .ui-animal .uni-switch-input.uni-switch-input-checked::after { background-color: $animal-yellow !important; }
 
+/* === 动画关键帧：迎宾、入场、按压、氛围动效 === */
 @keyframes animal-hero-arrive {
   from { opacity: 0; transform: translateY(26rpx) scale(.84); }
   72% { opacity: 1; transform: translateY(-4rpx) scale(1.03); }
@@ -726,6 +767,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+/* 系统开启减弱动态时，关闭全部入场与装饰动画 */
 @media (prefers-reduced-motion: reduce) {
   .ui-animal .animal-friends-image,
   .ui-animal .ganzhi-card,

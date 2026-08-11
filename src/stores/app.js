@@ -86,7 +86,7 @@ const THEME_CHROME = {
   }
 }
 
-// === 新增的四套界面风格（uiStyle）===
+// === 新增的六套界面风格（uiStyle）===
 // classic 沿用传统配色主题；下面四套风格各自拥有完整的排版、组件和交互样式。
 // 注释统一说明设计意图，避免把“主色替换”误当成一套完整风格。
 const UI_STYLE_OPTIONS = [
@@ -98,7 +98,7 @@ const UI_STYLE_OPTIONS = [
   { id: 'morandi', name: '莫兰迪奶油', desc: '低饱和灰调，温柔治愈', swatch: 'morandi' },
   // 水彩画风：使用透明色层与纸面晕染，不使用生硬的纯色矩形堆叠。
   { id: 'watercolor', name: '水彩画风', desc: '纸面晕染，柔和诗意', swatch: 'watercolor' },
-  // 动物岛露营：参考 Animal Island UI 的奶油纸面、岛屿青绿和暖黄木牌语言。
+  // 动物森友会：参考 Animal Island UI 的奶油纸面、岛屿青绿和暖黄木牌语言。
   { id: 'animal', name: '动物森友会', desc: '双狸迎宾，轻松岛居', swatch: 'animal' },
   // 复古像素：遵循 Pixelium Design 的硬边轮廓、有限色板和 4px 像素节奏。
   { id: 'pixel', name: '复古像素', desc: '掌机像素，怀旧冒险', swatch: 'pixel' }

@@ -1,10 +1,18 @@
 /* ============================================
    复古像素（ui-pixel）
 
-   依据 Pixelium Design：4rpx 像素节奏、硬边轮廓、有限调色板、阶梯阴影，
-   不依赖 Web 专用组件库，确保 uni-app 的 App/H5 WebView 表现一致。
+   设计语言：像素网格 + 硬边轮廓 + 有限调色板 + 阶梯阴影
+   - 依据 Pixelium Design 的 4rpx 像素节奏与掌机视觉语言实现
+   - 所有圆角归零、阴影为硬偏移（阶梯阴影），不使用模糊阴影，还原像素质感
+   - 页面铺棋盘纹理模拟像素屏幕底色；导航与横幅模拟掌机游戏界面
+   - 交互按钮按下时整体位移并缩短阴影，模拟实体按键手感
+   - 不依赖 Web 专用组件库，仅用 uni-app 基础组件，确保 App/H5 WebView 表现一致
+   - 像素字体优先使用 Fusion Pixel / Ark Pixel / Zpix，缺失时回退等宽字体
+
+   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
    ============================================ */
 
+// 像素调色板：深墨、牛皮纸、沙金、掌机蓝、珊瑚红等，均为 Pixelium 有限色板成员
 $px-ink: #3F3A4B;
 $px-brown: #6B5B53;
 $px-paper: #FFF4D6;
@@ -31,6 +39,8 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   --theme-border: #{$px-ink};
   --theme-shadow: rgba(63, 58, 75, .22);
 
+  /* === 页面背景：沙金底 + 双色棋盘纹理 === */
+  // 两层 45° 线性渐变错位叠加成 32rpx 棋盘格，模拟像素屏幕的网点质感。
   color: $px-ink !important;
   font-family: $px-font !important;
   background-color: $px-sand !important;
@@ -43,6 +53,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   text,
   view { font-family: $px-font; }
 
+  /* === 导航栏：深墨底 + 金色底边 + 硬阴影，模拟掌机顶部状态区 === */
   .navbar {
     background: $px-ink !important;
     border-bottom: 8rpx solid $px-gold !important;
@@ -52,6 +63,8 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
 
   .navbar-title { color: $px-paper !important; text-shadow: 4rpx 4rpx 0 $px-blue-dark; letter-spacing: 4rpx; }
 
+  /* === 冒险日志横幅：蓝色任务面板 + 红色图标格 + 生命心 === */
+  // 首页与设置页各有一块横幅，用硬边框与阶梯阴影做出掌机卡带标签的既视感。
   .pixel-hero,
   .pixel-setting-banner {
     margin: 18rpx 32rpx 24rpx;
@@ -91,6 +104,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   .pixel-hero-hearts text { color: $px-red !important; font-size: 28rpx; text-shadow: 2rpx 2rpx 0 $px-ink; }
   .pixel-setting-cursor { color: $px-gold !important; animation: pixel-cursor 1s steps(2, end) infinite; }
 
+  /* === 卡片通用：纸面底 + 6rpx 硬边 + 8rpx 阶梯阴影，圆角一律归零 === */
   .ganzhi-card,
   .result-panel,
   .setting-card,
@@ -109,6 +123,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   .setting-card,
   .fanke-supplement { margin-left: 32rpx !important; margin-right: 32rpx !important; }
 
+  // 标题统一像素字体 + 金色硬阴影，营造屏幕文字发光效果
   .ganzhi-title,
   .header-title,
   .card-title,
@@ -124,6 +139,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
     text-shadow: 2rpx 2rpx 0 rgba(246,200,95,.72);
   }
 
+  /* === 分段控件与选项：沙金底 + 4rpx 硬边 + 小阶梯阴影 === */
   .ganzhi-toggle,
   .nazi-mode-switch,
   .theme-current,
@@ -144,6 +160,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
     transition: none !important;
   }
 
+  // 选中态：掌机蓝填充 + 内凹阴影，模拟被按下的凹槽
   .toggle-btn.active,
   .switch-option.active,
   .method-tab.active {
@@ -152,6 +169,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
     box-shadow: inset -6rpx -6rpx 0 $px-blue-dark !important;
   }
 
+  /* === 方法切换栏：深墨轨道 + 硬阴影底边 === */
   .method-tabs {
     margin-left: 32rpx !important;
     margin-right: 32rpx !important;
@@ -164,6 +182,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   .method-tab { color: $px-paper !important; }
   .method-indicator { height: 6rpx !important; border-radius: 0 !important; background: $px-gold !important; }
 
+  /* === 干支标签与五行标签：硬边小卡 === */
   .ganzhi-tag-item,
   .result-ganzhi-hour-tag,
   .tag-primary,
@@ -176,6 +195,8 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   .ganzhi-tag-item { background: $px-cyan !important; }
   .ganzhi-tag-item.highlight { background: $px-gold !important; }
 
+  /* === 主操作按钮：掌机蓝 + 底部厚阴影，按下下移 6rpx === */
+  // 阴影高度即按键行程，按下时阴影缩短、按钮下移，模拟实体按键触感。
   .query-btn,
   .confirm-ok,
   .action-btn.confirm,
@@ -194,6 +215,8 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
     box-shadow: 0 2rpx 0 $px-blue-dark !important;
   }
 
+  /* === 穴位按钮：金色底 + 硬边 + 像素化渲染 === */
+  // image-rendering: pixelated 让位图边缘保持锯齿而非模糊，贴合像素主题。
   .point-btn {
     color: $px-ink !important;
     background: $px-gold !important;
@@ -207,6 +230,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   .point-name { color: $px-ink !important; font-family: $px-font !important; }
   .point-code { color: $px-blue-dark !important; font-family: $px-font !important; font-weight: 800; }
 
+  /* === 次级信息块：旧纸色 + 硬边框，与主卡片层次分开 === */
   .info-item,
   .location-box,
   .method-item,
@@ -236,6 +260,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   .fullscreen-header .fullscreen-title,
   .fullscreen-header .close-icon { color: $px-paper !important; text-shadow: 2rpx 2rpx 0 $px-blue-dark; }
 
+  /* === 关闭/翻页按钮：珊瑚红方块 === */
   .close-btn,
   .year-nav,
   .month-nav {
@@ -250,6 +275,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   .month-arrow { color: $px-paper !important; }
 }
 
+/* === 日历/时辰面板（px 单位组件）：8rpx 硬边 + 12rpx 阶梯阴影 === */
 .date-picker-panel.ui-pixel,
 .time-picker-panel.ui-pixel,
 .popup.ui-pixel {
@@ -265,6 +291,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
 .time-picker-panel.ui-pixel {
   .day-item,
   .hour-item { border-radius: 0 !important; }
+  // 选中日期/时辰：掌机蓝填充 + 内凹阴影，与按钮选中态同一语言
   .day-item.selected,
   .hour-item.selected {
     color: $px-paper !important;
@@ -274,6 +301,7 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   }
 }
 
+/* === 原生开关：硬边轨道 + 金色开启滑块 === */
 .ui-pixel switch .uni-switch-input,
 .ui-pixel .uni-switch-input {
   border: 4rpx solid $px-ink !important;
@@ -289,11 +317,13 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
 .ui-pixel switch .uni-switch-input.uni-switch-input-checked::after,
 .ui-pixel .uni-switch-input.uni-switch-input-checked::after { background: $px-gold !important; }
 
+/* 设置页光标闪烁：steps(2, end) 让透明度二值跳变，保持像素感而非平滑过渡 */
 @keyframes pixel-cursor {
   0%, 45% { opacity: 1; transform: translateX(0); }
   50%, 100% { opacity: .25; transform: translateX(4rpx); }
 }
 
+/* 系统开启减弱动态时，关闭光标闪烁 */
 @media (prefers-reduced-motion: reduce) {
   .ui-pixel .pixel-setting-cursor { animation: none !important; }
 }
