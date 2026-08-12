@@ -80,7 +80,7 @@
         </view>
 
         <!-- 干支显示：乙巳年 辛巳月 癸亥日 丁巳时 -->
-        <view v-if="store.currentGanZhi" class="ganzhi-display">
+        <view v-if="store.currentGanZhi && store.showGanZhi" class="ganzhi-display">
           <view class="ganzhi-tag-item">
             <text class="ganzhi-tag-text">{{ store.currentGanZhi.year.ganZhi }}年</text>
           </view>

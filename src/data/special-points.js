@@ -178,10 +178,10 @@ export const SPECIAL_POINTS = [
   { code: 'GV1', name: '长强', meridian: '督脉', categories: ['络穴（督脉络穴）'], wuxing: '' },
   
   // 奇经八脉
-  { code: 'KI9', name: '筑宾', meridian: '阴维脉', categories: ['郄穴'], wuxing: '' },
-  { code: 'GB35', name: '阳交', meridian: '阳维脉', categories: ['郄穴'], wuxing: '' },
-  { code: 'KI8', name: '交信', meridian: '阴跷脉', categories: ['郄穴'], wuxing: '' },
-  { code: 'BL59', name: '跗阳', meridian: '阳跷脉', categories: ['郄穴'], wuxing: '' }
+  { code: 'KI9', name: '筑宾', meridian: '足少阴肾经', categories: ['郄穴'], wuxing: '' },
+  { code: 'GB35', name: '阳交', meridian: '足少阳胆经', categories: ['郄穴'], wuxing: '' },
+  { code: 'KI8', name: '交信', meridian: '足少阴肾经', categories: ['郄穴'], wuxing: '' },
+  { code: 'BL59', name: '跗阳', meridian: '足太阳膀胱经', categories: ['郄穴'], wuxing: '' }
 ]
 
 /**

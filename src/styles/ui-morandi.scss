@@ -316,6 +316,14 @@ $mor-serif: 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'STSong', 'Son
     border: 1rpx solid rgba(169, 130, 130, 0.10) !important;
     border-radius: 999rpx !important;
     backdrop-filter: none !important;
+    align-items: center !important;
+
+    // 无衬线编码相对衬线大字 name 视觉偏上，下移微调使其等线
+    .point-code {
+      position: relative !important;
+      top: 2rpx !important;
+      line-height: 1 !important;
+    }
 
     &:active {
       background: rgba(169, 130, 130, 0.22) !important;
@@ -324,7 +332,7 @@ $mor-serif: 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'STSong', 'Son
 
   .point-name {
     color: $mor-primary !important;
-    font-family: $mor-font !important;
+    font-family: $mor-serif !important;
   }
 
   .point-code {

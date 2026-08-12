@@ -18,11 +18,12 @@
           <text class="pixel-setting-cursor">▶</text>
         </view>
         <!-- ========== 真太阳时设置区域 ========== -->
-        <view class="setting-card">
+        <view class="setting-card solar-card">
           <view class="card-title">
-            <text class="card-icon">🌍</text>
+            <view class="card-icon-svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><line x1="56" y1="232" x2="200" y2="232" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><circle cx="128" cy="104" r="32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path d="M208,104c0,72-80,128-80,128S48,176,48,104a80,80,0,0,1,160,0Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg></view>
             <text>真太阳时校正</text>
           </view>
+          <text class="solar-desc">根据指定城市的地理位置进行时间误差校正</text>
           <view class="setting-row">
             <text class="setting-label">启用真太阳时</text>
             <view
@@ -57,7 +58,7 @@
         <!-- ========== 外观风格统一切换 ========== -->
         <view class="setting-card">
           <view class="card-title">
-            <text class="card-icon">✦</text>
+            <view class="card-icon-svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><line x1="216" y1="128" x2="216" y2="176" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="192" y1="152" x2="240" y2="152" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="80" y1="40" x2="80" y2="88" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="56" y1="64" x2="104" y2="64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="168" y1="184" x2="168" y2="216" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="152" y1="200" x2="184" y2="200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="144" y1="80" x2="176" y2="112" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><rect x="21.49" y="105.37" width="213.02" height="45.25" rx="8" transform="translate(-53.02 128) rotate(-45)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg></view>
             <text>外观风格</text>
           </view>
           <!-- 默认只呈现当前风格，避免八个选项把设置页拉得过长。 -->
@@ -123,95 +124,161 @@
           </view>
         </view>
 
-        <!-- ========== 纳甲法设置 ========== -->
-        <view class="setting-card">
-          <view class="card-title">
-            <text class="card-icon">☯</text>
-            <text>纳甲法设置</text>
+        <!-- ========== 特殊取穴（原纳甲法设置） ========== -->
+        <view class="setting-card" :class="{ 'card-collapsed': !najiaExpanded }">
+          <view class="card-title card-title-collapsible" @tap="najiaExpanded = !najiaExpanded">
+            <view class="card-title-left">
+              <text class="card-icon">☯</text>
+              <text>特殊取穴</text>
+            </view>
+            <view class="caret-expand" :class="{ expanded: najiaExpanded }">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><polyline points="88 112 128 152 168 112" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
+            </view>
           </view>
-          <view class="setting-row">
-            <view class="setting-copy">
-              <text class="setting-label">反克法</text>
-              <text class="setting-hint">开启后将会显示反克法取穴（如有）</text>
+          <text class="card-desc">调整纳甲法的特殊取穴方法</text>
+          <view v-if="najiaExpanded">
+            <view class="setting-row">
+              <view class="setting-copy">
+                <text class="setting-label">反克法</text>
+                <text class="setting-hint">开启后将会显示反克法取穴（如有）</text>
+              </view>
+              <view
+                v-if="store.activeUiStyle === 'ink'"
+                class="ink-switch"
+                :class="{ active: store.showFanke }"
+                @tap="onFankeToggle({ detail: { value: !store.showFanke } })"
+              >
+                <view class="ink-switch-track"></view>
+                <view class="ink-switch-knob"></view>
+              </view>
+              <switch
+                v-else
+                :checked="store.showFanke"
+                @change="onFankeToggle"
+                :color="store.themeSwitchColor"
+              />
             </view>
-            <view
-              v-if="store.activeUiStyle === 'ink'"
-              class="ink-switch"
-              :class="{ active: store.showFanke }"
-              @tap="onFankeToggle({ detail: { value: !store.showFanke } })"
-            >
-              <view class="ink-switch-track"></view>
-              <view class="ink-switch-knob"></view>
+            <!-- 默认关闭，只在纳甲法闭穴时补充合日穴位，不改变原始纳甲结果。 -->
+            <view class="setting-row no-border">
+              <view class="setting-copy">
+                <text class="setting-label">合日互用</text>
+                <text class="setting-hint">开启后将会显示合日互用取穴（如有）</text>
+              </view>
+              <view
+                v-if="store.activeUiStyle === 'ink'"
+                class="ink-switch"
+                :class="{ active: store.useHeRiHuYong }"
+                @tap="onHeRiHuYongToggle({ detail: { value: !store.useHeRiHuYong } })"
+              >
+                <view class="ink-switch-track"></view>
+                <view class="ink-switch-knob"></view>
+              </view>
+              <switch
+                v-else
+                :checked="store.useHeRiHuYong"
+                @change="onHeRiHuYongToggle"
+                :color="store.themeSwitchColor"
+              />
             </view>
-            <switch
-              v-else
-              :checked="store.showFanke"
-              @change="onFankeToggle"
-              :color="store.themeSwitchColor"
-            />
-          </view>
-          <!-- 默认关闭，只在纳甲法闭穴时补充合日穴位，不改变原始纳甲结果。 -->
-          <view class="setting-row no-border">
-            <view class="setting-copy">
-              <text class="setting-label">合日互用</text>
-              <text class="setting-hint">开启后将会显示合日互用取穴（如有）</text>
-            </view>
-            <view
-              v-if="store.activeUiStyle === 'ink'"
-              class="ink-switch"
-              :class="{ active: store.useHeRiHuYong }"
-              @tap="onHeRiHuYongToggle({ detail: { value: !store.useHeRiHuYong } })"
-            >
-              <view class="ink-switch-track"></view>
-              <view class="ink-switch-knob"></view>
-            </view>
-            <switch
-              v-else
-              :checked="store.useHeRiHuYong"
-              @change="onHeRiHuYongToggle"
-              :color="store.themeSwitchColor"
-            />
           </view>
         </view>
 
-        <!-- ========== 穴位编码显示 ========== -->
-        <view class="setting-card">
-          <view class="setting-row">
-            <view class="setting-copy">
-              <text class="setting-label">穴位编码</text>
-              <text class="setting-hint">开启后将显示穴位编码</text>
+        <!-- ========== 个性化 ========== -->
+        <view class="setting-card" :class="{ 'card-collapsed': !personalExpanded }">
+          <view class="card-title card-title-collapsible" @tap="personalExpanded = !personalExpanded">
+            <view class="card-title-left">
+              <view class="card-icon-svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><circle cx="128" cy="128" r="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path d="M130.05,206.11c-1.34,0-2.69,0-4,0L94,224a104.61,104.61,0,0,1-34.11-19.2l-.12-36c-.71-1.12-1.38-2.25-2-3.41L25.9,147.24a99.15,99.15,0,0,1,0-38.46l31.84-18.1c.65-1.15,1.32-2.29,2-3.41l.16-36A104.58,104.58,0,0,1,94,32l32,17.89c1.34,0,2.69,0,4,0L162,32a104.61,104.61,0,0,1,34.11,19.2l.12,36c.71,1.12,1.38,2.25,2,3.41l31.85,18.14a99.15,99.15,0,0,1,0,38.46l-31.84,18.1c-.65,1.15-1.32,2.29-2,3.41l-.16,36A104.58,104.58,0,0,1,162,224Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg></view>
+              <text>个性化</text>
             </view>
-            <view
-              v-if="store.activeUiStyle === 'ink'"
-              class="ink-switch"
-              :class="{ active: store.showPointCode }"
-              @tap="onPointCodeToggle({ detail: { value: !store.showPointCode } })"
-            >
-              <view class="ink-switch-track"></view>
-              <view class="ink-switch-knob"></view>
+            <view class="caret-expand" :class="{ expanded: personalExpanded }">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><polyline points="88 112 128 152 168 112" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
             </view>
-            <switch
-              v-else
-              :checked="store.showPointCode"
-              @change="onPointCodeToggle"
-              :color="store.themeSwitchColor"
-            />
+          </view>
+          <text class="card-desc">调整个性化体验和观感</text>
+          <view v-if="personalExpanded">
+            <view class="setting-row">
+              <view class="setting-copy">
+                <text class="setting-label">干支历法</text>
+                <text class="setting-hint">开启后将显示干支历法（四柱八字）</text>
+              </view>
+              <view
+                v-if="store.activeUiStyle === 'ink'"
+                class="ink-switch"
+                :class="{ active: store.showGanZhi }"
+                @tap="onGanZhiToggle({ detail: { value: !store.showGanZhi } })"
+              >
+                <view class="ink-switch-track"></view>
+                <view class="ink-switch-knob"></view>
+              </view>
+              <switch
+                v-else
+                :checked="store.showGanZhi"
+                @change="onGanZhiToggle"
+                :color="store.themeSwitchColor"
+              />
+            </view>
+            <view class="setting-row">
+              <view class="setting-copy">
+                <text class="setting-label">穴位编码</text>
+                <text class="setting-hint">开启后将显示穴位编码</text>
+              </view>
+              <view
+                v-if="store.activeUiStyle === 'ink'"
+                class="ink-switch"
+                :class="{ active: store.showPointCode }"
+                @tap="onPointCodeToggle({ detail: { value: !store.showPointCode } })"
+              >
+                <view class="ink-switch-track"></view>
+                <view class="ink-switch-knob"></view>
+              </view>
+              <switch
+                v-else
+                :checked="store.showPointCode"
+                @change="onPointCodeToggle"
+                :color="store.themeSwitchColor"
+              />
+            </view>
+            <view class="setting-row no-border">
+              <view class="setting-copy">
+                <text class="setting-label">五行属性</text>
+                <text class="setting-hint">开启后将显示穴位的五行属性</text>
+              </view>
+              <view
+                v-if="store.activeUiStyle === 'ink'"
+                class="ink-switch"
+                :class="{ active: store.showWuXing }"
+                @tap="onWuXingToggle({ detail: { value: !store.showWuXing } })"
+              >
+                <view class="ink-switch-track"></view>
+                <view class="ink-switch-knob"></view>
+              </view>
+              <switch
+                v-else
+                :checked="store.showWuXing"
+                @change="onWuXingToggle"
+                :color="store.themeSwitchColor"
+              />
+            </view>
           </view>
         </view>
 
         <!-- ========== 取穴方法说明入口 ========== -->
-        <view class="setting-card" @tap="goMethods">
+        <view class="setting-card card-compact" @tap="goMethods">
           <view class="setting-row">
             <text class="setting-label">取穴方法说明</text>
-            <text class="picker-arrow">▶</text>
+            <view class="picker-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><polyline points="112 88 152 128 112 168" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
+            </view>
           </view>
         </view>
 
         <!-- ========== 关于入口 ========== -->
-        <view class="setting-card" @tap="goAbout">
+        <view class="setting-card card-compact" @tap="goAbout">
           <view class="setting-row">
             <text class="setting-label">关于</text>
-            <text class="picker-arrow">▶</text>
+            <view class="picker-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><polyline points="112 88 152 128 112 168" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
+            </view>
           </view>
         </view>
 
@@ -326,6 +393,8 @@ const showMethods = ref(false)
 const showAbout = ref(false)
 const appearanceExpanded = ref(false)
 const classicThemesExpanded = ref(false)
+const najiaExpanded = ref(false)
+const personalExpanded = ref(false)
 const themeTransitionVisible = ref(false)
 const themeTransitionClosing = ref(false)
 const themeTransitionKind = ref('animal')
@@ -404,9 +473,18 @@ function onHeRiHuYongToggle(e) {
 }
 
 /** 穴位编码显示开关；状态持久化后同时作用于列表和详情标题。 */
-function onPointCodeToggle(e) {
-  store.togglePointCode(e.detail.value)
-}
+  function onPointCodeToggle(e) {
+    store.togglePointCode(e.detail.value)
+  }
+
+  function onGanZhiToggle(e) {
+    store.toggleGanZhi(e.detail.value)
+  }
+
+  /** 五行属性显示开关；状态持久化后同时作用于取穴列表与穴位详情。 */
+  function onWuXingToggle(e) {
+    store.toggleWuXing(e.detail.value)
+  }
 
 /** 选择外观后立即收起列表，让用户清楚看到当前生效项。 */
 function selectAppearance(optionId) {
@@ -524,6 +602,143 @@ onBackPress(() => {
 
 .card-icon {
   font-size: $font-size-lg;
+  line-height: 1;
+  width: 40rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+// 内联矢量图标容器（替换 emoji 符号）：跟随卡片标题主题色，垂直居中
+.card-icon-svg {
+  width: 40rpx;
+  height: 40rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.svg-icon {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card-title-collapsible {
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.card-title-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.card-desc {
+  display: block;
+  font-size: $font-size-xs;
+  color: $tcm-text-hint;
+  line-height: 1.5;
+  margin-top: -20rpx;
+  margin-bottom: 28rpx;
+  padding-left: 58rpx;
+}
+
+// 真太阳时校正标题下方的说明小字
+.solar-desc {
+  display: block;
+  font-size: $font-size-xs;
+  color: $tcm-text-hint;
+  line-height: 1.5;
+  margin-top: -16rpx;
+  margin-bottom: 14rpx;
+  padding-left: 58rpx;
+}
+
+// 真太阳时校正区域等比缩小（仅间距/图标/控件等比，字号保持原样），仅作用于本卡片内部
+.solar-card {
+  padding: 30rpx;
+
+  .card-title {
+    gap: 14rpx;
+    margin-bottom: 26rpx;
+  }
+
+  .card-icon-svg {
+    width: 32rpx;
+    height: 32rpx;
+  }
+
+  .solar-desc {
+    margin-top: -13rpx;
+    margin-bottom: 12rpx;
+    padding-left: 52rpx;
+  }
+
+  .setting-row {
+    padding: 20rpx 0 12rpx;
+  }
+
+  .city-picker-btn {
+    padding: 8rpx 20rpx;
+    gap: 6rpx;
+    border-radius: 14rpx;
+  }
+
+  // 行内控件与左侧文字垂直中线对齐，修正开关/图标偏上（跨端通用）
+  switch,
+  .ink-switch,
+  .city-picker-btn,
+  .setting-value {
+    vertical-align: middle;
+  }
+
+  // 开关等比缩小（右侧对齐，缩放后位置不变）
+  switch,
+  .ink-switch {
+    align-self: center;
+    vertical-align: middle;
+    transform: scale(0.82);
+    transform-origin: right center;
+  }
+
+  // H5 下原生 switch 内部包裹层基线对齐
+  uni-switch,
+  .uni-switch-wrapper {
+    vertical-align: middle;
+  }
+}
+
+// 折叠态：压缩成与「取穴方法说明」类似的紧凑单行入口（仅标题 + 展开箭头）
+.card-collapsed {
+  .card-title {
+    margin-bottom: 0;
+  }
+
+  .card-desc {
+    display: none;
+  }
+}
+
+// 取穴方法说明 / 关于：内部行清零上下内边距，与折叠态卡片等高的紧凑单行入口
+.card-compact {
+  .setting-row {
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .setting-label {
+    font-size: $font-size-base;
+  }
+
+  // 右侧导航箭头改用 caret-circle-right 内联 SVG；限定在本卡片内，不影响真太阳时城市选择器的文本箭头
+  .picker-arrow {
+    width: 36rpx;
+    height: 36rpx;
+    font-size: 0;
+  }
 }
 
 .setting-row {
@@ -737,8 +952,7 @@ onBackPress(() => {
 }
 
 .classic-theme-option {
-  padding-top: 20rpx;
-  padding-bottom: 20rpx;
+  padding: 16rpx 24rpx;
 }
 
 .ui-style-option {
@@ -772,12 +986,31 @@ onBackPress(() => {
 
 .ui-style-current {
   cursor: pointer;
+  padding: 42rpx;
+
+  .ui-style-name {
+    font-size: $font-size-md;
+  }
 }
 
 .appearance-expand-icon {
   flex-shrink: 0;
   font-size: 34rpx;
   line-height: 1;
+  color: var(--theme-primary);
+  transform: rotate(0deg);
+  transition: transform 0.22s ease;
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+// 折叠卡片展开图标（替换原 ⌄ 文本，flex 垂直居中的圆形箭头，展开时旋转 180° 指向上）
+.caret-expand {
+  flex-shrink: 0;
+  width: 40rpx;
+  height: 40rpx;
   color: var(--theme-primary);
   transform: rotate(0deg);
   transition: transform 0.22s ease;

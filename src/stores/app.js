@@ -228,6 +228,10 @@ export const useAppStore = defineStore('app', () => {
   const useHeRiHuYong = ref(false)
   // 穴位编码默认显示；关闭后各主题使用独立的中文名排版。
   const showPointCode = ref(true)
+  // 干支历法（四柱八字）默认关闭；开启后取穴界面当前时间面板显示年/月/日/时干支，关闭则仅显示公历。
+  const showGanZhi = ref(false)
+  // 五行属性默认开启；关闭后取穴界面与穴位详情不再显示穴位的五行属性。
+  const showWuXing = ref(true)
 
   // === 计算属性 ===
 
@@ -421,6 +425,15 @@ export const useAppStore = defineStore('app', () => {
     showPointCode.value = Boolean(enabled)
   }
 
+  function toggleGanZhi(enabled) {
+    showGanZhi.value = Boolean(enabled)
+  }
+
+  /** 五行属性显示开关；状态持久化后同时作用于取穴列表与穴位详情。 */
+  function toggleWuXing(enabled) {
+    showWuXing.value = Boolean(enabled)
+  }
+
   /**
    * 控制纳甲法闭穴时是否启用合日互用。
    * 该状态参与 results 计算依赖，切换后无需手动刷新，纳甲结果会立即重新计算。
@@ -533,6 +546,8 @@ export const useAppStore = defineStore('app', () => {
     showFanke,
     useHeRiHuYong,
     showPointCode,
+    showGanZhi,
+    showWuXing,
     // Getters
     currentResults,
     currentGanZhi,
@@ -551,6 +566,8 @@ export const useAppStore = defineStore('app', () => {
     setNaziMode,
     toggleHeRiHuYong,
     togglePointCode,
+    toggleGanZhi,
+    toggleWuXing,
     setTheme,
     setUiStyle,
     setAppearance,
@@ -579,7 +596,7 @@ export const useAppStore = defineStore('app', () => {
             }
           }
         },
-        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'useHeRiHuYong', 'showPointCode', 'theme', 'uiStyle']
+        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'useHeRiHuYong', 'showPointCode', 'showGanZhi', 'showWuXing', 'theme', 'uiStyle']
       }
     ]
   }

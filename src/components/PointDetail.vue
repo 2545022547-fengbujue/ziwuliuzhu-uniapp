@@ -44,16 +44,16 @@
             <view class="title-dot"></view>
             <text>基本信息</text>
           </view>
-          <view class="info-grid" :class="{ 'info-grid-center': !point?.wuxing, 'info-grid-meridian-long': isMeridianLong }">
+          <view class="info-grid" :class="{ 'info-grid-center': (!point?.wuxing || !store.showWuXing), 'info-grid-meridian-long': isMeridianLong }">
             <view class="info-item">
               <text class="info-label">所属经络</text>
-              <text class="info-value info-value-center">{{ point?.meridian || '-' }}</text>
+              <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing }">{{ point?.meridian || '-' }}</text>
             </view>
             <view class="info-item">
               <text class="info-label">穴位类别</text>
-              <text class="info-value info-value-center">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
+              <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing }">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
             </view>
-            <view v-if="point?.wuxing" class="info-item">
+            <view v-if="point?.wuxing && store.showWuXing" class="info-item">
               <text class="info-label">五行属性</text>
               <text class="info-value info-value-center wuxing-value" :class="{ 'wuxing-value-large': isCategoryLong }" :style="{ color: getWuxingColor(point?.wuxing) }">
                 {{ point.wuxing }}
@@ -226,7 +226,7 @@ const isCategoryLong = computed(() => {
 // 经络名是否为6字且有五行属性（此时经络框变宽，五行框变窄）
 const isMeridianLong = computed(() => {
   const meridian = point.value?.meridian || ''
-  return meridian.length === 6 && point.value?.wuxing
+  return meridian.length === 6 && point.value?.wuxing && store.showWuXing
 })
 
 /**
@@ -563,6 +563,11 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .info-value-center {
   text-align: center;
+}
+
+// 所属经络 / 穴位类别的值字号放大
+.info-value-lg {
+  font-size: 36rpx;
 }
 
 .wuxing-value {

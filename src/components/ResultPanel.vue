@@ -11,7 +11,7 @@
     <!-- 面板内容 -->
     <view class="panel-body">
       <!-- 日期时辰信息（干支时间） -->
-      <view class="result-ganzhi-row">
+      <view v-if="store.showGanZhi" class="result-ganzhi-row">
         <text v-if="result?.date" class="result-ganzhi-date">{{ result.date }}</text>
         <view v-if="result?.hourGanZhi" class="result-ganzhi-hour-wrap">
           <text class="result-ganzhi-hour-label">时辰：</text>
@@ -38,12 +38,12 @@
             v-for="point in result.alternativePoints.openPoints"
             :key="'alt-' + point.code"
             class="point-btn"
-            :class="{ 'point-btn-code-hidden': !store.showPointCode }"
+            :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
             @tap="handlePointClick(point)"
           >
             <text class="point-name">{{ point.name }}</text>
             <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
-            <view v-if="point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
+            <view v-if="store.showWuXing && point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
               <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
             </view>
           </view>
@@ -80,12 +80,12 @@
             v-for="bp in bumuPoints"
             :key="'bumu-' + bp.point.code"
             class="point-btn"
-            :class="{ 'point-btn-code-hidden': !store.showPointCode }"
+            :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
             @tap="handlePointClick(bp.point)"
           >
             <text class="point-name">{{ bp.point.name }}</text>
             <text v-if="store.showPointCode" class="point-code">{{ bp.point.code }}</text>
-            <view v-if="bp.point.wuxing" class="wuxing-tag" :style="getWuxingStyle(bp.point.wuxing)">
+            <view v-if="store.showWuXing && bp.point.wuxing" class="wuxing-tag" :style="getWuxingStyle(bp.point.wuxing)">
               <text class="wuxing-text" :style="{ color: getWuxingColor(bp.point.wuxing) }">{{ bp.point.wuxing }}</text>
             </view>
           </view>
@@ -103,12 +103,12 @@
             v-for="point in displayPoints"
             :key="'open-' + point.code"
             class="point-btn"
-            :class="{ 'point-btn-code-hidden': !store.showPointCode }"
+            :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
             @tap="handlePointClick(point)"
           >
             <text class="point-name">{{ point.name }}</text>
             <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
-            <view v-if="point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
+            <view v-if="store.showWuXing && point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
               <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
             </view>
           </view>
@@ -434,6 +434,16 @@ function handlePointClick(point) {
   font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
   line-height: 1.2;
   white-space: nowrap;
+}
+
+// 不显示穴位编码时，给穴位名更多空间，字号增大一点点
+.point-btn.point-btn-code-hidden .point-name {
+  font-size: 30rpx;
+}
+
+// 不显示五行属性时，同样给穴位名更多空间，字号增大一点点
+.point-btn.point-btn-wuxing-hidden .point-name {
+  font-size: 34rpx;
 }
 
 .point-code {
