@@ -139,7 +139,7 @@ def main() -> None:
             kaiti_characters,
         ),
         (
-            Path(r"<HOME_DIR>\LXGWZhenKaiSlabGB-Regular.ttf"),
+            args.source_dir / "LXGWZhenKaiSlabGB-Regular.ttf",
             FONT_DIR / "LXGWZhenKaiSlabGB-subset.ttf",
             "LXGW ZhenKai Slab GB",
             characters,
