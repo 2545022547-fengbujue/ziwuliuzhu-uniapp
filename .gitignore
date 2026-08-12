@@ -36,6 +36,7 @@ CHANGELOG.md
 # Local source material and full font archives
 /水墨风格原始素材/
 /用到的完整字体/
+src/assets/fonts/_sources/
 
 # 设计文档仅留本地（不推 GitHub）
 子午流注uniapp-UI结构说明.md
