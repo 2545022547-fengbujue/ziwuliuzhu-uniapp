@@ -11,7 +11,9 @@
     "build:app": "uni build -p app",
     "build:mp-weixin": "npm run fonts:base64 && uni build -p mp-weixin",
     "fonts:base64": "node scripts/sync-font-base64.js",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "test": "node scripts/run-validation.cjs",
+    "fonts:verify": "python scripts/verify-font-subsets.py"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-alpha-5020320260803001",
