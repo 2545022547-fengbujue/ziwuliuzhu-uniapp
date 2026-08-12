@@ -72,8 +72,18 @@ def collect_characters() -> str:
     return "".join(sorted(chars, key=ord))
 
 
-def subset_font(source: Path, destination: Path, characters: str) -> tuple[int, int]:
+def subset_font(
+    source: Path,
+    destination: Path,
+    characters: str,
+    drop_tables: tuple[str, ...] = (),
+) -> tuple[int, int]:
     font = TTFont(source)
+    # 个别第三方字体的 hinting 表（如 gasp）格式不规范，fontTools 裁剪时
+    # 无法反编译；这类表对 H5/App 渲染无影响，按需删除。
+    for tag in drop_tables:
+        if tag in font:
+            del font[tag]
     before = len(font.getBestCmap())
 
     options = subset.Options()
@@ -144,13 +154,25 @@ def main() -> None:
             "LXGW ZhenKai Slab GB",
             characters,
         ),
+        # 衡山毛笔行书（内部名 KouzanBrushFontGyousyo）：水墨风格展示字体。
+        # 日文行书字体，部分简化字无字形，缺失字符由 CSS 回退到 LXGW 真楷。
+        # 其 gasp 表数据长度异常，裁剪前删除，避免 fontTools 反编译失败。
+        (
+            args.source_dir / "KouzanBrushGyousyo.ttf",
+            FONT_DIR / "hengshan-brush-subset.ttf",
+            "衡山毛笔行书",
+            characters,
+            ("gasp",),
+        ),
     ]
 
     print(f"项目字符集：{len(characters)} 个字符")
-    for source, destination, label, job_characters in jobs:
+    for job in jobs:
+        source, destination, label, job_characters = job[:4]
+        drop_tables = job[4] if len(job) > 4 else ()
         if not source.exists():
             raise FileNotFoundError(f"缺少完整源字体：{source}")
-        before, after = subset_font(source, destination, job_characters)
+        before, after = subset_font(source, destination, job_characters, drop_tables)
         print(
             f"{label}: 源字体 {before} 字符 -> 子集 {after} 字符，"
             f"输出 {destination.stat().st_size} bytes"

@@ -65,6 +65,16 @@
   font-style: normal;
   font-display: swap;
 }
+/* 水墨风主展示字体：衡山毛笔行书（内部名 KouzanBrushFontGyousyo） */
+/* 日文行书字体，部分简化字（如 经、针、纳、龟、飞腾、纸）无字形，由 font-family 链回退 LXGW */
+/* 仅 H5/App 打包；微信小程序不加载，自动回退已加载的 LXGW，避免主包体积膨胀 */
+@font-face {
+  font-family: 'HengshanBrush';
+  src: url('@/assets/fonts/hengshan-brush-subset.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 /* #endif */
 /* 微信小程序：在 font-loader.js 中用 uni.loadFontFace + 生成的 base64 模块动态加载 */
 
