@@ -154,15 +154,14 @@ def main() -> None:
             "LXGW ZhenKai Slab GB",
             characters,
         ),
-        # 衡山毛笔行书（内部名 KouzanBrushFontGyousyo）：水墨风格展示字体。
-        # 日文行书字体，部分简化字无字形，缺失字符由 CSS 回退到 LXGW 真楷。
-        # 其 gasp 表数据长度异常，裁剪前删除，避免 fontTools 反编译失败。
+        # 敦煌飞天行楷（内部名 AaDHFT XKT）：水墨风格展示字体。
+        # 覆盖全部 1364 个项目汉字，仅 emoji/装饰符号按设计回退系统字体。
+        # 注意：字体标注 Non-Commercial Use，仅限非商业用途。
         (
-            args.source_dir / "KouzanBrushGyousyo.ttf",
-            FONT_DIR / "hengshan-brush-subset.ttf",
-            "衡山毛笔行书",
+            args.source_dir / "AaDunHuangFeiTian-XKT.ttf",
+            FONT_DIR / "dunhuang-xingkai-subset.ttf",
+            "敦煌飞天行楷",
             characters,
-            ("gasp",),
         ),
     ]
 

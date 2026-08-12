@@ -207,7 +207,7 @@ defineProps({
   z-index: 2;
   color: #F8F6EF;
   font-size: 66rpx;
-  font-family: 'HengshanBrush', 'LXGWZhenKaiSlabGB', 'KaitiGB2312', serif;
+  font-family: 'DunhuangXingKai', 'LXGWZhenKaiSlabGB', 'KaitiGB2312', serif;
 }
 .ink-ring {
   position: absolute;
@@ -238,7 +238,7 @@ defineProps({
   left: 0;
   right: 0;
   text-align: center;
-  font-family: 'HengshanBrush', 'LXGWZhenKaiSlabGB', 'KaitiGB2312', serif;
+  font-family: 'DunhuangXingKai', 'LXGWZhenKaiSlabGB', 'KaitiGB2312', serif;
 }
 .ink-transition-title { top: calc(50% + 162rpx); color: #202728; font-size: 42rpx; letter-spacing: 12rpx; }
 .ink-transition-subtitle { top: calc(50% + 226rpx); color: #737A76; font-size: 24rpx; letter-spacing: 4rpx; }

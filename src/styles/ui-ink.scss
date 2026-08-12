@@ -19,9 +19,9 @@ $ink-text: #2B2B2B;
 $ink-text-secondary: #4F5654;
 $ink-text-hint: #737A76;
 $ink-border: rgba(43, 43, 43, 0.16);
-// 水墨主展示字体：衡山毛笔行书优先；其为日文行书字体，缺字形（经、针、纳、龟等简化字）
-// 逐字回退 LXGW 真楷，保证可读；再往后依次是内置楷体、文渊宋体和系统楷体。
-$ink-kaiti: 'HengshanBrush', 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif;
+// 水墨主展示字体：敦煌飞天行楷优先，项目汉字全覆盖；仅 emoji/装饰符号继续回退，
+// 其后依次是 LXGW 真楷、内置楷体、文渊宋体和系统楷体兜底。
+$ink-kaiti: 'DunhuangXingKai', 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif;
 $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .ui-ink {

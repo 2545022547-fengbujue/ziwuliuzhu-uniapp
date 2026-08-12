@@ -9,9 +9,9 @@ from fontTools.ttLib import TTFont
 ROOT = Path(__file__).resolve().parents[1]
 FONT_DIR = ROOT / "src" / "assets" / "fonts"
 REQUIRED_TEXTS = ("莫兰迪奶油", "动物森友会", "复古像素", "双狸迎宾，悠闲岛屿生活", "掌机像素，怀旧冒险")
-# 衡山毛笔行书仅用于 H5/App 水墨展示字体，小程序不打包，故只校验 TTF 与关键文案覆盖。
-INK_REQUIRED_TEXTS = ("水墨意境", "墨色入境", "子午流注", "合日互用")
-APP_ONLY_FONT_JOBS = (("hengshan-brush-subset.ttf", "衡山毛笔行书"),)
+# 敦煌飞天行楷仅用于 H5/App 水墨展示字体，小程序不打包，故只校验 TTF 与关键文案覆盖。
+INK_REQUIRED_TEXTS = ("水墨意境", "墨色入境", "子午流注", "合日互用", "灵龟八法", "飞腾八法", "纳甲法", "经络", "关冲", "真太阳时", "穴位详情")
+APP_ONLY_FONT_JOBS = (("dunhuang-xingkai-subset.ttf", "敦煌飞天行楷"),)
 FONT_JOBS = (("kaiti-gb2312.ttf", "kaiti-gb2312-base64.txt"), ("wenjinmincho-subset-v6.ttf", "wenjinmincho-subset-v6-base64.txt"), ("WenYuanSerifSC-Bold-subset-v2.ttf", "bold-v2-base64.txt"), ("LXGWZhenKaiSlabGB-subset.ttf", "lxgw-zhenkai-slab-base64.txt"))
 def load_builder():
     spec = importlib.util.spec_from_file_location("font_builder", ROOT / "scripts" / "build-font-subsets.py")

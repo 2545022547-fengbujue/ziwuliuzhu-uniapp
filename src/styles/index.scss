@@ -65,12 +65,12 @@
   font-style: normal;
   font-display: swap;
 }
-/* 水墨风主展示字体：衡山毛笔行书（内部名 KouzanBrushFontGyousyo） */
-/* 日文行书字体，部分简化字（如 经、针、纳、龟、飞腾、纸）无字形，由 font-family 链回退 LXGW */
-/* 仅 H5/App 打包；微信小程序不加载，自动回退已加载的 LXGW，避免主包体积膨胀 */
+/* 水墨风主展示字体：敦煌飞天行楷（内部名 AaDHFT XKT，Non-Commercial Use） */
+/* 项目 1394 字符中覆盖全部 1364 个汉字；缺失的 emoji/装饰符号按设计回退系统字体 */
+/* 仅 H5/App 打包；微信小程序不加载，自动回退已加载的 LXGW */
 @font-face {
-  font-family: 'HengshanBrush';
-  src: url('@/assets/fonts/hengshan-brush-subset.ttf') format('truetype');
+  font-family: 'DunhuangXingKai';
+  src: url('@/assets/fonts/dunhuang-xingkai-subset.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
