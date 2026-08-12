@@ -39,3 +39,6 @@ CHANGELOG.md
 
 # 设计文档仅留本地（不推 GitHub）
 子午流注uniapp-UI结构说明.md
+
+# Python 脚本缓存
+__pycache__/
