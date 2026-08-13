@@ -12,7 +12,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import { reactive } from 'vue'
+import { reactive, defineComponent, h, provide } from 'vue'
 
 const uniLifecycle = vi.hoisted(() => ({ onShowCbs: [], onHideCbs: [], onBackPressCbs: [] }))
 vi.mock('@dcloudio/uni-app', () => ({
@@ -61,11 +61,38 @@ beforeEach(() => {
   uniLifecycle.onBackPressCbs.length = 0
 })
 
+// uni-app 内置组件在 happy-dom 下无注册实现，声明为自定义元素避免解析警告
+const UNI_TAGS = ['scroll-view', 'switch', 'image', 'text', 'view', 'input', 'button', 'canvas', 'video']
+
+/**
+ * 主题组件全链挂载：
+ * - 用包装组件在 setup() 内调用 composable 并 provide —— 保证生命周期钩子
+ *   （vue 的 onMounted/onUnmounted）注册在真实组件实例上下文，避免
+ *   "no active component instance" 警告与回调丢失。
+ * - 挂载目标为主题组件（薄壳），其公共布局 HomeLayout/SettingLayout
+ *   通过 useHome()/useSetting() 继承该注入。
+ */
+function mountTheme(Comp, provideKey, useFn) {
+  const Provide = defineComponent({
+    setup() {
+      provide(provideKey, reactive(useFn()))
+      return () => h(Comp)
+    }
+  })
+  return mount(Provide, {
+    global: {
+      config: {
+        compilerOptions: {
+          isCustomElement: (tag) => UNI_TAGS.includes(tag)
+        }
+      }
+    }
+  })
+}
+
 describe('首页主题组件可渲染冒烟（provide("home") 契约）', () => {
   it.each(HOME_COMPONENTS)('%s 首页全链渲染出干支卡片', (_name, Comp) => {
-    const wrapper = mount(Comp, {
-      global: { provide: { home: reactive(useHomePage()) } }
-    })
+    const wrapper = mountTheme(Comp, 'home', useHomePage)
     expect(wrapper.find('.ganzhi-card').exists()).toBe(true)
     wrapper.unmount()
   })
@@ -73,9 +100,7 @@ describe('首页主题组件可渲染冒烟（provide("home") 契约）', () => 
 
 describe('设置页主题组件可渲染冒烟（provide("setting") 契约）', () => {
   it.each(SETTING_COMPONENTS)('%s 设置页全链渲染出设置卡片', (_name, Comp) => {
-    const wrapper = mount(Comp, {
-      global: { provide: { setting: reactive(useSettingPage()) } }
-    })
+    const wrapper = mountTheme(Comp, 'setting', useSettingPage)
     expect(wrapper.find('.setting-card').exists()).toBe(true)
     wrapper.unmount()
   })

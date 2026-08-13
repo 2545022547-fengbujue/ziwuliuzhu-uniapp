@@ -24,8 +24,18 @@ import { fileURLToPath } from 'node:url'
 
 const dir = path.dirname(fileURLToPath(import.meta.url))
 
+// uni-app 内置组件在单测环境无注册实现；编译期声明为自定义元素，
+// 消除 SFC 预编译时 "Failed to resolve component: scroll-view" 等警告。
+const UNI_TAGS = new Set(['scroll-view', 'switch', 'image', 'text', 'view', 'input', 'button', 'canvas', 'video'])
+
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue({
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => UNI_TAGS.has(tag)
+      }
+    }
+  })],
   resolve: {
     alias: {
       '@': path.resolve(dir, 'src')
