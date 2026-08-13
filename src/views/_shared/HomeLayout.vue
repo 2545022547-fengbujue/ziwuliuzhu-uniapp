@@ -196,8 +196,10 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { useHome } from '@/composables/useHomePage.js'
 import { useRootClasses } from '@/composables/useRootClasses.js'
+import { mark, measure } from '@/utils/perf.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
@@ -210,6 +212,12 @@ const home = useHome()
 // 主题根 class 自动推导（classic → theme-*，其它 → ui-*，ink 补 ink-bg-*），
 // 规则唯一来源见 useRootClasses.js
 const rootClasses = useRootClasses()
+
+// 挂载终点打点：切完主题回首页时量化首页主题渲染耗时（与 'theme-switch:start' 配对）
+onMounted(() => {
+  mark('theme-home:mounted')
+  measure('theme-switch:start', 'theme-home:mounted', `首页主题渲染 → ${home.store.activeUiStyle}`)
+})
 </script>
 
 <style lang="scss" scoped>

@@ -296,8 +296,10 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { useSetting } from '@/composables/useSettingPage.js'
 import { useRootClasses } from '@/composables/useRootClasses.js'
+import { mark, measure } from '@/utils/perf.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import CityPicker from '@/components/CityPicker.vue'
 import ThemeTransitionOverlay from '@/components/ThemeTransitionOverlay.vue'
@@ -309,6 +311,13 @@ const setting = useSetting()
 // 主题根 class 自动推导（classic → theme-*，其它 → ui-*，ink 补 ink-bg-*），
 // 与 HomeLayout 共用同一实现，规则唯一来源见 useRootClasses.js
 const rootClasses = useRootClasses()
+
+// 挂载终点打点：与 useSettingPage.selectAppearance 的 'theme-switch:start' 配对，
+// 汇总「切换命令 → 新主题 Layout 挂载完成」总耗时（含异步 chunk 解析/组件树创建/首次渲染）
+onMounted(() => {
+  mark('theme-layout:mounted')
+  measure('theme-switch:start', 'theme-layout:mounted', `设置页主题切换 → ${setting.store.activeUiStyle}`)
+})
 </script>
 
 <style lang="scss" scoped>

@@ -2,6 +2,7 @@
 import { onShow, onHide, onBackPress } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
+import { mark } from '@/utils/perf.js'
 import manifest from '@/manifest.json'
 import { METHOD_DESCS } from '@/data/constants.js'
 
@@ -126,6 +127,8 @@ export function useSettingPage() {
   /** 选择外观后立即收起列表，让用户清楚看到当前生效项。 */
   function selectAppearance(optionId) {
     appearanceExpanded.value = false
+    // 切换起点打点：终点在 SettingLayout onMounted（measure 'theme-switch:start' → 'theme-layout:mounted'）
+    mark('theme-switch:start')
 
     const targetStyle = optionId.startsWith('style-') ? optionId.slice(6) : ''
     const needsTransition = targetStyle === 'animal' || targetStyle === 'ink'
