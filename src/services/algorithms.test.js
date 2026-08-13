@@ -66,6 +66,63 @@ describe('灵龟八法（黄金值）', () => {
     expect(r.palace.actualPalace).toBe(7)
     expect(pointCodes(r.openPoints)).toEqual(['SI3', 'BL62'])
   })
+
+  // 以下黄金值迁移自 tests/verify-lingui-fix.js（表10-16 丁壬=6/戊癸=5 修复回归用例），
+  // 该脚本已废弃（复制 src 常量表有漂移风险），断言并入本文件的真实实现测试。
+  it('庚子日己卯时：开 GB41+TE5（足临泣+外关）', () => {
+    const gz = makeGanZhi(new Date(2026, 4, 26), 3)
+    expect(pointCodes(calculateLingui(gz, 3).openPoints)).toEqual(['GB41', 'TE5'])
+  })
+
+  it('庚子日乙酉时：开 GB41+TE5（足临泣+外关）', () => {
+    const gz = makeGanZhi(new Date(2026, 4, 26), 9)
+    expect(pointCodes(calculateLingui(gz, 9).openPoints)).toEqual(['GB41', 'TE5'])
+  })
+
+  it('辛丑日甲午时：开 SP4+PC6（公孙+内关）', () => {
+    const gz = makeGanZhi(new Date(2026, 4, 27), 6)
+    expect(pointCodes(calculateLingui(gz, 6).openPoints)).toEqual(['SP4', 'PC6'])
+  })
+})
+
+describe('灵龟八法结构不变量（多日 × 12 时辰）', () => {
+  // 八脉交会穴对集合（code 集合，用于断言开穴必属于交会穴）
+  const PAIR_CODES = new Set(['GB41', 'TE5', 'SP4', 'PC6', 'SI3', 'BL62', 'KI6', 'LU7'])
+
+  // 从 2026-01-01 起取 5 个不同日干日期，覆盖阳/阴日两类
+  const stems = new Set()
+  const dates = []
+  const d = new Date(2026, 0, 1)
+  while (dates.length < 5 && stems.size < 10) {
+    const gz = getGanZhi(d, 116.407, false)
+    if (!stems.has(gz.day.heavenlyStem)) {
+      stems.add(gz.day.heavenlyStem)
+      dates.push(new Date(d))
+    }
+    d.setDate(d.getDate() + 1)
+  }
+
+  it.each(dates.map((date, i) => [`日期${i + 1}: ${date.toISOString().slice(0, 10)}`, date]))(
+    '%s 的 12 时辰：宫位合法、开穴必属八脉交会穴、阳除9/阴除6 自洽',
+    (_label, date) => {
+      for (let h = 0; h < 12; h++) {
+        const gz = makeGanZhi(date, h)
+        const r = calculateLingui(gz, h)
+        const p = r.palace
+        // 宫位 1-9 合法（5 中宫会被转换为 2/8，故实际宫位不含 5）
+        expect(p.actualPalace).toBeGreaterThanOrEqual(1)
+        expect(p.actualPalace).toBeLessThanOrEqual(9)
+        expect(p.actualPalace).not.toBe(5)
+        // 九宫数校验：阳日除9、阴日除6
+        const mod = p.dayYinYang === '阳' ? 9 : 6
+        expect(p.palaceNumber).toBe(p.totalSum % mod === 0 ? mod : p.totalSum % mod)
+        // 开穴必属于八脉交会穴对
+        for (const pt of r.openPoints) {
+          expect(PAIR_CODES.has(pt.code)).toBe(true)
+        }
+      }
+    }
+  )
 })
 
 describe('飞腾八法（黄金值）', () => {

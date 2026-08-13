@@ -161,6 +161,11 @@ export function useSettingPage() {
 
   /** 打开城市选择弹窗（复用 CityPicker 组件） */
   function openCityPicker() {
+    if (!cityPickerRef.value) {
+      // 防御：CityPicker 组件尚未绑定（如 onSolarTimeToggle 的 100ms 延迟窗口内页面被切换）
+      console.warn('[useSettingPage] cityPickerRef 尚未绑定 CityPicker 组件，跳过打开')
+      return
+    }
     cityPickerRef.value.open((cityData) => {
       store.updateLongitude(cityData.longitude, cityData.name)
     })
