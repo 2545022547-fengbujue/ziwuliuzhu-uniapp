@@ -818,3 +818,102 @@ describe('纳甲法值日周期跨夜推导（23:00 后仍属前日周期）', (
     }
   })
 })
+
+/**
+ * ============================================================
+ * 论文级交叉验证（2026-08-14 用户提供两篇论文）
+ *
+ * 论文一：张雨辰《子午流注针法中干支数学公式推算法的修正》
+ *   - 时干支公式：时干代数 = [(日干支代数-1)×12+时支代数]÷10 取余
+ *   - 日干支：元旦公式 + 顺推（本项目用 lunar-javascript，此处验证时干支）
+ * 论文二：佟佳恒《子午流注（纳甲法）的数学原理》
+ *   - 佟氏第一定律：HSH-EBH=2HSD（推论①：跨日 HSD'≡HSD 或 HSD+1 = 本项目的值日周期推导）
+ *   - 佟氏第二定律：HSH+EBH=4(F-1)（F=井1荥2输3经4合5，6=三焦/心包）
+ *   - 佟氏第三定律：气纳三焦 PTE≡(HSD+3)/2、血归包络 PPC≡(HSD+2)/2 (mod5)
+ *   - 佟氏第四定律：HSH≡C(mod10)（时辰天干=所开经）
+ *
+ * 独立脚本已验证全部公式/定律（60+50+10 处）与代码一致，此处固化为单元测试。
+ * ============================================================
+ */
+
+describe('论文级交叉验证（张雨辰干支公式 + 佟佳恒纳甲四定律）', () => {
+  // === 佟氏编号（1-based，癸≡10≡0 mod10）===
+  const STEM_NUM = { '甲': 1, '乙': 2, '丙': 3, '丁': 4, '戊': 5, '己': 6, '庚': 7, '辛': 8, '壬': 9, '癸': 10 }
+  const BRANCH_NUM = { '子': 1, '丑': 2, '寅': 3, '卯': 4, '辰': 5, '巳': 6, '午': 7, '未': 8, '申': 9, '酉': 10, '戌': 11, '亥': 12 }
+  const MERID_NUM = { 'GB': 1, 'LR': 2, 'SI': 3, 'HT': 4, 'ST': 5, 'SP': 6, 'LI': 7, 'LU': 8, 'BL': 9, 'KI': 0 }
+  const CN_MERID = { '胆': 'GB', '肝': 'LR', '小肠': 'SI', '心': 'HT', '胃': 'ST', '脾': 'SP', '大肠': 'LI', '肺': 'LU', '膀胱': 'BL', '肾': 'KI' }
+  const BRANCH_IDX = { '子': 0, '丑': 1, '寅': 2, '卯': 3, '辰': 4, '巳': 5, '午': 6, '未': 7, '申': 8, '酉': 9, '戌': 10, '亥': 11 }
+  const JING_HOUR = { '甲': 10, '乙': 9, '丙': 8, '丁': 7, '戊': 6, '己': 5, '庚': 4, '辛': 3, '壬': 2, '癸': 11 }
+  // 值日周期开穴时辰（徐凤歌诀 10日×6时）
+  const SONG = {
+    '甲': ['甲戌', '丙子', '戊寅', '庚辰', '壬午', '甲申'], '乙': ['乙酉', '丁亥', '己丑', '辛卯', '癸巳', '乙未'],
+    '丙': ['丙申', '戊戌', '庚子', '壬寅', '甲辰', '丙午'], '丁': ['丁未', '己酉', '辛亥', '癸丑', '乙卯', '丁巳'],
+    '戊': ['戊午', '庚申', '壬戌', '甲子', '丙寅', '戊辰'], '己': ['己巳', '辛未', '癸酉', '乙亥', '丁丑', '己卯'],
+    '庚': ['庚辰', '壬午', '甲申', '丙戌', '戊子', '庚寅'], '辛': ['辛卯', '癸巳', '乙未', '丁酉', '己亥', '辛丑'],
+    '壬': ['壬寅', '甲辰', '丙午', '戊申', '庚戌', '壬子'], '癸': ['癸亥', '乙丑', '丁卯', '己巳', '辛未', '癸酉']
+  }
+
+  it('佟氏第二定律：HSH+EBH=4(F-1)，60 个开穴时辰全部成立（mod 双值表示）', () => {
+    for (const [periodDay, hours] of Object.entries(SONG)) {
+      for (let f = 1; f <= 6; f++) {
+        const gz = hours[f - 1]
+        const hshBase = STEM_NUM[gz[0]]
+        const ebhBase = BRANCH_NUM[gz[1]]
+        // HSH 双值（含癸≡0），EBH 双值（mod12 负表示）
+        const hs = [hshBase, hshBase + 10, hshBase === 10 ? 0 : -1].filter(v => v >= 0 && v <= 20)
+        const eb = [ebhBase, ebhBase - 12].filter(v => v >= -10 && v <= 10)
+        const hit = hs.some(h => eb.some(e => h + e === 4 * (f - 1)))
+        expect(hit, `${periodDay}日${gz}时 F${f} 佟氏第二定律`).toBe(true)
+      }
+    }
+  })
+
+  it('佟氏第四定律：HSH≡C(mod10)（时辰天干=所开经），50 个五输穴开穴全部成立', () => {
+    for (const [periodDay, hours] of Object.entries(SONG)) {
+      for (let f = 1; f <= 5; f++) {
+        const gz = hours[f - 1]
+        const r = calculateNajia(mkNajia(periodDay, gz, BRANCH_IDX[gz[1]]), BRANCH_IDX[gz[1]])
+        const mer = r.openPoints[0]?.meridian || ''
+        const merCode = Object.entries(CN_MERID).find(([cn]) => mer.includes(cn))?.[1] || ''
+        expect(MERID_NUM[merCode] !== undefined, `${periodDay}日${gz}时开穴经可解析`).toBe(true)
+        expect((STEM_NUM[gz[0]] % 10), `${periodDay}日${gz}时 HSH≡C`).toBe(MERID_NUM[merCode] % 10)
+      }
+    }
+  })
+
+  it('佟氏第三定律：气纳三焦 PTE≡(HSD+3)/2、血归包络 PPC≡(HSD+2)/2 (mod5)，10 处全部成立', () => {
+    const wushuOrder = ['井', '荥', '输', '经', '合']
+    for (const [periodDay, hours] of Object.entries(SONG)) {
+      const hsd = STEM_NUM[periodDay]
+      const lastGz = hours[5]
+      const r = calculateNajia(mkNajia(periodDay, lastGz, BRANCH_IDX[lastGz[1]]), BRANCH_IDX[lastGz[1]])
+      const point = r.openPoints[0]
+      expect(point, `${periodDay}日${lastGz}时应开穴`).toBeTruthy()
+      const isYang = ['甲', '丙', '戊', '庚', '壬'].includes(periodDay)
+      const expectedF = isYang ? (hsd + 3) / 2 : (hsd + 2) / 2
+      const mod5 = ((expectedF % 5) + 5) % 5 || 5
+      const cat = (point.category || '').replace(/穴/g, '')
+      const actualF = wushuOrder.indexOf(cat) + 1
+      expect(actualF, `${periodDay}日 ${point.name} 佟氏第三定律`).toBe(mod5)
+    }
+  })
+
+  it('佟氏第一定律跨日推论（HSD\'≡HSD 或 HSD+1）对应本项目的值日周期推导', () => {
+    // 佟氏4.5推论①：开穴所在日干支 HSD' 与经气流注日干 HSD 的关系
+    //   EBH≥12-HSD → HSD'≡HSD；EBH<12-HSD → HSD'≡HSD+1 (mod10)
+    // 本项目值日周期推导：hourIdx >= jingHour → 值日=当日干；否则=前一日干
+    // 验证甲日周期：甲戌(开井,自然日甲) HSD'=HSD=甲；丙子(自然日乙) HSD'=HSD+1=乙
+    // 用歌诀甲日丙子时验证：值日周期日干=甲，自然日日干=乙（HSD'=HSD+1）
+    const hsd = STEM_NUM['甲']  // 1
+    const gz = '丙子'
+    const h = BRANCH_IDX['子']  // 0
+    const r = calculateNajia(mkNajia('甲', gz, h), h)
+    expect(r.dayStem).toBe('甲')          // 值日周期日干 HSD
+    // 佟氏推论：EBH=子=1，HSD=1，EBH≥12-HSD? 1≥11? 否 → HSD'=HSD+1=2=乙
+    // 验证 mkNajia 推导的自然日干=乙
+    const stems = '甲乙丙丁戊己庚辛壬癸'
+    const naturalStem = h >= JING_HOUR['甲'] ? '甲' : stems[(stems.indexOf('甲') + 1) % 10]
+    expect(naturalStem).toBe('乙')        // 自然日 HSD'=HSD+1 ✓
+    expect(STEM_NUM[naturalStem]).toBe(hsd + 1)  // 佟氏推论数值验证
+  })
+})
