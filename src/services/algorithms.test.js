@@ -134,6 +134,63 @@ describe('飞腾八法（黄金值）', () => {
   })
 })
 
+describe('飞腾八法结构不变量（多日 × 12 时辰）', () => {
+  const PAIR_CODES = new Set(['GB41', 'TE5', 'SP4', 'PC6', 'SI3', 'BL62', 'KI6', 'LU7'])
+
+  const stems = new Set()
+  const dates = []
+  const d = new Date(2026, 0, 1)
+  while (dates.length < 3 && stems.size < 10) {
+    const gz = getGanZhi(d, 116.407, false)
+    if (!stems.has(gz.day.heavenlyStem)) {
+      stems.add(gz.day.heavenlyStem)
+      dates.push(new Date(d))
+    }
+    d.setDate(d.getDate() + 1)
+  }
+
+  it.each(dates.map((date, i) => [`日期${i + 1}: ${date.toISOString().slice(0, 10)}`, date]))(
+    '%s 的 12 时辰：开穴为空或为一对八脉交会穴',
+    (_label, date) => {
+      for (let h = 0; h < 12; h++) {
+        const gz = makeGanZhi(date, h)
+        const r = calculateFeiteng(gz, h)
+        expect(r.openPoints.length === 0 || r.openPoints.length === 2).toBe(true)
+        for (const pt of r.openPoints) {
+          expect(PAIR_CODES.has(pt.code)).toBe(true)
+        }
+      }
+    }
+  )
+})
+
+describe('纳子法结构不变量（12 时辰全覆盖）', () => {
+  // 十二经（井荥输经合 五输穴按顺序：金水木火土 / 阳经井金起始，阴经井木起始）
+  const MERIDIAN_CODES = ['LU', 'LI', 'ST', 'SP', 'HT', 'SI', 'BL', 'KI', 'PC', 'TE', 'GB', 'LR']
+
+  it('12 时辰各自经络合法、五输穴 5 个、本/原/母/子穴齐全', () => {
+    for (let h = 0; h < 12; h++) {
+      const gz = makeGanZhi(new Date(2026, 4, 26), h)
+      const r = calculateNazi(gz, h)
+      expect(MERIDIAN_CODES).toContain(r.hourMeridian.code)
+      expect(r.openPoints).toHaveLength(5)
+      expect(r.benPoint.code).toBeTruthy()
+      expect(r.yuanPoint.code).toBeTruthy()
+      expect(r.muPoint.code).toBeTruthy()
+      expect(r.ziPoint.code).toBeTruthy()
+    }
+  })
+
+  it('12 时辰经络覆盖完整（十二经各出现一次）', () => {
+    const gz = new Date(2026, 4, 26)
+    const seen = new Set()
+    for (let h = 0; h < 12; h++) {
+      seen.add(calculateNazi(makeGanZhi(gz, h), h).hourMeridian.code)
+    }
+    expect(seen.size).toBe(12)
+  })
+})
+
 describe('纳子法（黄金值）', () => {
   it('子时值胆经，五输穴顺序与本/原/母/子穴正确', () => {
     const gz = makeGanZhi(new Date(2026, 4, 26), 0)
