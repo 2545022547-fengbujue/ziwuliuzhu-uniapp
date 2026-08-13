@@ -15,7 +15,7 @@
     "test": "npm run test:unit && node scripts/run-validation.cjs",
     "test:unit": "vitest run",
     "fonts:verify": "python scripts/verify-font-subsets.py",
-    "test:builds": "npm run build:h5 && npm run build:app && npm run build:mp-weixin"
+    "test:builds": "npm run build:h5 && npm run build:mp-weixin && node scripts/verify-mp-isolation.cjs && npm run build:app"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-alpha-5020320260803001",
