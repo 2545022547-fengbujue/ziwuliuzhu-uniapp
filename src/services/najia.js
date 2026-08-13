@@ -23,7 +23,7 @@
  * - 闭穴时使用合日的开穴
  */
 
-import { getStemIndex, getBranchIndex, HEAVENLY_STEMS, EARTHLY_BRANCHES } from './ganzhi.js'
+import { getStemIndex, HEAVENLY_STEMS, EARTHLY_BRANCHES } from './ganzhi.js'
 import { getWushuPointsFull, getYuanPointFull, getPointByCode } from './acupuncturePoints.js'
 import { getFankePoint } from '@/data/fanke-points.js'
 import { DAY_MERIDIAN_MAP, HOUR_NAMES, WUXING_SHENG, WU_SHU_DUN, WUXING_CHAIN } from '@/data/constants.js'

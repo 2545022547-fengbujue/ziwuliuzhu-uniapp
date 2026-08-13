@@ -18,7 +18,7 @@
  * - 乾6/艮8 → 公孙+内关（父母配）
  */
 
-import { getStemIndex, getBranchIndex } from './ganzhi.js'
+import { getStemIndex } from './ganzhi.js'
 import { getEightPointFull } from './acupuncturePoints.js'
 import { HOUR_NAMES } from '@/data/constants.js'
 import { EIGHT_POINTS } from '@/data/eight-points.js'

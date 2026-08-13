@@ -1,4 +1,4 @@
-import { Lunar, Solar } from 'lunar-javascript'
+import { Lunar } from 'lunar-javascript'
 import {
   HEAVENLY_STEMS,
   EARTHLY_BRANCHES,
