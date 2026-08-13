@@ -50,3 +50,7 @@ docs/code-snapshots/
 __pycache__/
 
 build/
+
+# 本地安全校验工具（模式定义含本机用户名/工作区路径，不推远程；本地 pre-commit 仍生效）
+scripts/verify-push-safety.cjs
+.githooks/pre-commit
