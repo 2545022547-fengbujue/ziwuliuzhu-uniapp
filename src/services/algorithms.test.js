@@ -9,7 +9,7 @@
  *   若新增用例请优先加在本文件，再决定是否同步到数据门禁脚本。
  */
 import { describe, it, expect } from 'vitest'
-import { getGanZhi, HEAVENLY_STEMS, EARTHLY_BRANCHES } from '@/services/ganzhi.js'
+import { getGanZhi, getTrueSolarDate, HEAVENLY_STEMS, EARTHLY_BRANCHES } from '@/services/ganzhi.js'
 import { WU_SHU_DUN } from '@/data/constants.js'
 import { calculateNajia, calculateFanke } from '@/services/najia.js'
 import { calculateNazi } from '@/services/nazi.js'
@@ -49,6 +49,58 @@ describe('干支计算（黄金值）', () => {
     const gz = makeGanZhi(new Date(2026, 4, 4), 5)
     expect(gz.day.ganZhi).toBe('戊寅')
     expect(gz.hour.ganZhi).toBe('丁巳')
+  })
+})
+
+describe('干支边界（子时翻转 / 真太阳时 / 非法参数防御）', () => {
+  it('23:00-23:59 视为次日子时：5/26 23:30 的日干支为次日辛丑、时干支为戊子（辛日起戊子）', () => {
+    const gz = getGanZhi(new Date(2026, 4, 26, 23, 30))
+    // 5/26 庚子日 → 5/27 辛丑日（60 干支循环顺推）
+    expect(gz.day.ganZhi).toBe('辛丑')
+    // 五鼠遁：丙辛从戊起 → 辛日子时为戊子
+    expect(gz.hour.ganZhi).toBe('戊子')
+  })
+
+  it('0:00-0:59 为当日子时：5/26 00:30 日干支为庚子、时干支为丙子（庚日起丙子）', () => {
+    const gz = getGanZhi(new Date(2026, 4, 26, 0, 30))
+    expect(gz.day.ganZhi).toBe('庚子')
+    // 五鼠遁：乙庚起丙子
+    expect(gz.hour.ganZhi).toBe('丙子')
+  })
+
+  it('真太阳时未启用时返回同一时间（同一性）', () => {
+    const d = new Date(2026, 4, 26, 12, 0, 0)
+    expect(getTrueSolarDate(d, 116.407, false).getTime()).toBe(d.getTime())
+  })
+
+  it('真太阳时：经度 120 仅含 EoT（±16 分钟内）；北京 116.407 比东经 120 早约 14.37 分钟', () => {
+    const d = new Date(2026, 4, 26, 12, 0, 0)
+    const at120 = getTrueSolarDate(d, 120, true)
+    // 5/26 的 EoT ≈ -3.3min，偏移量应在 ±16min 内（EoT 理论范围 ±16.4min）
+    const eotOnly = at120.getTime() - d.getTime()
+    expect(Math.abs(eotOnly)).toBeLessThan(16 * 60 * 1000)
+    // 北京(116.407) 比 120°E 少 (120-116.407)*4 = 14.372 分钟
+    const beijing = getTrueSolarDate(d, 116.407, true)
+    const diff = beijing.getTime() - at120.getTime()
+    expect(diff).toBeCloseTo(-14.372 * 60 * 1000, -1)
+  })
+
+  it('非法经度防御：getTrueSolarDate 经度越界回退北京（不产生 2.4 天偏移）', () => {
+    const d = new Date(2026, 4, 26, 12, 0, 0)
+    const bad = getTrueSolarDate(d, 1000, true)
+    // 回退北京 → 偏移仅 EoT + (116.407-120)*4 ≈ -18min，绝不可能是 3520min
+    const diff = Math.abs(bad.getTime() - d.getTime())
+    expect(diff).toBeLessThan(30 * 60 * 1000)
+  })
+
+  it('非法参数防御：无效 Date 返回 null（getGanZhi），不抛异常', () => {
+    const gz = getGanZhi(new Date('invalid'))
+    expect(gz).toBeNull()
+  })
+
+  it('经度越界经 getGanZhi 时回退默认并正常计算', () => {
+    const gz = getGanZhi(new Date(2026, 4, 26), 500)
+    expect(gz.day.ganZhi).toBe('庚子')
   })
 })
 
