@@ -9,9 +9,11 @@ from fontTools.ttLib import TTFont
 ROOT = Path(__file__).resolve().parents[1]
 FONT_DIR = ROOT / "src" / "assets" / "fonts"
 REQUIRED_TEXTS = ("莫兰迪奶油", "动物森友会", "复古像素", "双狸迎宾，悠闲岛屿生活", "掌机像素，怀旧冒险")
-# 敦煌飞天行楷仅用于 H5/App 水墨展示字体，小程序不打包，故只校验 TTF 与关键文案覆盖。
+# 华文行楷（HuawenXingkai）为 H5/App 水墨主展示字体（小程序不打包、无 Base64），仅校验 TTF 与关键文案覆盖。
 INK_REQUIRED_TEXTS = ("水墨意境", "墨色入境", "子午流注", "合日互用", "灵龟八法", "飞腾八法", "纳甲法", "经络", "关冲", "真太阳时", "穴位详情")
-APP_ONLY_FONT_JOBS = (("dunhuang-xingkai-subset.ttf", "敦煌飞天行楷"),)
+# 注：敦煌飞天行楷 / 字魂苍劲行楷已于 2026-08-13 按用户要求彻底移除（font-face、链引用、子集 TTF 均删除），
+# 此处仅保留当前实际打包的水墨主字体，避免校验脚本引用已删除资源导致回归误报。
+APP_ONLY_FONT_JOBS = (("huawen-xingkai-subset.ttf", "华文行楷"),)
 FONT_JOBS = (("kaiti-gb2312.ttf", "kaiti-gb2312-base64.txt"), ("wenjinmincho-subset-v6.ttf", "wenjinmincho-subset-v6-base64.txt"), ("WenYuanSerifSC-Bold-subset-v2.ttf", "bold-v2-base64.txt"), ("LXGWZhenKaiSlabGB-subset.ttf", "lxgw-zhenkai-slab-base64.txt"))
 def load_builder():
     spec = importlib.util.spec_from_file_location("font_builder", ROOT / "scripts" / "build-font-subsets.py")

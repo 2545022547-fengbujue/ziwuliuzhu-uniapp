@@ -196,8 +196,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useHome } from '@/composables/useHomePage.js'
+import { useRootClasses } from '@/composables/useRootClasses.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
@@ -207,22 +207,9 @@ import TimePicker from '@/components/TimePicker.vue'
 // 壳层注入的共享业务状态与方法（契约见 useHomePage.js）
 const home = useHome()
 
-// 根 class 自动推导：
-//   classic → theme-<activeTheme>；其它 → ui-<activeUiStyle>；ink 额外补时段背景类。
-// 与壳层 v-if 分发共用同一数据源，避免主题组件各自拼类名导致错配。
-const rootClasses = computed(() => {
-  const list = []
-  const style = home.store.activeUiStyle
-  if (style === 'classic') {
-    list.push(`theme-${home.store.activeTheme}`)
-  } else {
-    list.push(`ui-${style}`)
-    if (style === 'ink') {
-      list.push(`ink-bg-${home.store.inkBackgroundPeriod}`)
-    }
-  }
-  return list
-})
+// 主题根 class 自动推导（classic → theme-*，其它 → ui-*，ink 补 ink-bg-*），
+// 规则唯一来源见 useRootClasses.js
+const rootClasses = useRootClasses()
 </script>
 
 <style lang="scss" scoped>

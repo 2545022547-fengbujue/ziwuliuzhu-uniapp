@@ -51,7 +51,7 @@
           </view>
           <view v-if="setting.store.useTrueSolarTime" class="setting-row">
             <text class="setting-label">经度</text>
-            <text class="setting-value">{{ setting.store.longitude.toFixed(1) }}°</text>
+            <text class="setting-value">{{ Number(setting.store.longitude || 0).toFixed(1) }}°</text>
           </view>
         </view>
 
@@ -296,8 +296,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useSetting } from '@/composables/useSettingPage.js'
+import { useRootClasses } from '@/composables/useRootClasses.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import CityPicker from '@/components/CityPicker.vue'
 import ThemeTransitionOverlay from '@/components/ThemeTransitionOverlay.vue'
@@ -306,21 +306,9 @@ import ThemeSwitch from '@/views/_shared/ThemeSwitch.vue'
 // 壳层注入的共享业务状态与方法（契约见 useSettingPage.js）
 const setting = useSetting()
 
-// 根 class 自动推导：与 HomeLayout 同一套规则，
-// classic → theme-<activeTheme>；其它 → ui-<activeUiStyle>；ink 额外补时段背景类。
-const rootClasses = computed(() => {
-  const list = []
-  const style = setting.store.activeUiStyle
-  if (style === 'classic') {
-    list.push(`theme-${setting.store.activeTheme}`)
-  } else {
-    list.push(`ui-${style}`)
-    if (style === 'ink') {
-      list.push(`ink-bg-${setting.store.inkBackgroundPeriod}`)
-    }
-  }
-  return list
-})
+// 主题根 class 自动推导（classic → theme-*，其它 → ui-*，ink 补 ink-bg-*），
+// 与 HomeLayout 共用同一实现，规则唯一来源见 useRootClasses.js
+const rootClasses = useRootClasses()
 </script>
 
 <style lang="scss" scoped>
