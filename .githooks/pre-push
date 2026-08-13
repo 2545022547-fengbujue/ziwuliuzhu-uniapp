@@ -1,0 +1,10 @@
+#!/bin/sh
+# 推送前隐私快查（当前工作树，秒级）。
+# 涉及历史改写或长期未推送时，请手动补全量检查:
+#   python scripts/audit-repo-privacy.py --scope all
+python scripts/audit-repo-privacy.py --scope tree || {
+    echo ""
+    echo "❌ 推送被拦截：当前工作树存在疑似敏感信息（见上方命中列表）。"
+    echo "   确认为误报可在 .privacy-patterns.local.json 的 ignore_files 中排除后重试。"
+    exit 1
+}

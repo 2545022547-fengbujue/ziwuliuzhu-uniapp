@@ -45,6 +45,9 @@ docs/architecture/
 docs/design-history/
 docs/dev-environment/
 docs/code-snapshots/
+# 本地交付物与打包产物（含经验教训等敏感示例，永不入库）
+deliverables/
+项目目录/
 
 # Python 脚本缓存
 __pycache__/
@@ -54,3 +57,5 @@ build/
 # 本地安全校验工具（模式定义含本机用户名/工作区路径，不推远程；本地 pre-commit 仍生效）
 scripts/verify-push-safety.cjs
 .githooks/pre-commit
+# 本地隐私敏感词配置（含真实用户名/路径，不推远程；audit-repo-privacy.py 读取）
+.privacy-patterns.local.json
