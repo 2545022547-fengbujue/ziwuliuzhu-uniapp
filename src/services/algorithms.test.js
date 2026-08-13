@@ -654,14 +654,15 @@ describe('纳甲法时辰干支与徐凤歌诀全量对照（10日×6时=60处�
     }
   })
 
-  it('跨日顺推自洽：甲日周期开井(甲戌)后荥穴时辰为丙子——丙子在干支纪时上属于乙日（乙庚丙作初），值日周期仍为甲日', () => {
+  it('跨日顺推自洽：甲日周期开井(甲戌)后荥穴时辰为丙子——丙子在干支纪时上属于乙日/庚日的子时（乙庚丙作初），值日周期仍为甲日', () => {
     // 歌诀原文「甲日戌时胆窍阴，丙子时中前谷荣」。
     // 关键澄清（勿混淆两个维度）：
-    //   ① 干支纪时：丙子时属于「乙日」的子时（五鼠遁"乙庚丙作初"），甲日自然日的
-    //      12 时辰为甲子…乙亥，绝无丙子——dailySequence 的干支是值日周期顺推视角
-    //      （从开井时辰甲戌起连续顺推，跨日不断），因干支纪时全局连续，两者恰好一致。
+    //   ① 干支纪时：丙子时属于「乙日」或「庚日」的子时（五鼠遁"乙庚丙作初"；
+    //      本例为乙日子时），甲日自然日的 12 时辰为甲子…乙亥，绝无丙子——
+    //      dailySequence 的干支是值日周期顺推视角（从开井时辰甲戌起连续顺推，
+    //      跨日不断），因干支纪时全局连续，两者恰好一致。
     //   ② 值日周期：丙子时（乙日自然日子时）仍在甲日值日周期内（甲日周期=甲日甲戌→乙日甲申），
-    //      所以开穴按甲日周期计算，开荥穴前谷。
+    //      所以开穴按甲日周期计算，开荥穴前谷。庚日子时的丙子同理属己日周期（己日开井巳时）。
     const r = calculateNajia(mkNajia('甲', '丙子', 0), 0)
     // 子时（h0）是荥穴步：开小肠荥前谷 SI2
     expect(r.dailySequence[0].points.map(p => p.code)).toEqual(['SI2'])
@@ -705,7 +706,7 @@ describe('五鼠遁约束：丙子仅属乙/庚日子时，甲日（自然日）
     }
   })
 
-  it('5/20 23:30（子时换日）：日干切为乙，时干支为丙子——丙子属于乙日', () => {
+  it('5/20 23:30（子时换日）：日干切为乙，时干支为丙子——本例丙子属于乙日子时（乙庚丙作初，庚日子时同为丙子）', () => {
     const gz = getGanZhi(new Date(2026, 4, 20, 23, 30))
     expect(gz.day.heavenlyStem).toBe('乙')
     expect(gz.hour.ganZhi).toBe('丙子')
@@ -972,5 +973,116 @@ describe('论文级交叉验证（张雨辰干支公式 + 佟佳恒纳甲四定�
     const naturalStem = h >= JING_HOUR['甲'] ? '甲' : stems[(stems.indexOf('甲') + 1) % 10]
     expect(naturalStem).toBe('乙')        // 自然日 HSD'=HSD+1 ✓
     expect(STEM_NUM[naturalStem]).toBe(hsd + 1)  // 佟氏推论数值验证
+  })
+})
+
+/**
+ * ============================================================
+ * 合日互用/反克法全量语义验证（2026-08-14 轮次：排查"同类概念性错误"）
+ *
+ * 合日互用语义：纳甲法闭穴时，借「天干五合」之日的开穴规律开穴。
+ * 五合：甲己、乙庚、丙辛、丁壬、戊癸（heMap）。
+ * 关键自洽性（已推敲）：
+ *   - 合日取穴 = calculateDailySequence(合日日干)[hourIndex]；
+ *   - 因干支纪时全局连续 + offset 公式，该槽位干支恒等于当前真实时干支，
+ *     即"合日周期在当前时辰开什么穴"——语义正确。
+ *   - 合日开穴非空性 = (合日 offset 为偶) = (h - jingHour(合日)) % 12 为偶。
+ *   - 对称性：X 日闭穴的合日穴 ≡ 合日 Y 直接开穴（镜像）。
+ * ============================================================
+ */
+describe('合日互用全量验证（10 日 × 12 时辰，55 个闭穴场景）', () => {
+  const HE_MAP = { '甲': '己', '己': '甲', '乙': '庚', '庚': '乙', '丙': '辛', '辛': '丙', '丁': '壬', '壬': '丁', '戊': '癸', '癸': '戊' }
+  const STEMS = '甲乙丙丁戊己庚辛壬癸'
+  const BRANCHES = '子丑寅卯辰巳午未申酉戌亥'
+
+  it('55 闭穴场景：heLabel 五合正确 + 合日开穴非空性与 heOffset 偶一致', () => {
+    let closed = 0
+    for (const natural of STEMS) {
+      for (let h = 0; h < 12; h++) {
+        const subStem = STEMS[((WU_SHU_DUN[natural] || 0) + h) % 10]
+        const hourBranch = BRANCHES[h]
+        const gz = {
+          day: { heavenlyStem: natural, earthlyBranch: '子', ganZhi: natural + '子日' },
+          hour: { heavenlyStem: subStem, earthlyBranch: hourBranch, ganZhi: subStem + hourBranch },
+          year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+        }
+        const r = calculateNajia(gz, h, { enableHeRiHuYong: true })
+        if (!r.isClosed) continue // 只验证闭穴
+        closed++
+        const effective = r.dayStem // calculateNajia 已返回值日周期日干
+        const heStem = HE_MAP[effective]
+        expect(r.alternativePoints, `${natural}日h${h} 闭穴必有合日互用`).toBeTruthy()
+        expect(r.alternativePoints.heLabel, `${natural}日h${h} 合日标签`).toBe(`${effective}合${heStem}`)
+        const heOffset = (h - JING_HOUR_BY_STEM[heStem] + 12) % 12
+        const expectOpen = heOffset % 2 === 0
+        expect((r.alternativePoints.openPoints || []).length > 0, `${effective}合${heStem} h${h} 开穴性（heOffset=${heOffset}）`).toBe(expectOpen)
+      }
+    }
+    expect(closed).toBe(55) // 10 日 × 12 时辰中闭穴场景数（数学必然）
+  })
+
+  it('合日互用对称性：闭穴的 alternativePoints 与合日直接开穴全等（可构造场景 55 组）', () => {
+    let checked = 0
+    for (const natural of STEMS) {
+      for (let h = 0; h < 12; h++) {
+        const subStem = STEMS[((WU_SHU_DUN[natural] || 0) + h) % 10]
+        const hourBranch = BRANCHES[h]
+        const gz = {
+          day: { heavenlyStem: natural, earthlyBranch: '子', ganZhi: natural + '子日' },
+          hour: { heavenlyStem: subStem, earthlyBranch: hourBranch, ganZhi: subStem + hourBranch },
+          year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+        }
+        const r = calculateNajia(gz, h, { enableHeRiHuYong: true })
+        if (!r.isClosed || !r.alternativePoints) continue
+        const heStem = HE_MAP[r.dayStem]
+        // 对称日构造：合日自然日 + 同小时，calculateNajia 应产生与 alternativePoints 相同的开穴
+        const heNatural = h >= JING_HOUR_BY_STEM[heStem] ? heStem : STEMS[(STEMS.indexOf(heStem) + 1) % 10]
+        // 仅当对称日能导出合日为有效日干时对比（否则合日周期槽位无法用 calculateNajia 直接构造）
+        const effHe = h >= JING_HOUR_BY_STEM[heNatural] ? heNatural : STEMS[(STEMS.indexOf(heNatural) + 9) % 10]
+        if (effHe !== heStem) continue
+        const heGz = {
+          day: { heavenlyStem: heNatural, earthlyBranch: '子', ganZhi: heNatural + '子日' },
+          hour: { heavenlyStem: STEMS[((WU_SHU_DUN[heNatural] || 0) + h) % 10], earthlyBranch: hourBranch, ganZhi: '' },
+          year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+        }
+        const heResult = calculateNajia(heGz, h, { enableHeRiHuYong: false })
+        expect(pointCodes(r.alternativePoints.openPoints).sort(), `${r.dayStem}合${heStem} h${h} 对称全等`)
+          .toEqual(pointCodes(heResult.openPoints).sort())
+        checked++
+      }
+    }
+    expect(checked).toBe(55)
+  })
+})
+
+describe('反克法健壮性：hour.ganZhi 格式防御（"丙子"与"丙子时"均可查表）', () => {
+  it('甲日甲戌时 → 窍阴 GB44（纯干支格式）', () => {
+    const r = calculateFanke({
+      day: { heavenlyStem: '甲', earthlyBranch: '子', ganZhi: '甲子日' },
+      hour: { heavenlyStem: '甲', earthlyBranch: '戌', ganZhi: '甲戌' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 10)
+    expect(pointCodes(r.openPoints)).toEqual(['GB44'])
+  })
+
+  it('带"时"后缀同样可查（防御生效，mkNajia 即产此后缀）', () => {
+    const r = calculateFanke({
+      day: { heavenlyStem: '甲', earthlyBranch: '子', ganZhi: '甲子日' },
+      hour: { heavenlyStem: '甲', earthlyBranch: '戌', ganZhi: '甲戌时' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 10)
+    expect(pointCodes(r.openPoints)).toEqual(['GB44'])
+  })
+})
+
+describe('23:00 换日边界：灵龟/飞腾纯函数随干支一致切换（无值日周期）', () => {
+  it('5/20 23:30 与 5/21 0:30 同属乙日子时丙子，灵龟/飞腾结果一致', () => {
+    const t1 = getGanZhi(new Date(2026, 4, 20, 23, 30))
+    const t2 = getGanZhi(new Date(2026, 4, 21, 0, 30))
+    expect(t1.day.ganZhi).toBe(t2.day.ganZhi)
+    expect(t1.hour.ganZhi).toBe('丙子')
+    expect(t1.hour.ganZhi).toBe(t2.hour.ganZhi)
+    expect(pointCodes(calculateLingui(t1, 0).openPoints).sort()).toEqual(pointCodes(calculateLingui(t2, 0).openPoints).sort())
+    expect(pointCodes(calculateFeiteng(t1, 0).openPoints).sort()).toEqual(pointCodes(calculateFeiteng(t2, 0).openPoints).sort())
   })
 })

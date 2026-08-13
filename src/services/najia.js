@@ -523,7 +523,9 @@ export function calculateFanke(ganzhi, hourIndex) {
   }
 
   const dayStem = ganzhi.day.heavenlyStem
-  const hourGanZhi = ganzhi.hour.ganZhi
+  // 防御：hour.ganZhi 兼容「丙子」与「丙子时」两种格式（正常链路 getGanZhi 返回纯干支，
+  // 但外部直接构造 ganzhi 时可能带"时"后缀），避免查表 key 不匹配导致漏穴。
+  const hourGanZhi = String(ganzhi.hour.ganZhi || '').replace(/时$/, '')
 
   // 直接查表
   const fankePointData = getFankePoint(dayStem, hourGanZhi)
