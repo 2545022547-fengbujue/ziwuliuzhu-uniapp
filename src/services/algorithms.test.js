@@ -312,3 +312,56 @@ describe('纳甲法结构不变量（多日 × 12 时辰冒烟）', () => {
     }
   )
 })
+
+describe('权威教材范例交叉验证（2026-08-14 联网核对）', () => {
+  // 来源：百科/教材「灵龟八法」条目官方计算范例 + 《针灸大成》阳进阴退开井穴表 + 教材表13-9 反克表
+
+  it('灵龟官方范例一：甲子日戊辰时 → 27 阳日除9整除 → 以9代之 → 离宫 列缺+照海（LU7+KI6）', () => {
+    const r = calculateLingui({
+      day: { heavenlyStem: '甲', earthlyBranch: '子' },
+      hour: { heavenlyStem: '戊', earthlyBranch: '辰' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 4)
+    expect(r.palace.palaceNumber).toBe(9)
+    expect(r.palace.gua).toBe('离')
+    expect(pointCodes(r.openPoints).sort()).toEqual(['KI6', 'LU7'])
+  })
+
+  it('灵龟官方范例二：乙丑日壬午时 → 34 阴日除6 → 余4 → 巽宫 临泣+外关（GB41+TE5）', () => {
+    const r = calculateLingui({
+      day: { heavenlyStem: '乙', earthlyBranch: '丑' },
+      hour: { heavenlyStem: '壬', earthlyBranch: '午' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 6)
+    expect(r.palace.actualPalace).toBe(4)
+    expect(r.palace.gua).toBe('巽')
+    expect(pointCodes(r.openPoints).sort()).toEqual(['GB41', 'TE5'])
+  })
+
+  it('纳甲阳进阴退开井穴：甲日戌时开胆井足窍阴 GB44、癸日亥时开肾井涌泉 KI1（教材表13-8）', () => {
+    const mk = (dayStem, hourStem, hourBranch, hourIdx) => ({
+      day: { heavenlyStem: dayStem, earthlyBranch: '子' },
+      hour: { heavenlyStem: hourStem, earthlyBranch: hourBranch },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    })
+    // 甲日甲戌时 → 足窍阴
+    const r1 = calculateNajia(mk('甲', '甲', '戌', 10), 10)
+    expect(pointCodes(r1.openPoints)).toContain('GB44')
+    // 癸日癸亥时 → 涌泉
+    const r2 = calculateNajia(mk('癸', '癸', '亥', 11), 11)
+    expect(pointCodes(r2.openPoints)).toContain('KI1')
+    // 庚日庚辰时 → 商阳
+    const r3 = calculateNajia(mk('庚', '庚', '辰', 4), 4)
+    expect(pointCodes(r3.openPoints)).toContain('LI1')
+  })
+
+  it('纳甲闭穴逻辑：阳日逢阴时闭穴（甲日乙亥时无穴可开）', () => {
+    const r = calculateNajia({
+      day: { heavenlyStem: '甲', earthlyBranch: '子' },
+      hour: { heavenlyStem: '乙', earthlyBranch: '亥' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 11)
+    expect(r.isClosed).toBe(true)
+    expect(r.openPoints.length).toBe(0)
+  })
+})

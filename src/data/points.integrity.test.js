@@ -14,6 +14,7 @@ import path from 'node:path'
 import { getWushuPointsFull, getPointByCode } from '@/services/acupuncturePoints.js'
 import { NAZI_SPECIAL_POINTS } from '@/data/constants.js'
 import { STEM_POINT_MAP, EIGHT_POINTS_MAP } from '@/data/eight-points.js'
+import { FANKE_TABLE } from '@/data/fanke-points.js'
 
 const DATA_PATH = path.resolve(process.cwd(), 'src/data/acupuncture-points-gb2021.json')
 const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'))
@@ -128,6 +129,43 @@ describe('飞腾八法数据契约（STEM_POINT_MAP / EIGHT_POINTS_MAP）', () =
       expect(getPointByCode(code), `${code} 主数据缺失`).toBeTruthy()
       expect(getPointByCode(paired), `${paired} 主数据缺失`).toBeTruthy()
     }
+  })
+})
+
+describe('反克法取穴表（FANKE_TABLE，教材表13-9 一四二五三〇）', () => {
+  // 2026-08-14 联网与教材表13-9 全量 60 条人工核对一致；此处固化结构不变量 + 黄金抽样防回归。
+  it('恰 60 条（10 日干 × 6 时辰），key 格式「日干+时干支」且 code 可解析', () => {
+    const keys = Object.keys(FANKE_TABLE)
+    expect(keys.length).toBe(60)
+    for (const key of keys) {
+      const [day, hour] = key.split('+')
+      expect(day, `${key} 日干非法`).toMatch(/^[甲乙丙丁戊己庚辛壬癸]$/)
+      expect(hour, `${key} 时干支非法`).toMatch(/^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$/)
+      const entry = FANKE_TABLE[key]
+      expect(entry.code, `${key} 缺 code`).toBeTruthy()
+      expect(getPointByCode(entry.code), `${key} → ${entry.code} 无法解析`).toBeTruthy()
+      expect(entry.wuxing, `${key} 缺五行`).toBeTruthy()
+      expect(entry.type, `${key} 缺类型`).toBeTruthy()
+    }
+  })
+
+  it('每组时辰天干恰好 6 条（六甲=甲X时 6 条，日干各不相同）', () => {
+    // 反克表结构：按「时辰天干」分组——六甲行的 6 条时辰干支都是甲X时，
+    // 但每条日干不同（如甲日甲戌、己日甲子、戊日甲寅…），与教材表13-9 一致。
+    const groupCount = {}
+    for (const key of Object.keys(FANKE_TABLE)) {
+      const hourStem = key.split('+')[1][0]  // 时干支的天干
+      groupCount[hourStem] = (groupCount[hourStem] || 0) + 1
+    }
+    for (const stem of '甲乙丙丁戊己庚辛壬癸') {
+      expect(groupCount[stem], `${stem} 时天干组条数 ≠ 6`).toBe(6)
+    }
+  })
+
+  it('黄金抽样（教材表13-9 确认）：甲日甲戌=窍阴GB44、癸日癸亥=涌泉KI1、丙日乙未=劳宫PC8', () => {
+    expect(FANKE_TABLE['甲+甲戌'].code).toBe('GB44')
+    expect(FANKE_TABLE['癸+癸亥'].code).toBe('KI1')
+    expect(FANKE_TABLE['丙+乙未'].code).toBe('PC8')
   })
 })
 
