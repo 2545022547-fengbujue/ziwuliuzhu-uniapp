@@ -22,9 +22,12 @@ import webbrowser
 import tkinter as tk
 from tkinter import scrolledtext, ttk
 
-PROJECT_DIR = r"<PROJECT_ROOT>"
+# 项目根目录：用脚本自身位置定位（不硬编码本机路径——既避免泄露本机目录结构，又可移植到任意机器）
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 PORT = 5174
-EXTRA_PATHS = [r"<NODE_HOME>", r"<NPM_GLOBAL>"]  # 确保 npm 在 PATH 中
+# 本机 npm/Node 附加路径：从环境变量 ZIWU_EXTRA_PATHS 读取（分号分隔），默认空。
+# 本机用法示例：set ZIWU_EXTRA_PATHS=<你的Nodejs目录>;<你的npm-global目录>
+EXTRA_PATHS = [p.strip() for p in os.environ.get('ZIWU_EXTRA_PATHS', '').split(';') if p.strip()]
 
 # Windows 隐藏子进程控制台黑框
 CREATE_NO_WINDOW = 0x08000000
