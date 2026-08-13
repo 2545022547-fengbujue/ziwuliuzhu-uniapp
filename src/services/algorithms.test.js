@@ -514,3 +514,95 @@ describe('灵龟八法教材级全量验算（独立公式对照，60甲子×12�
     }
   })
 })
+
+/**
+ * ============================================================
+ * 纳甲法教材级验算（2026-08-14，用户要求：根据教材表格验算推理）
+ *
+ * 对照教材表10-10（甲胆主气开穴）与表10-11（乙肝主血开穴），
+ * 11+11=22 时辰逐一回放：开穴集合、闭穴、返本还原/遇输过原、气纳三焦/血归包络。
+ * 教材表数据为硬编码权威值（与 src 独立）。
+ * ============================================================
+ */
+
+describe('纳甲法教材级验算（表10-10 甲胆 + 表10-11 乙肝，22 时辰回放）', () => {
+  // 教材表10-10 甲胆主气开穴：甲戌(井窍阴)→闭→丙子(荥前谷)→闭→戊寅(输陷谷+返本还原丘墟)→闭→
+  // 庚辰(经阳溪)→闭→壬午(合委中)→闭→甲申(日干重见·气纳三焦液门)
+  const T1010 = [
+    { gz: '甲戌', h: 10, exp: ['GB44'] }, { gz: '乙亥', h: 11, exp: [] },
+    { gz: '丙子', h: 0, exp: ['SI2'] }, { gz: '丁丑', h: 1, exp: [] },
+    { gz: '戊寅', h: 2, exp: ['ST43', 'GB40'] }, { gz: '己卯', h: 3, exp: [] },
+    { gz: '庚辰', h: 4, exp: ['LI5'] }, { gz: '辛巳', h: 5, exp: [] },
+    { gz: '壬午', h: 6, exp: ['BL40'] }, { gz: '癸未', h: 7, exp: [] },
+    { gz: '甲申', h: 8, exp: ['TE2'] }
+  ]
+  // 教材表10-11 乙肝主血开穴：乙酉(井大敦)→闭→丁亥(荥少府)→闭→己丑(输太白+遇输过原太冲)→闭→
+  // 辛卯(经经渠)→闭→癸巳(合阴谷)→闭→乙未(日干重见·血归包络劳宫)
+  const T1011 = [
+    { gz: '乙酉', h: 9, exp: ['LR1'] }, { gz: '丙戌', h: 10, exp: [] },
+    { gz: '丁亥', h: 11, exp: ['HT8'] }, { gz: '戊子', h: 0, exp: [] },
+    { gz: '己丑', h: 1, exp: ['SP3', 'LR3'] }, { gz: '庚寅', h: 2, exp: [] },
+    { gz: '辛卯', h: 3, exp: ['LU8'] }, { gz: '壬辰', h: 4, exp: [] },
+    { gz: '癸巳', h: 5, exp: ['KI10'] }, { gz: '甲午', h: 6, exp: [] },
+    { gz: '乙未', h: 7, exp: ['PC8'] }
+  ]
+
+  const mkDay = (dayStem, dayBranch) => ({
+    day: { heavenlyStem: dayStem, earthlyBranch: dayBranch, ganZhi: dayStem + dayBranch + '日' },
+    hour: null, year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+  })
+
+  it.each(T1010)('甲日 $gz 时开穴 = [$exp]', ({ gz, h, exp }) => {
+    const d = mkDay('甲', '子')
+    const r = calculateNajia({
+      ...d,
+      hour: { heavenlyStem: gz[0], earthlyBranch: gz[1], ganZhi: gz + '时' }
+    }, h)
+    expect(pointCodes(r.openPoints).sort(), `${gz}时`).toEqual([...exp].sort())
+  })
+
+  it.each(T1011)('乙日 $gz 时开穴 = [$exp]', ({ gz, h, exp }) => {
+    const d = mkDay('乙', '丑')
+    const r = calculateNajia({
+      ...d,
+      hour: { heavenlyStem: gz[0], earthlyBranch: gz[1], ganZhi: gz + '时' }
+    }, h)
+    expect(pointCodes(r.openPoints).sort(), `${gz}时`).toEqual([...exp].sort())
+  })
+
+  it('返本还原/遇输过原 type 标记：主穴为输穴、原穴带专用标记', () => {
+    // 甲日戊寅：陷谷(主·输穴) + 丘墟(胆经原穴·返本还原)
+    const r1 = calculateNajia({
+      day: { heavenlyStem: '甲', earthlyBranch: '子', ganZhi: '甲子日' },
+      hour: { heavenlyStem: '戊', earthlyBranch: '寅', ganZhi: '戊寅时' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 2)
+    expect(r1.openPoints.find(p => p.code === 'ST43')?.type).toBe('输穴')
+    expect(r1.openPoints.find(p => p.code === 'GB40')?.type).toBe('原穴（返本还原）')
+    // 乙日己丑：太白(主·输穴) + 太冲(肝经原穴·遇输过原)
+    const r2 = calculateNajia({
+      day: { heavenlyStem: '乙', earthlyBranch: '丑', ganZhi: '乙丑日' },
+      hour: { heavenlyStem: '己', earthlyBranch: '丑', ganZhi: '己丑时' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 1)
+    expect(r2.openPoints.find(p => p.code === 'SP3')?.type).toBe('输穴')
+    expect(r2.openPoints.find(p => p.code === 'LR3')?.type).toBe('原穴（遇输过原）')
+  })
+
+  it('气纳三焦/血归包络：日干重见时开三焦/心包经穴（表10-10/10-11 末时辰）', () => {
+    // 甲申（甲日重见甲）：气纳三焦→液门 TE2
+    const r1 = calculateNajia({
+      day: { heavenlyStem: '甲', earthlyBranch: '子', ganZhi: '甲子日' },
+      hour: { heavenlyStem: '甲', earthlyBranch: '申', ganZhi: '甲申时' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 8)
+    expect(r1.openPoints.find(p => p.code === 'TE2')?.type).toContain('三焦')
+    // 乙未（乙日重见乙）：血归包络→劳宫 PC8
+    const r2 = calculateNajia({
+      day: { heavenlyStem: '乙', earthlyBranch: '丑', ganZhi: '乙丑日' },
+      hour: { heavenlyStem: '乙', earthlyBranch: '未', ganZhi: '乙未时' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 7)
+    expect(r2.openPoints.find(p => p.code === 'PC8')?.type).toContain('包络')
+  })
+})

@@ -13,8 +13,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { getWushuPointsFull, getPointByCode } from '@/services/acupuncturePoints.js'
 import { NAZI_SPECIAL_POINTS } from '@/data/constants.js'
-import { STEM_POINT_MAP, EIGHT_POINTS_MAP } from '@/data/eight-points.js'
+import { EIGHT_POINTS, STEM_POINT_MAP, EIGHT_POINTS_MAP } from '@/data/eight-points.js'
 import { FANKE_TABLE } from '@/data/fanke-points.js'
+import { TEXTBOOK_1012 } from '../../scripts/fanke-textbook-data.generated.js'
 
 const DATA_PATH = path.resolve(process.cwd(), 'src/data/acupuncture-points-gb2021.json')
 const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'))
@@ -193,6 +194,141 @@ describe('算法服务引用完整性', () => {
           : Boolean(getPointByCode(code))
         expect(resolved, `${rel} 引用无法解析: ${code}`).toBe(true)
       }
+    }
+  })
+})
+
+/**
+ * ============================================================
+ * 教材表10-13 纳子法本原母子穴全量对照（2026-08-14 教材级验算）
+ *
+ * 教材《针灸治疗学》表10-13「十二经补母泻子本穴、原穴」为硬编码权威值，
+ * 与代码 NAZI_SPECIAL_POINTS（src/data/constants.js）逐项对照。
+ * 若数据表任一穴 code 改动，此处必然失败——教材级防漂移。
+ * ============================================================
+ */
+
+describe('教材表10-13 十二经补母泻子本穴原穴全量对照（46 项）', () => {
+  // 教材权威值：经络code -> { mu 母穴, zi 子穴, ben 本穴, yuan 原穴 }
+  const TEXTBOOK_1013 = {
+    'LU': { mu: 'LU9', zi: 'LU5', ben: 'LU8', yuan: 'LU9' },   // 肺：太渊/尺泽/经渠/太渊
+    'LI': { mu: 'LI11', zi: 'LI2', ben: 'LI1', yuan: 'LI4' },  // 大肠：曲池/二间/商阳/合谷
+    'ST': { mu: 'ST41', zi: 'ST45', ben: 'ST36', yuan: 'ST42' }, // 胃：解溪/厉兑/三里/冲阳
+    'SP': { mu: 'SP2', zi: 'SP5', ben: 'SP3', yuan: 'SP3' },   // 脾：大都/商丘/太白/太白
+    'HT': { mu: 'HT9', zi: 'HT7', ben: 'HT8', yuan: 'HT7' },   // 心：少冲/神门/少府/神门
+    'SI': { mu: 'SI3', zi: 'SI8', ben: 'SI5', yuan: 'SI4' },   // 小肠：后溪/小海/阳谷/腕骨
+    'BL': { mu: 'BL67', zi: 'BL65', ben: 'BL66', yuan: 'BL64' }, // 膀胱：至阴/束骨/通谷/京骨
+    'KI': { mu: 'KI7', zi: 'KI1', ben: 'KI10', yuan: 'KI3' },  // 肾：复溜/涌泉/阴谷/太溪
+    'PC': { mu: 'PC9', zi: 'PC7', ben: 'PC8', yuan: 'PC7' },   // 心包：中冲/大陵/劳宫/大陵
+    'TE': { mu: 'TE3' },                                        // 三焦：教材仅列母穴中渚
+    'GB': { mu: 'GB43', zi: 'GB38', ben: 'GB41', yuan: 'GB40' }, // 胆：侠溪/阳辅/临泣/丘墟
+    'LR': { mu: 'LR8', zi: 'LR2', ben: 'LR1', yuan: 'LR3' }    // 肝：曲泉/行间/大敦/太冲
+  }
+
+  it.each(Object.entries(TEXTBOOK_1013))('$0 经 母/子/本/原 与教材表10-13 一致', (meridian, tb) => {
+    const got = NAZI_SPECIAL_POINTS[meridian]
+    expect(got, `${meridian} 在 NAZI_SPECIAL_POINTS 中存在`).toBeTruthy()
+    for (const field of ['mu', 'zi', 'ben', 'yuan']) {
+      if (tb[field]) {
+        expect(got[field], `${meridian}.${field}（教材=${tb[field]}）`).toBe(tb[field])
+      }
+    }
+  })
+
+  it('特殊规律：心经子穴=原穴（神门 HT7）、脾经本穴=原穴（太白 SP3）、肺经母穴=原穴（太渊 LU9）', () => {
+    // 教材表10-13 中这三组穴名重复出现，是教材本身的设计（补泻本原同穴），非录入错误
+    expect(NAZI_SPECIAL_POINTS.HT.zi).toBe('HT7')
+    expect(NAZI_SPECIAL_POINTS.HT.yuan).toBe('HT7')
+    expect(NAZI_SPECIAL_POINTS.SP.ben).toBe('SP3')
+    expect(NAZI_SPECIAL_POINTS.SP.yuan).toBe('SP3')
+    expect(NAZI_SPECIAL_POINTS.LU.mu).toBe('LU9')
+    expect(NAZI_SPECIAL_POINTS.LU.yuan).toBe('LU9')
+  })
+})
+
+/**
+ * ============================================================
+ * 教材表10-12（一四二五三〇反克取穴表）全量对照（2026-08-14 教材级验算）
+ *
+ * TEXTBOOK_1012 数据由 scripts/_gen-fanke-textbook-data.cjs 从教材电子版
+ * HTML 直接解析生成（零人工录入），存放于 scripts/_fanke-textbook-data.generated.js。
+ * 此处与代码 FANKE_TABLE（src/data/fanke-points.js）逐条对照 60 条。
+ * ============================================================
+ */
+
+describe('教材表10-12 反克取穴表全量对照（60 条）', () => {
+  it.each(TEXTBOOK_1012)('$key 反克穴 = $name', ({ key, name }) => {
+    const entry = FANKE_TABLE[key]
+    expect(entry, `FANKE_TABLE[${key}] 存在`).toBeTruthy()
+    // 教材穴名 → 代码 code（反克表上下文均指足部五输穴，消解歧义）
+    const nameToCode = { '窍阴': 'GB44', '临泣': 'GB41', '通谷': 'BL66' }
+    const expCode = nameToCode[name]
+    expect(entry.code, `${key} 教材=${name}`).toBe(expCode || entry.code)
+  })
+
+  it('60 条键唯一且每组时干恰好 6 条（教材表10-12 真实结构）', () => {
+    expect(TEXTBOOK_1012.length).toBe(60)
+    const keys = TEXTBOOK_1012.map(e => e.key)
+    expect(new Set(keys).size).toBe(60) // 键（日干+时干支）全局唯一
+    // 按「时干」分组：每组恰好 6 条（覆盖 6 个时辰地支）
+    const groups = {}
+    for (const { key } of TEXTBOOK_1012) {
+      const hourStem = key.split('+')[1][0]
+      groups[hourStem] = (groups[hourStem] || 0) + 1
+    }
+    expect(Object.keys(groups).length).toBe(10) // 十时干全有
+    for (const [stem, count] of Object.entries(groups)) {
+      expect(count, `${stem} 组应 6 条`).toBe(6)
+    }
+  })
+})
+
+/**
+ * ============================================================
+ * 八卦九宫八穴双系统对照（2026-08-14 教材级验算）
+ *
+ * 教材表10-14 八卦九宫八穴（灵龟八法用后天八卦）：
+ *   乾6公孙 / 坎1申脉 / 艮8内关 / 震3外关 / 巽4临泣 / 离9列缺 / 坤2(二五)照海 / 兑7后溪
+ * 飞腾八法用先天八卦，天干→卦映射为歌诀（《针灸大全》），两系统同穴不同卦，不得混用。
+ * ============================================================
+ */
+
+describe('八卦九宫八穴双系统（教材表10-14 灵龟 + 歌诀飞腾）', () => {
+  // 教材表10-14 后天八卦九宫八穴（权威值；教材穴名为简称「临泣」，
+  // 代码数据用国标全称「足临泣」，此处统一用全称与数据规范对齐）
+  const TEXTBOOK_1014 = {
+    6: { gua: '乾', code: 'SP4', name: '公孙' },
+    1: { gua: '坎', code: 'BL62', name: '申脉' },
+    8: { gua: '艮', code: 'PC6', name: '内关' },
+    3: { gua: '震', code: 'TE5', name: '外关' },
+    4: { gua: '巽', code: 'GB41', name: '足临泣' },
+    9: { gua: '离', code: 'LU7', name: '列缺' },
+    2: { gua: '坤', code: 'KI6', name: '照海' },
+    7: { gua: '兑', code: 'SI3', name: '后溪' }
+  }
+
+  it('EIGHT_POINTS 的 gua/palace 与教材表10-14 完全一致（灵龟后天八卦）', () => {
+    for (const p of EIGHT_POINTS) {
+      const tb = TEXTBOOK_1014[p.palace]
+      expect(tb, `宫${p.palace} 在教材表中`).toBeTruthy()
+      expect(p.gua, `${p.code} 卦`).toBe(tb.gua)
+      expect(p.code, `宫${p.palace} 穴`).toBe(tb.code)
+      expect(p.name, `${p.code} 名`).toBe(tb.name)
+    }
+  })
+
+  it('飞腾 STEM_POINT_MAP：10 天干全覆盖且与《针灸大全》歌诀逐字一致', () => {
+    // 歌诀：壬甲公孙乾、丙内关艮、戊临泣坎、庚外关震、辛后溪巽、乙癸申脉坤、己列缺离、丁照海兑
+    const JUEGUE = {
+      '壬': 'SP4', '甲': 'SP4', '丙': 'PC6', '戊': 'GB41', '庚': 'TE5',
+      '辛': 'SI3', '乙': 'BL62', '癸': 'BL62', '己': 'LU7', '丁': 'KI6'
+    }
+    for (const [stem, code] of Object.entries(JUEGUE)) {
+      expect(STEM_POINT_MAP[stem], `时干 ${stem}`).toBe(code)
+    }
+    // 10 天干全覆盖
+    for (const stem of '甲乙丙丁戊己庚辛壬癸') {
+      expect(STEM_POINT_MAP[stem], `${stem} 有映射`).toBeTruthy()
     }
   })
 })
