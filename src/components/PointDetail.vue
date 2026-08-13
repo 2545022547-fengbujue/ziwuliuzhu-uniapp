@@ -1,135 +1,142 @@
 <template>
-  <view v-if="!point" class="overlay" @tap="handleClose">
-    <view class="popup" :class="[store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`, `watercolor-wash-${watercolorWash}`]" @tap.stop>
+  <!-- 空态（防御性：selectPoint 总是先设 point 再 showDetail，正常流程不可达）与正常态共用同一
+       overlay/popup 骨架，内部仅按 point 有无切换，避免两套弹窗骨架重复维护。 -->
+  <view class="overlay" @tap="handleClose">
+    <view
+      class="popup"
+      :class="[store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`, `watercolor-wash-${watercolorWash}`]"
+      @tap.stop
+    >
       <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-primary"></view>
       <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-secondary"></view>
       <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-paper-texture"></view>
-      <view class="popup-header">
+
+      <template v-if="point">
+        <!-- 头部 -->
+        <view class="popup-header">
+          <view class="header-icon-wrap">
+            <text class="header-icon">📍</text>
+          </view>
+          <!-- close-btn 保持 44px 左右触控面积；各主题只改视觉，不缩小可点击区域。 -->
+          <view class="close-btn" role="button" aria-label="关闭穴位详情" @tap="handleClose">
+            <text class="close-icon">✕</text>
+          </view>
+          <!-- 穴位名称+编码：绝对定位，独立于图标和关闭按钮 -->
+          <view class="header-name-layer">
+            <text class="point-name" :class="{ 'point-name-code-hidden': !store.showPointCode }"><text
+              v-for="(ch, i) in nameChars"
+              :key="i"
+              :style="pnGapStyle(i, ch)"
+            >{{ ch }}</text></text>
+            <text v-if="store.showPointCode" class="point-code">{{ point?.code }}</text>
+          </view>
+        </view>
+
+        <scroll-view scroll-y class="popup-body">
+          <view class="popup-body-content">
+            <!-- 基本信息 -->
+            <view class="info-section">
+              <view class="section-title">
+                <view class="title-dot"></view>
+                <text>基本信息</text>
+              </view>
+              <view class="info-grid" :class="{ 'info-grid-center': (!point?.wuxing || !store.showWuXing), 'info-grid-meridian-long': isMeridianLong }">
+                <view class="info-item">
+                  <text class="info-label">所属经络</text>
+                  <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing || !point?.wuxing }">{{ point?.meridian || '-' }}</text>
+                </view>
+                <view class="info-item">
+                  <text class="info-label">穴位类别</text>
+                  <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing || !point?.wuxing }">{{ formatCategory(point?.category) || '-' }}</text>
+                </view>
+                <view v-if="point?.wuxing && store.showWuXing" class="info-item">
+                  <text class="info-label">五行属性</text>
+                  <text class="info-value info-value-center wuxing-value" :class="{ 'wuxing-value-large': isCategoryLong }" :style="{ color: getWuxingColor(point?.wuxing) }">
+                    {{ point.wuxing }}
+                  </text>
+                </view>
+              </view>
+            </view>
+
+            <!-- 定位 -->
+            <view class="info-section">
+              <view class="section-title">
+                <view class="title-dot"></view>
+                <text>定位</text>
+              </view>
+              <view class="location-box">
+                <text class="location-text">{{ point?.location || '暂无定位信息' }}</text>
+              </view>
+            </view>
+
+            <!-- 操作方法 -->
+            <view class="info-section" v-if="point?.needling || point?.moxibustion">
+              <view class="section-title">
+                <view class="title-dot"></view>
+                <text>操作方法</text>
+              </view>
+              <view class="method-grid">
+                <view v-if="point?.needling" class="method-item">
+                  <text class="method-label">🪡 针刺</text>
+                  <text class="method-value">{{ point.needling }}</text>
+                </view>
+                <view v-if="point?.moxibustion" class="method-item">
+                  <text class="method-label">🔥 艾灸</text>
+                  <text class="method-value">{{ point.moxibustion }}</text>
+                </view>
+              </view>
+            </view>
+
+            <!-- 注意事项 -->
+            <view v-if="point?.contraindications" class="caution-box">
+              <view class="caution-header">
+                <text class="caution-icon">⚠️</text>
+                <text class="caution-title">注意事项</text>
+              </view>
+              <text class="caution-text">{{ point.contraindications }}</text>
+            </view>
+
+            <!-- 纳子法补母泻子说明（仅在补母泻子法模式下点击母穴/子穴时显示） -->
+            <view v-if="naziBumuTip" class="nazi-bumu-tip">
+              <text class="nazi-bumu-tip-text">{{ naziBumuTip }}</text>
+            </view>
+          </view>
+
+          <!-- 动物岛主题底部场景：角色固定在详情卡右下角，草地与海浪补足原来的空白。 -->
+          <view v-if="store.activeUiStyle === 'animal'" class="animal-detail-scene" aria-hidden="true">
+            <view class="animal-scene-cloud cloud-one"></view>
+            <view class="animal-scene-cloud cloud-two"></view>
+            <view class="animal-scene-sun"></view>
+            <view class="animal-scene-tree tree-left"><view></view><view></view><text></text></view>
+            <view class="animal-scene-tree tree-mid"><view></view><view></view><text></text></view>
+            <view class="animal-scene-wave wave-back"></view>
+            <view class="animal-scene-wave wave-front"></view>
+            <view class="animal-scene-grass"></view>
+            <view class="animal-mascot-corner">
+              <AnimalMascot :variant="animalMascot.id" />
+            </view>
+          </view>
+
+          <view v-else style="height: 80rpx;"></view>
+        </scroll-view>
+      </template>
+
+      <!-- 空态（防御性）：point 为 null 时展示，与正常态共用关闭按钮 -->
+      <template v-else>
         <!-- 统一保留文字叉号作为非水墨主题的可见图形；水墨主题通过 CSS 双笔画重绘，避免字体基线偏移。 -->
-        <view class="close-btn" role="button" aria-label="关闭穴位详情" @tap="handleClose">
-          <text class="close-icon">✕</text>
-        </view>
-      </view>
-      <view class="empty-state">
-        <text class="empty-text">穴位信息加载失败</text>
-      </view>
-    </view>
-  </view>
-  <view v-else class="overlay" @tap="handleClose">
-    <view class="popup" :class="[store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`, `watercolor-wash-${watercolorWash}`]" @tap.stop>
-      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-primary"></view>
-      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-secondary"></view>
-      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-paper-texture"></view>
-      <!-- 头部 -->
-      <view class="popup-header">
-        <view class="header-icon-wrap">
-          <text class="header-icon">📍</text>
-        </view>
-        <!-- close-btn 保持 44px 左右触控面积；各主题只改视觉，不缩小可点击区域。 -->
-        <view class="close-btn" role="button" aria-label="关闭穴位详情" @tap="handleClose">
-          <text class="close-icon">✕</text>
-        </view>
-        <!-- 穴位名称+编码：绝对定位，独立于图标和关闭按钮 -->
-        <view class="header-name-layer">
-          <text class="point-name" :class="{ 'point-name-code-hidden': !store.showPointCode }"><text
-            v-for="(ch, i) in nameChars"
-            :key="i"
-            :style="pnGapStyle(i, ch)"
-          >{{ ch }}</text></text>
-          <text v-if="store.showPointCode" class="point-code">{{ point?.code }}</text>
-        </view>
-      </view>
-
-      <scroll-view scroll-y class="popup-body">
-        <view class="popup-body-content">
-        <!-- 基本信息 -->
-        <view class="info-section">
-          <view class="section-title">
-            <view class="title-dot"></view>
-            <text>基本信息</text>
-          </view>
-          <view class="info-grid" :class="{ 'info-grid-center': (!point?.wuxing || !store.showWuXing), 'info-grid-meridian-long': isMeridianLong }">
-            <view class="info-item">
-              <text class="info-label">所属经络</text>
-              <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing || !point?.wuxing }">{{ point?.meridian || '-' }}</text>
-            </view>
-            <view class="info-item">
-              <text class="info-label">穴位类别</text>
-              <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing || !point?.wuxing }">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
-            </view>
-            <view v-if="point?.wuxing && store.showWuXing" class="info-item">
-              <text class="info-label">五行属性</text>
-              <text class="info-value info-value-center wuxing-value" :class="{ 'wuxing-value-large': isCategoryLong }" :style="{ color: getWuxingColor(point?.wuxing) }">
-                {{ point.wuxing }}
-              </text>
-            </view>
+        <view class="popup-header">
+          <view class="close-btn" role="button" aria-label="关闭穴位详情" @tap="handleClose">
+            <text class="close-icon">✕</text>
           </view>
         </view>
-
-        <!-- 定位 -->
-        <view class="info-section">
-          <view class="section-title">
-            <view class="title-dot"></view>
-            <text>定位</text>
-          </view>
-          <view class="location-box">
-            <text class="location-text">{{ point?.location || '暂无定位信息' }}</text>
-          </view>
+        <view class="empty-state">
+          <text class="empty-text">穴位信息加载失败</text>
         </view>
-
-        <!-- 操作方法 -->
-        <view class="info-section" v-if="point?.needling || point?.moxibustion">
-          <view class="section-title">
-            <view class="title-dot"></view>
-            <text>操作方法</text>
-          </view>
-          <view class="method-grid">
-            <view v-if="point?.needling" class="method-item">
-              <text class="method-label">🪡 针刺</text>
-              <text class="method-value">{{ point.needling }}</text>
-            </view>
-            <view v-if="point?.moxibustion" class="method-item">
-              <text class="method-label">🔥 艾灸</text>
-              <text class="method-value">{{ point.moxibustion }}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 注意事项 -->
-        <view v-if="point?.contraindications" class="caution-box">
-          <view class="caution-header">
-            <text class="caution-icon">⚠️</text>
-            <text class="caution-title">注意事项</text>
-          </view>
-          <text class="caution-text">{{ point.contraindications }}</text>
-        </view>
-
-        <!-- 纳子法补母泻子说明（仅在补母泻子法模式下点击母穴/子穴时显示） -->
-        <view v-if="naziBumuTip" class="nazi-bumu-tip">
-          <text class="nazi-bumu-tip-text">{{ naziBumuTip }}</text>
-        </view>
-        </view>
-
-        <!-- 动物岛主题底部场景：角色固定在详情卡右下角，草地与海浪补足原来的空白。 -->
-        <view v-if="store.activeUiStyle === 'animal'" class="animal-detail-scene" aria-hidden="true">
-          <view class="animal-scene-cloud cloud-one"></view>
-          <view class="animal-scene-cloud cloud-two"></view>
-          <view class="animal-scene-sun"></view>
-          <view class="animal-scene-tree tree-left"><view></view><view></view><text></text></view>
-          <view class="animal-scene-tree tree-mid"><view></view><view></view><text></text></view>
-          <view class="animal-scene-wave wave-back"></view>
-          <view class="animal-scene-wave wave-front"></view>
-          <view class="animal-scene-grass"></view>
-          <view class="animal-mascot-corner">
-            <AnimalMascot :variant="animalMascot.id" />
-          </view>
-        </view>
-
-        <view v-else style="height: 80rpx;"></view>
-      </scroll-view>
+      </template>
     </view>
   </view>
 </template>
+
 
 <script setup>
 /**
@@ -170,6 +177,8 @@ function pnGapStyle(i, ch) {
 const watercolorWashes = ['mist', 'peach', 'ocean', 'rose', 'golden', 'shore']
 
 function getSecureRandomIndex(length) {
+  // 防御：length 非法（0/负数/非数）时直接返回 0，避免除零产生 NaN 污染调用方
+  if (!Number.isInteger(length) || length <= 0) return 0
   const cryptoApi = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined
 
   if (cryptoApi?.getRandomValues) {
@@ -248,7 +257,7 @@ const isMeridianLong = computed(() => {
  * 格式化穴位类别
  * 顿号统一改为空格分隔（"井穴、输穴" → "井穴 输穴"）
  */
-function formatCategory(category, wuxing) {
+function formatCategory(category) {
   if (!category) return ''
   return category.replace(/、/g, ' ')
 }
@@ -308,7 +317,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .empty-text {
   font-size: 28rpx;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 .popup-header {
@@ -695,13 +704,13 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   justify-content: center;
   gap: 16rpx;
   padding: 20rpx;
-  background: rgba($tcm-text, 0.04);
+  background: var(--theme-surface-muted);
   border-radius: 28rpx;
   margin-top: $spacing-md;
 }
 
 .nazi-bumu-tip-text {
   font-size: 24rpx;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 </style>

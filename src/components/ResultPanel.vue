@@ -33,21 +33,7 @@
           <view class="dot secondary"></view>
           <text>合日互用开穴（{{ result.alternativePoints.heLabel }}）</text>
         </view>
-        <view class="points-grid">
-          <view
-            v-for="point in result.alternativePoints.openPoints"
-            :key="'alt-' + point.code"
-            class="point-btn"
-            :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
-            @tap="handlePointClick(point)"
-          >
-            <text class="point-name" :class="{ 'name-long': point.name.length >= 3 }">{{ point.name }}</text>
-            <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
-            <view v-if="store.showWuXing && point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
-              <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
-            </view>
-          </view>
-        </view>
+        <PointGrid :points="result.alternativePoints.openPoints" key-prefix="alt" />
       </view>
 
       <!-- 值日/值时经络 -->
@@ -75,21 +61,7 @@
           <view class="dot primary"></view>
           <text>当前开穴</text>
         </view>
-        <view class="points-grid">
-          <view
-            v-for="bp in bumuPoints"
-            :key="'bumu-' + bp.point.code"
-            class="point-btn"
-            :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
-            @tap="handlePointClick(bp.point)"
-          >
-            <text class="point-name" :class="{ 'name-long': bp.point.name.length >= 3 }">{{ bp.point.name }}</text>
-            <text v-if="store.showPointCode" class="point-code">{{ bp.point.code }}</text>
-            <view v-if="store.showWuXing && bp.point.wuxing" class="wuxing-tag" :style="getWuxingStyle(bp.point.wuxing)">
-              <text class="wuxing-text" :style="{ color: getWuxingColor(bp.point.wuxing) }">{{ bp.point.wuxing }}</text>
-            </view>
-          </view>
-        </view>
+        <PointGrid :points="bumuPoints" key-prefix="bumu" />
       </view>
 
       <!-- 开穴列表（非补母泻子模式时显示） -->
@@ -98,21 +70,7 @@
           <view class="dot primary"></view>
           <text>当前开穴</text>
         </view>
-        <view class="points-grid">
-          <view
-            v-for="point in displayPoints"
-            :key="'open-' + point.code"
-            class="point-btn"
-            :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
-            @tap="handlePointClick(point)"
-          >
-            <text class="point-name" :class="{ 'name-long': point.name.length >= 3 }">{{ point.name }}</text>
-            <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
-            <view v-if="store.showWuXing && point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
-              <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
-            </view>
-          </view>
-        </view>
+        <PointGrid :points="displayPoints" key-prefix="open" />
       </view>
 
       <!-- 补母泻子法底部提示 -->
@@ -178,8 +136,8 @@
  */
 import { computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
-import { getWuxingStyle, getWuxingColor } from '@/utils/wuxing.js'
 import { METHOD_NAMES } from '@/data/constants.js'
+import PointGrid from '@/components/PointGrid.vue'
 
 // Props 定义
 const props = defineProps({
@@ -228,10 +186,11 @@ const bumuPoints = computed(() => {
     if (!point) continue
     if (seen.has(point.code)) continue
     seen.add(point.code)
-    items.push({ point })
+    items.push(point)
   }
 
-  return items.sort((a, b) => (a.point?.name?.length || 0) - (b.point?.name?.length || 0))
+  // 按名字字数排序：两字在前、三字在后
+  return items.sort((a, b) => (a?.name?.length || 0) - (b?.name?.length || 0))
 })
 
 // 穴位显示列表：纳子法按名字字数排序（两字在前、三字在后），其他方法不变
@@ -251,19 +210,12 @@ const methodIcon = computed(() => {
   return icons[props.method] || '•'
 })
 
-/**
- * 穴位点击处理：打开穴位详情弹窗
- * @param {Object} point - 穴位对象 { id, name, code, wuxing, ... }
- */
-function handlePointClick(point) {
-  store.selectPoint(point)
-}
 </script>
 
 <style lang="scss" scoped>
 .result-panel {
   margin: 0 $spacing-md $spacing-md;
-  background: $tcm-bg-light;
+  background: var(--theme-surface, #FFFDF5);
   border-radius: 28rpx;
   box-shadow: 0 8rpx 32rpx rgba(139, 69, 19, 0.08);
   overflow: hidden;
@@ -315,7 +267,7 @@ function handlePointClick(point) {
 
 .result-ganzhi-date {
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
   font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
 }
 
@@ -327,7 +279,7 @@ function handlePointClick(point) {
 
 .result-ganzhi-hour-label {
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 .result-ganzhi-hour-tag {
@@ -380,7 +332,7 @@ function handlePointClick(point) {
   margin-bottom: $spacing-sm;
   font-size: $font-size-sm;
   font-weight: 500;
-  color: rgba($tcm-text, 0.8);
+  color: var(--theme-text-secondary);
 }
 
 .dot {
@@ -388,101 +340,9 @@ function handlePointClick(point) {
   height: 12rpx;
   border-radius: 50%;
 
-  &.primary { background: $tcm-secondary; }
-  &.secondary { background: $tcm-secondary; }
+  &.primary { background: var(--theme-secondary, #5B8C3E); }
+  &.secondary { background: var(--theme-secondary, #5B8C3E); }
   &.fanke { background: $tcm-red; }
-}
-
-/* === 穴位网格 ===
- * 主面板和纵向对比面板统一使用三列，不再让 flex 根据文字宽度自行换行。
- * minmax(0, 1fr) 很重要：允许包含三字穴位名、编码和五行标签的网格项真正收缩，
- * 避免某个按钮的内容宽度把整列撑开，重新形成“2 + 2 + 1”的不规则排列。
- */
-.points-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12rpx;
-  align-items: stretch;
-}
-
-.point-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6rpx;
-  width: 100%;
-  min-width: 0;
-  min-height: 84rpx;
-  padding: 12rpx 10rpx;
-  box-sizing: border-box;
-  overflow: hidden;
-  border-radius: 20rpx;
-  background: var(--theme-surface-muted);
-  transition: all 0.25s ease;
-
-  &:active {
-    transform: scale(0.96);
-    opacity: 0.85;
-  }
-}
-
-.point-name {
-  flex-shrink: 0;
-  font-size: 38rpx;
-  font-weight: 700;
-  color: var(--theme-primary);
-  font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-// 三字及以上穴名（如三阴交）在默认布局下易把五行属性挤出，缩小字号
-.point-name.name-long {
-  font-size: 32rpx;
-}
-
-// 不显示穴位编码时：二字名略放大到 44rpx，三字名放到 38rpx
-.point-btn.point-btn-code-hidden .point-name {
-  font-size: 44rpx;
-}
-.point-btn.point-btn-code-hidden .point-name.name-long {
-  font-size: 38rpx;
-}
-
-// 不显示五行属性时：二字名放大到 50rpx，三字名放大到 48rpx
-.point-btn.point-btn-wuxing-hidden .point-name {
-  font-size: 50rpx;
-}
-.point-btn.point-btn-wuxing-hidden .point-name.name-long {
-  font-size: 46rpx;
-}
-
-// 编码与五行属性都关闭时，统一放大到 46rpx（二字、三字一致）
-.point-btn.point-btn-code-hidden.point-btn-wuxing-hidden .point-name {
-  font-size: 42rpx;
-}
-.point-btn.point-btn-code-hidden.point-btn-wuxing-hidden .point-name.name-long {
-  font-size: 42rpx;
-}
-
-.point-code {
-  min-width: 0;
-  font-size: 16rpx;
-  color: $tcm-text-hint;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.wuxing-tag {
-  flex-shrink: 0;
-  padding: 2rpx 7rpx;
-  border-radius: $radius-sm;
-}
-
-.wuxing-text {
-  font-size: 20rpx;
-  font-weight: 500;
-  font-family: 'WenYuanSerifSC-Bold', 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 /* === 经络行 === */
@@ -516,18 +376,18 @@ function handlePointClick(point) {
 
 .palace-icon {
   font-size: $font-size-lg;
-  color: $tcm-secondary;
+  color: var(--theme-secondary, #5B8C3E);
 }
 
 .palace-text {
   font-size: $font-size-sm;
-  color: rgba($tcm-text, 0.8);
+  color: var(--theme-text-secondary);
   line-height: 1.6;
 }
 
 .palace-note {
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 /* === 补泻建议 === */
@@ -567,7 +427,7 @@ function handlePointClick(point) {
 
 .principle-text {
   font-size: $font-size-xs;
-  color: rgba($tcm-text, 0.65);
+  color: var(--theme-text-hint);
   line-height: 1.8;
 }
 
@@ -586,7 +446,7 @@ function handlePointClick(point) {
 
 .empty-text {
   font-size: $font-size-sm;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 /* === 纳子法模式切换 === */
@@ -601,7 +461,7 @@ function handlePointClick(point) {
 .switch-option {
   padding: 4rpx 14rpx;
   font-size: 22rpx;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
   background: var(--theme-surface-muted);
 
   &.active {
@@ -617,18 +477,18 @@ function handlePointClick(point) {
   justify-content: center;
   gap: 8rpx;
   padding: 20rpx;
-  background: rgba($tcm-text, 0.04);
+  background: var(--theme-surface-muted);
   border-radius: 14rpx;
   margin-top: $spacing-md;
 }
 
 .bumu-tip-icon {
   font-size: 24rpx;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 .bumu-tip-text {
   font-size: 24rpx;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 </style>
