@@ -43,7 +43,20 @@ export default {
     store.applyThemeChrome()
     // #endif
   },
-  onHide() {}
+  onHide() {},
+
+  /**
+   * 全局错误兜底（生产可用健壮性）：
+   * - 捕获未预期的运行时错误与未处理的 Promise 拒绝，统一落日志，
+   *   便于真机/线上问题定位（本项目无网络上报，仅 console，按需扩展）。
+   * - 注意：这里只做「记录」，不做静默吞错——错误仍会按平台默认行为继续。
+   */
+  onError(err) {
+    console.error('[App] 全局运行时错误:', err)
+  },
+  onUnhandledRejection(err) {
+    console.error('[App] 未处理的 Promise 拒绝:', err)
+  }
 }
 </script>
 

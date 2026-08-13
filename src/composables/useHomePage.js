@@ -20,20 +20,25 @@ import { formatDate, getHourIndexFromDate, HOUR_OPTIONS, SHICHEN_START_HOURS } f
  *
  * 主题页面通过 inject('home') 获取本函数返回的共享状态与方法。
  */
+
+// 模块级只读常量（避免每次调用 useHomePage 重建数组）：
+// 四种主取穴方法（不含反克法，反克法是闭穴时的补充）
+const METHODS = [
+  { id: 'najia', name: '纳甲法', icon: '☰' },
+  { id: 'nazi', name: '纳子法', icon: '☷' },
+  { id: 'lingui', name: '灵龟八法', icon: '☯' },
+  { id: 'feiteng', name: '飞腾八法', icon: '⚡' }
+]
+
+// 时辰下拉选项标签（"子时 23:00-01:00"），由 HOUR_OPTIONS 派生
+const HOUR_LABELS = HOUR_OPTIONS.map(h => h.label)
+
 export function useHomePage() {
   const store = useAppStore()
   const { statusBarHeight, safeAreaBottom } = useSystemInfo()
   // 导航栏高度 = 状态栏 + 44px
   const navHeight = computed(() => statusBarHeight.value + 44)
   const safeBottom = computed(() => safeAreaBottom.value)
-
-  // 四种主取穴方法（不含反克法，反克法是闭穴时的补充）
-  const methods = [
-    { id: 'najia', name: '纳甲法', icon: '☰' },
-    { id: 'nazi', name: '纳子法', icon: '☷' },
-    { id: 'lingui', name: '灵龟八法', icon: '☯' },
-    { id: 'feiteng', name: '飞腾八法', icon: '⚡' }
-  ]
 
   // 当前日期时间格式化字符串（如"2026年04月30日 22:30"）
   const currentDateTimeStr = computed(() => {
@@ -199,11 +204,11 @@ export function useHomePage() {
     store,
     navHeight,
     safeBottom,
-    methods,
+    methods: METHODS,
     currentDateTimeStr,
     selectedDateStr,
     selectedHourIdx,
-    hourLabels,
+    hourLabels: HOUR_LABELS,
     showQueryConfirm,
     showDatePicker,
     showTimePicker,
