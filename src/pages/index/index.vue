@@ -9,7 +9,7 @@
   -->
   <view class="page" :class="[store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`, store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : '']">
     <!-- 导航栏 -->
-    <AppNavbar title="子午流注取穴" />
+    <AppNavbar title="子午流注取穴" class="home-navbar" />
     <view :style="{ height: navHeight + 'px' }" class="nav-placeholder"></view>
 
     <scroll-view scroll-y class="page-scroll" :show-scrollbar="false">

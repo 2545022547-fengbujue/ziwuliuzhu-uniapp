@@ -19,14 +19,26 @@ $ink-text: #2B2B2B;
 $ink-text-secondary: #4F5654;
 $ink-text-hint: #737A76;
 $ink-border: rgba(43, 43, 43, 0.16);
-// 水墨主展示字体：字魂苍劲行楷优先（用户指定替换，商用需授权），项目汉字覆盖 99.3%；
-// 其后依次是敦煌飞天行楷、LXGW 真楷、内置楷体、文渊宋体和系统楷体兜底。
-$ink-kaiti: 'ZihunCangjingXingkai', 'DunhuangXingKai', 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif;
+// 水墨主展示字体：华文行楷优先（仅 H5/App 打包），项目汉字覆盖 99.3%；
+// 其后依次是 LXGW 真楷（落霞孤鹜体）、内置楷体、文渊宋体和系统楷体兜底。
+$ink-kaiti: 'HuawenXingkai', 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif;
 $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 .ui-ink {
   /* === 主题变量重定义 === */
   --theme-primary: #{$ink-primary};
+
+  /* 首页标题"子午流注取穴"放大（仅水墨主题生效） */
+  .home-navbar .navbar-title {
+    font-size: 42rpx !important;
+  }
+
+  /* 穴位详情弹窗内所有文字统一使用水墨主字体（华文行楷优先，自动跟随 $ink-kaiti 链首） */
+  .popup,
+  .popup * {
+    font-family: $ink-kaiti !important;
+  }
+
   --theme-primary-dark: #1A1A1A;
   --theme-secondary: #{$ink-seal};
   --theme-bg: #{$ink-bg};
@@ -551,6 +563,8 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   .point-name {
     color: $ink-text !important;
     font-family: $ink-kaiti !important;
+    // 华文行楷基线偏高，结果面板穴名整体下移 2rpx 与同行编码/五行属性对齐（仅水墨主题生效）
+    transform: translateY(2rpx);
   }
 
   .point-code {
@@ -762,6 +776,14 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   .ui-style-option.active .ui-style-name {
     color: $ink-primary !important;
     font-weight: 700 !important;
+    font-size: 34rpx !important;
+    // 水墨意境主题下，外观风格中被选中的那一项名称也用行楷，与其余项区分
+    font-family: $ink-kaiti !important;
+  }
+
+  // 水墨意境主题下，选中项下方的说明小字也跟随行楷
+  .ui-style-option.active .ui-style-desc {
+    font-family: $ink-kaiti !important;
   }
 
   .ui-style-option.active {
@@ -909,6 +931,9 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   // 穴位大名保留楷体，墨色
   .popup .point-name {
     color: $ink-text !important;
+    // 华文行楷基线偏高：字距收紧 2rpx、整体下移 2rpx 与结果面板穴名对齐（仅水墨主题生效）
+    letter-spacing: -2rpx !important;
+    transform: translateY(2rpx) !important;
   }
 
   /*

@@ -31,7 +31,11 @@
         </view>
         <!-- 穴位名称+编码：绝对定位，独立于图标和关闭按钮 -->
         <view class="header-name-layer">
-          <text class="point-name" :class="{ 'point-name-code-hidden': !store.showPointCode }">{{ point?.name }}</text>
+          <text class="point-name" :class="{ 'point-name-code-hidden': !store.showPointCode }"><text
+            v-for="(ch, i) in nameChars"
+            :key="i"
+            :style="pnGapStyle(i, ch)"
+          >{{ ch }}</text></text>
           <text v-if="store.showPointCode" class="point-code">{{ point?.code }}</text>
         </view>
       </view>
@@ -47,11 +51,11 @@
           <view class="info-grid" :class="{ 'info-grid-center': (!point?.wuxing || !store.showWuXing), 'info-grid-meridian-long': isMeridianLong }">
             <view class="info-item">
               <text class="info-label">所属经络</text>
-              <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing }">{{ point?.meridian || '-' }}</text>
+              <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing || !point?.wuxing }">{{ point?.meridian || '-' }}</text>
             </view>
             <view class="info-item">
               <text class="info-label">穴位类别</text>
-              <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing }">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
+              <text class="info-value info-value-center" :class="{ 'info-value-lg': !store.showWuXing || !point?.wuxing }">{{ formatCategory(point?.category, point?.wuxing) || '-' }}</text>
             </view>
             <view v-if="point?.wuxing && store.showWuXing" class="info-item">
               <text class="info-label">五行属性</text>
@@ -152,6 +156,17 @@ import AnimalMascot from '@/components/AnimalMascot.vue'
 
 const store = useAppStore()
 const point = computed(() => store.selectedPoint)
+
+// 弹窗穴名按字拆分，便于"陵→泉"这一对单独收紧字距，其余字对保持原字距
+const nameChars = computed(() => Array.from(point.value?.name || ''))
+
+// 仅在水墨主题、且上一字为"陵"且当前字为"泉"时额外负 margin 收拢该字对；其它情况不加
+function pnGapStyle(i, ch) {
+  if (store.activeUiStyle === 'ink' && i > 0 && nameChars.value[i - 1] === '陵' && ch === '泉') {
+    return 'margin-left:-10rpx'
+  }
+  return ''
+}
 const watercolorWashes = ['mist', 'peach', 'ocean', 'rose', 'golden', 'shore']
 
 function getSecureRandomIndex(length) {
@@ -340,6 +355,8 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   color: var(--theme-text);
   font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', '楷体', 'STKaiti', serif;
   line-height: 1.2;
+  // 字距改按字拆分的精准方案：仅"陵→泉"一对额外收拢（见 pnGapStyle），其余字对保持原字距；
+  // 华文行楷基线偏高所需的 letter-spacing/translateY 微调仅水墨主题需要，已移至 ui-ink.scss 的 .popup .point-name
 }
 
 .point-code {
@@ -567,7 +584,7 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
 // 所属经络 / 穴位类别的值字号放大
 .info-value-lg {
-  font-size: 36rpx;
+  font-size: 40rpx;
 }
 
 .wuxing-value {

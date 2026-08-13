@@ -21,14 +21,14 @@ export default {
     loadMiniProgramFonts()
     // #endif
 
-    // #ifdef APP-PLUS
-    // App端：启动时应用主题 tabBar
+    // #ifdef H5 || APP-PLUS
+    // H5 / App 端：启动时应用主题 tabBar
     const store = useAppStore()
     store.applyThemeChrome()
 
-    // 监听 theme 变化，自动更新 tabBar
+    // 监听 theme / uiStyle 变化，自动更新 tabBar
     watch(
-      () => store.theme,
+      () => [store.theme, store.uiStyle],
       () => {
         setTimeout(() => store.applyThemeChrome(), 50)
       }
@@ -36,7 +36,7 @@ export default {
     // #endif
   },
   onShow() {
-    // #ifdef APP-PLUS
+    // #ifdef H5 || APP-PLUS
     const store = useAppStore()
     store.applyThemeChrome()
     // #endif

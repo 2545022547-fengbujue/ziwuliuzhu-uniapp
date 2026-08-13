@@ -41,7 +41,7 @@
             :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
             @tap="handlePointClick(point)"
           >
-            <text class="point-name">{{ point.name }}</text>
+            <text class="point-name" :class="{ 'name-long': point.name.length >= 3 }">{{ point.name }}</text>
             <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
             <view v-if="store.showWuXing && point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
               <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
@@ -83,7 +83,7 @@
             :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
             @tap="handlePointClick(bp.point)"
           >
-            <text class="point-name">{{ bp.point.name }}</text>
+            <text class="point-name" :class="{ 'name-long': bp.point.name.length >= 3 }">{{ bp.point.name }}</text>
             <text v-if="store.showPointCode" class="point-code">{{ bp.point.code }}</text>
             <view v-if="store.showWuXing && bp.point.wuxing" class="wuxing-tag" :style="getWuxingStyle(bp.point.wuxing)">
               <text class="wuxing-text" :style="{ color: getWuxingColor(bp.point.wuxing) }">{{ bp.point.wuxing }}</text>
@@ -106,7 +106,7 @@
             :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
             @tap="handlePointClick(point)"
           >
-            <text class="point-name">{{ point.name }}</text>
+            <text class="point-name" :class="{ 'name-long': point.name.length >= 3 }">{{ point.name }}</text>
             <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
             <view v-if="store.showWuXing && point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
               <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>
@@ -428,7 +428,7 @@ function handlePointClick(point) {
 
 .point-name {
   flex-shrink: 0;
-  font-size: 26rpx;
+  font-size: 38rpx;
   font-weight: 700;
   color: var(--theme-primary);
   font-family: 'SimSun', '宋体', 'Noto Serif SC', serif;
@@ -436,19 +436,38 @@ function handlePointClick(point) {
   white-space: nowrap;
 }
 
-// 不显示穴位编码时，给穴位名更多空间，字号增大一点点
-.point-btn.point-btn-code-hidden .point-name {
-  font-size: 30rpx;
+// 三字及以上穴名（如三阴交）在默认布局下易把五行属性挤出，缩小字号
+.point-name.name-long {
+  font-size: 32rpx;
 }
 
-// 不显示五行属性时，同样给穴位名更多空间，字号增大一点点
+// 不显示穴位编码时：二字名略放大到 44rpx，三字名放到 38rpx
+.point-btn.point-btn-code-hidden .point-name {
+  font-size: 44rpx;
+}
+.point-btn.point-btn-code-hidden .point-name.name-long {
+  font-size: 38rpx;
+}
+
+// 不显示五行属性时：二字名放大到 50rpx，三字名放大到 48rpx
 .point-btn.point-btn-wuxing-hidden .point-name {
-  font-size: 34rpx;
+  font-size: 50rpx;
+}
+.point-btn.point-btn-wuxing-hidden .point-name.name-long {
+  font-size: 46rpx;
+}
+
+// 编码与五行属性都关闭时，统一放大到 46rpx（二字、三字一致）
+.point-btn.point-btn-code-hidden.point-btn-wuxing-hidden .point-name {
+  font-size: 42rpx;
+}
+.point-btn.point-btn-code-hidden.point-btn-wuxing-hidden .point-name.name-long {
+  font-size: 42rpx;
 }
 
 .point-code {
   min-width: 0;
-  font-size: 18rpx;
+  font-size: 16rpx;
   color: $tcm-text-hint;
   line-height: 1.2;
   white-space: nowrap;

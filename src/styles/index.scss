@@ -65,23 +65,12 @@
   font-style: normal;
   font-display: swap;
 }
-/* 水墨风主展示字体：敦煌飞天行楷（内部名 AaDHFT XKT，Non-Commercial Use） */
-/* 项目 1394 字符中覆盖全部 1364 个汉字；缺失的 emoji/装饰符号按设计回退系统字体 */
-/* 仅 H5/App 打包；微信小程序不加载，自动回退已加载的 LXGW */
+/* 水墨风主展示字体（临时切换试用）：华文行楷（STXingkai，系统字体提取，仅 H5/App 打包） */
+/* 子集化自华文行楷.ttf，依据 chars_project_complete.txt 字符集，4.0MB → 625KB */
+/* 微信小程序不加载，自动回退已加载的 LXGW */
 @font-face {
-  font-family: 'DunhuangXingKai';
-  src: url('@/assets/fonts/dunhuang-xingkai-subset.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* 水墨风主展示字体（新增·优先）：字魂苍劲行楷（商用需授权，仅 H5/App 打包） */
-/* 子集化自字魂苍劲行楷体，依据 chars_project_complete.txt 字符集，13.5MB → 2.0MB */
-/* 微信小程序不加载，自动回退已加载的 LXGW / Dunhuang / 系统宋体 */
-@font-face {
-  font-family: 'ZihunCangjingXingkai';
-  src: url('@/assets/fonts/zihun-cangjing-xingkai-subset.ttf') format('truetype');
+  font-family: 'HuawenXingkai';
+  src: url('@/assets/fonts/huawen-xingkai-subset.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
