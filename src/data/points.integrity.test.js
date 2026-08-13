@@ -13,6 +13,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { getWushuPointsFull, getPointByCode } from '@/services/acupuncturePoints.js'
 import { NAZI_SPECIAL_POINTS } from '@/data/constants.js'
+import { STEM_POINT_MAP, EIGHT_POINTS_MAP } from '@/data/eight-points.js'
 
 const DATA_PATH = path.resolve(process.cwd(), 'src/data/acupuncture-points-gb2021.json')
 const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'))
@@ -101,6 +102,31 @@ describe('纳子法特殊穴查表（NAZI_SPECIAL_POINTS）', () => {
         expect(code, `${m}.${field} 缺 code`).toBeTruthy()
         expect(getPointByCode(code), `${m}.${field}=${code} 无法解析`).toBeTruthy()
       }
+    }
+  })
+})
+
+describe('飞腾八法数据契约（STEM_POINT_MAP / EIGHT_POINTS_MAP）', () => {
+  // 与 NAZI_SPECIAL_POINTS 同理：对象值引用是正则扫描盲区。
+  // STEM_POINT_MAP 若缺某时天干 → 该时辰飞腾永闭穴（真实业务缺陷）。
+  it('时天干映射覆盖全部 10 天干，且映射穴可解析', () => {
+    for (const g of '甲乙丙丁戊己庚辛壬癸') {
+      const code = STEM_POINT_MAP[g]
+      expect(code, `缺时天干 ${g} 的飞腾映射`).toBeTruthy()
+      expect(getPointByCode(code), `${g} → ${code} 无法解析`).toBeTruthy()
+    }
+  })
+
+  it('八脉交会穴恰好 8 穴，配对双向闭合（pairedCode 互指）且均可解析', () => {
+    const codes = Object.keys(EIGHT_POINTS_MAP)
+    expect(codes.length).toBe(8)
+    for (const code of codes) {
+      const paired = EIGHT_POINTS_MAP[code].pairedCode
+      expect(paired, `${code} 缺 pairedCode`).toBeTruthy()
+      // 配对必须双向（公孙↔内关等），单向配对说明数据编辑出错
+      expect(EIGHT_POINTS_MAP[paired] && EIGHT_POINTS_MAP[paired].pairedCode, `${code}↔${paired} 配对非双向`).toBe(code)
+      expect(getPointByCode(code), `${code} 主数据缺失`).toBeTruthy()
+      expect(getPointByCode(paired), `${paired} 主数据缺失`).toBeTruthy()
     }
   })
 })
