@@ -25,18 +25,22 @@
 </template>
 
 <script setup>
-import { provide, reactive } from 'vue'
+import { provide, reactive, defineAsyncComponent } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { useHomePage } from '@/composables/useHomePage.js'
+// classic 常驻（唯一需兼容微信小程序的主题；小程序端仅保留此组件）
 import HomeClassic from '@/views/classic/HomeClassic.vue'
-// 非经典主题仅 H5/App 使用，小程序端不编译（见工作区约定"除经典四色外不考虑小程序"）
+// 非经典主题仅 H5/App 使用：
+//   - 小程序端：条件编译整体排除（不编译、不打包）
+//   - H5/App：defineAsyncComponent + 动态 import 异步加载，首次切到该主题才拉取，
+//     首包不再包含 6 套主题的代码与静态资源（主题切换时由设置页过渡遮罩掩盖加载瞬间）
 // #ifndef MP-WEIXIN
-import HomeModern from '@/views/modern/HomeModern.vue'
-import HomeInk from '@/views/ink/HomeInk.vue'
-import HomeMorandi from '@/views/morandi/HomeMorandi.vue'
-import HomeWatercolor from '@/views/watercolor/HomeWatercolor.vue'
-import HomeAnimal from '@/views/animal/HomeAnimal.vue'
-import HomePixel from '@/views/pixel/HomePixel.vue'
+const HomeModern = defineAsyncComponent(() => import('@/views/modern/HomeModern.vue'))
+const HomeInk = defineAsyncComponent(() => import('@/views/ink/HomeInk.vue'))
+const HomeMorandi = defineAsyncComponent(() => import('@/views/morandi/HomeMorandi.vue'))
+const HomeWatercolor = defineAsyncComponent(() => import('@/views/watercolor/HomeWatercolor.vue'))
+const HomeAnimal = defineAsyncComponent(() => import('@/views/animal/HomeAnimal.vue'))
+const HomePixel = defineAsyncComponent(() => import('@/views/pixel/HomePixel.vue'))
 // #endif
 
 const store = useAppStore()

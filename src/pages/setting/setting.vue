@@ -25,18 +25,21 @@
 </template>
 
 <script setup>
-import { provide, reactive } from 'vue'
+import { provide, reactive, defineAsyncComponent } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { useSettingPage } from '@/composables/useSettingPage.js'
+// classic 常驻（唯一需兼容微信小程序的主题；小程序端仅保留此组件）
 import SettingClassic from '@/views/classic/SettingClassic.vue'
-// 非经典主题仅 H5/App 使用，小程序端不编译（见工作区约定"除经典四色外不考虑小程序"）
+// 非经典主题仅 H5/App 使用：
+//   - 小程序端：条件编译整体排除（不编译、不打包）
+//   - H5/App：defineAsyncComponent + 动态 import 异步加载（首包瘦身）
 // #ifndef MP-WEIXIN
-import SettingModern from '@/views/modern/SettingModern.vue'
-import SettingInk from '@/views/ink/SettingInk.vue'
-import SettingMorandi from '@/views/morandi/SettingMorandi.vue'
-import SettingWatercolor from '@/views/watercolor/SettingWatercolor.vue'
-import SettingAnimal from '@/views/animal/SettingAnimal.vue'
-import SettingPixel from '@/views/pixel/SettingPixel.vue'
+const SettingModern = defineAsyncComponent(() => import('@/views/modern/SettingModern.vue'))
+const SettingInk = defineAsyncComponent(() => import('@/views/ink/SettingInk.vue'))
+const SettingMorandi = defineAsyncComponent(() => import('@/views/morandi/SettingMorandi.vue'))
+const SettingWatercolor = defineAsyncComponent(() => import('@/views/watercolor/SettingWatercolor.vue'))
+const SettingAnimal = defineAsyncComponent(() => import('@/views/animal/SettingAnimal.vue'))
+const SettingPixel = defineAsyncComponent(() => import('@/views/pixel/SettingPixel.vue'))
 // #endif
 
 const store = useAppStore()
