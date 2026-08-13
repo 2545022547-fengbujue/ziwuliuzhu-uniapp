@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import { getWushuPointsFull, getPointByCode } from '@/services/acupuncturePoints.js'
+import { NAZI_SPECIAL_POINTS } from '@/data/constants.js'
 
 const DATA_PATH = path.resolve(process.cwd(), 'src/data/acupuncture-points-gb2021.json')
 const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'))
@@ -81,6 +82,24 @@ describe('五输穴数据契约（算法取穴依赖）', () => {
     for (const m of MERIDIANS) {
       for (const w of getWushuPointsFull(m)) {
         expect(w.wuxing, `${m} ${w.code} 缺五行`).toBeTruthy()
+      }
+    }
+  })
+})
+
+describe('纳子法特殊穴查表（NAZI_SPECIAL_POINTS）', () => {
+  // 此表在 constants.js（数据层）维护，nazi.js 运行时按 code 查 getPointByCode——
+  // 字符串字面量扫描的正则无法覆盖「对象值」引用，是引用完整性检查的盲区，故在此单列。
+  const MERIDIANS = ['LU', 'LI', 'ST', 'SP', 'HT', 'SI', 'BL', 'KI', 'PC', 'TE', 'GB', 'LR']
+
+  it('12 经齐全，且本/原/母/子穴 code 均可解析到国标主数据', () => {
+    for (const m of MERIDIANS) {
+      const entry = NAZI_SPECIAL_POINTS[m]
+      expect(entry, `${m} 缺 NAZI_SPECIAL_POINTS 条目`).toBeTruthy()
+      for (const field of ['ben', 'yuan', 'mu', 'zi']) {
+        const code = entry[field]
+        expect(code, `${m}.${field} 缺 code`).toBeTruthy()
+        expect(getPointByCode(code), `${m}.${field}=${code} 无法解析`).toBeTruthy()
       }
     }
   })

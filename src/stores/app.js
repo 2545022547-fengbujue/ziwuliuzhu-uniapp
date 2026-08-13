@@ -48,6 +48,17 @@ function isKnownTheme(themeId) {
   return THEME_OPTIONS.some(t => t.id === themeId)
 }
 
+// === 持久化 schema 版本化 ===
+// 动机：pinia-plugin-persist-uni 只做「自动恢复 + 自动保存」，无迁移钩子。
+// 若未来新增/改状态字段语义，旧用户持久化数据可能不兼容。这里用显式版本号 +
+// 迁移注册表保证可平滑升级；当前 v1 是首个带版本的格式，旧数据视为 v0。
+const SCHEMA_VERSION = 1
+const PERSIST_KEY = 'ziwuliuzhu-app'  // 与 persist.strategies[0].key 保持一致
+/** 迁移注册表：{ 目标版本: (旧数据对象) => 新数据对象 }。v1 为基线，无破坏性变更。 */
+const SCHEMA_MIGRATIONS = {
+  1: (data) => data
+}
+
 export const useAppStore = defineStore('app', () => {
   // === 时间状态 ===
   const currentTime = ref(new Date())
@@ -89,6 +100,8 @@ export const useAppStore = defineStore('app', () => {
   const showGanZhi = ref(false)
   // 五行属性默认开启；关闭后取穴界面与穴位详情不再显示穴位的五行属性。
   const showWuXing = ref(true)
+  // 持久化 schema 版本（随 state 一起持久化，用于未来数据迁移判断）
+  const schemaVersion = ref(SCHEMA_VERSION)
 
   // === 计算属性 ===
 
@@ -123,25 +136,64 @@ export const useAppStore = defineStore('app', () => {
     }
   })
 
-  /** 全部取穴结果（从 currentGanZhi 自动推导，含错误边界） */
-  const results = computed(() => {
-    const ganzhi = currentGanZhi.value
-    const hourIndex = isManualMode.value ? selectedHour.value : currentHour.value
-    if (!ganzhi) {
-      return { najia: null, nazi: null, lingui: null, feiteng: null, fanke: null, _error: '干支计算失败' }
-    }
+  /** 当前生效的时辰索引（自动/手动模式统一入口） */
+  const activeHourIndex = computed(() => isManualMode.value ? selectedHour.value : currentHour.value)
+
+  /**
+   * 各取穴方法的独立计算结果（响应式精确化）。
+   *
+   * 演进动机：原实现把 5 种方法放在同一个 computed 内，任一依赖变化（如
+   * toggleHeRiHuYong 只影响纳甲、naziMode 只影响纳子展示）都会连带重算全部 5 种方法。
+   * 拆分后各方法 computed 只依赖自己真正需要的状态：
+   *   - najia 依赖 useHeRiHuYong（合日互用开关）
+   *   - nazi/lingui/feiteng/fanke 只依赖干支与时辰（切开关零重算）
+   * 对外接口不变：消费方仍通过 store.results[method] 访问（聚合 computed 组装）。
+   */
+  const najiaResult = computed(() => {
+    const gz = currentGanZhi.value
+    if (!gz) return null
     try {
-      return {
-        najia: calculateNajia(ganzhi, hourIndex, { enableHeRiHuYong: useHeRiHuYong.value }),
-        nazi: calculateNazi(ganzhi, hourIndex),
-        lingui: calculateLingui(ganzhi, hourIndex),
-        feiteng: calculateFeiteng(ganzhi, hourIndex),
-        fanke: calculateFanke(ganzhi, hourIndex)
-      }
+      return calculateNajia(gz, activeHourIndex.value, { enableHeRiHuYong: useHeRiHuYong.value })
     } catch (e) {
-      console.error('[取穴计算错误]', e)
-      return { najia: null, nazi: null, lingui: null, feiteng: null, fanke: null, _error: e.message }
+      console.error('[纳甲法计算错误]', e)
+      return null
     }
+  })
+
+  const naziResult = computed(() => {
+    const gz = currentGanZhi.value
+    if (!gz) return null
+    try { return calculateNazi(gz, activeHourIndex.value) } catch (e) { console.error('[纳子法计算错误]', e); return null }
+  })
+
+  const linguiResult = computed(() => {
+    const gz = currentGanZhi.value
+    if (!gz) return null
+    try { return calculateLingui(gz, activeHourIndex.value) } catch (e) { console.error('[灵龟八法计算错误]', e); return null }
+  })
+
+  const feitengResult = computed(() => {
+    const gz = currentGanZhi.value
+    if (!gz) return null
+    try { return calculateFeiteng(gz, activeHourIndex.value) } catch (e) { console.error('[飞腾八法计算错误]', e); return null }
+  })
+
+  const fankeResult = computed(() => {
+    const gz = currentGanZhi.value
+    if (!gz) return null
+    try { return calculateFanke(gz, activeHourIndex.value) } catch (e) { console.error('[反克法计算错误]', e); return null }
+  })
+
+  /** 聚合出口：保持 store.results[method] 接口不变；聚合仅为对象组装（子 computed 已缓存） */
+  const results = computed(() => {
+    const base = {
+      najia: najiaResult.value,
+      nazi: naziResult.value,
+      lingui: linguiResult.value,
+      feiteng: feitengResult.value,
+      fanke: fankeResult.value
+    }
+    return currentGanZhi.value ? base : { ...base, _error: '干支计算失败' }
   })
 
   // 当前激活方法的取穴结果（从 results 中按 activeMethod 索引）
@@ -378,8 +430,40 @@ export const useAppStore = defineStore('app', () => {
     selectedPoint.value = null
   }
 
+  /**
+   * 持久化 schema 版本检查与迁移。
+   *
+   * 时机：store setup 末尾执行（此时 pinia-plugin-persist-uni 已完成旧数据恢复，
+   * storage 里是已合并的持久化对象）。
+   *
+   * 行为：
+   *   - 读取 storage 原始对象；无 schemaVersion 视为 v0；
+   *   - 版本低于当前时，按 SCHEMA_MIGRATIONS 从 v+1 逐级迁移；
+   *   - 迁移后写回带新版本号的完整对象（保留全部既有字段）；
+   *   - 解析失败（脏数据）仅告警忽略，不阻断启动。
+   */
+  function ensureSchemaVersion() {
+    try {
+      const raw = uni.getStorageSync(PERSIST_KEY)
+      if (!raw) return
+      const saved = typeof raw === 'string' ? JSON.parse(raw) : raw
+      const from = Number(saved?.schemaVersion ?? 0)
+      if (from >= SCHEMA_VERSION) return
+      console.info(`[持久化] schema v${from} → v${SCHEMA_VERSION}`)
+      let data = saved
+      for (let v = from + 1; v <= SCHEMA_VERSION; v++) {
+        const migrate = SCHEMA_MIGRATIONS[v]
+        if (migrate) data = migrate(data)
+      }
+      uni.setStorageSync(PERSIST_KEY, JSON.stringify({ ...data, schemaVersion: SCHEMA_VERSION }))
+    } catch (e) {
+      console.warn('[持久化] schema 版本检查失败（按脏数据忽略）', e)
+    }
+  }
+
   // === 初始化 ===
   updateCurrentTime(true)  // 强制初始化，确保首次加载时间正确
+  ensureSchemaVersion()  // 持久化版本检查（需在恢复完成后、任何状态写入前）
 
   return {
     // State
@@ -410,6 +494,7 @@ export const useAppStore = defineStore('app', () => {
     showPointCode,
     showGanZhi,
     showWuXing,
+    schemaVersion,
     // Getters
     currentResults,
     currentGanZhi,
@@ -457,7 +542,7 @@ export const useAppStore = defineStore('app', () => {
             }
           }
         },
-        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'useHeRiHuYong', 'showPointCode', 'showGanZhi', 'showWuXing', 'theme', 'uiStyle']
+        paths: ['useTrueSolarTime', 'longitude', 'selectedCity', 'activeMethod', 'naziMode', 'fankeDisplayMode', 'useHeRiHuYong', 'showPointCode', 'showGanZhi', 'showWuXing', 'theme', 'uiStyle', 'schemaVersion']
       }
     ]
   }
