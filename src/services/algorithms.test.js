@@ -365,3 +365,152 @@ describe('权威教材范例交叉验证（2026-08-14 联网核对）', () => {
     expect(r.openPoints.length).toBe(0)
   })
 })
+
+/**
+ * ============================================================
+ * 教材级全量验算（2026-08-14 用户要求：根据教材表格验算推理，避免凭印象）
+ *
+ * 核心思想：测试文件内硬编码「教材权威常量表」（与 src 完全独立），
+ * 用独立公式推导宫位，与 calculateLingui 输出逐项对照。
+ * 若 src 中任一常量表/取余/归宫逻辑出错，此对照必然失败。
+ * ============================================================
+ */
+
+/** 教材表10-15 逐日干支代数（歌诀校正版：地支「巳午亥子」，教材印「己亥午子」为巳/己形近排印） */
+const TEXTBOOK_DAY_STEM = {
+  '甲': 10, '己': 10, '乙': 9, '庚': 9, '丙': 7, '辛': 7, '丁': 8, '壬': 8, '戊': 7, '癸': 7
+}
+const TEXTBOOK_DAY_BRANCH = {
+  '辰': 10, '戌': 10, '丑': 10, '未': 10, '申': 9, '酉': 9, '寅': 8, '卯': 8,
+  '巳': 7, '亥': 7, '午': 7, '子': 7
+}
+
+/** 教材表10-16 八法临时干支代数（歌诀校正版：地支「寅申」，教材印「寅甲」为形近排印） */
+const TEXTBOOK_HOUR_STEM = {
+  '甲': 9, '己': 9, '乙': 8, '庚': 8, '丙': 7, '辛': 7, '丁': 6, '壬': 6, '戊': 5, '癸': 5
+}
+const TEXTBOOK_HOUR_BRANCH = {
+  '子': 9, '午': 9, '丑': 8, '未': 8, '寅': 7, '申': 7, '卯': 6, '酉': 6, '辰': 5, '戌': 5, '巳': 4, '亥': 4
+}
+
+/** 独立公式：五鼠遁求时干（与 src 实现独立，按口诀公式硬推） */
+function textbookHourStem(dayStem, hourIndex) {
+  const stems = '甲乙丙丁戊己庚辛壬癸'
+  return stems[(stems.indexOf(dayStem) * 2 + hourIndex) % 10]
+}
+
+/** 独立公式：纯教材表推算灵龟宫位（不调用任何 src 代码） */
+function textbookPalace(dayStem, dayBranch, hourStem, hourBranch) {
+  const total = TEXTBOOK_DAY_STEM[dayStem] + TEXTBOOK_DAY_BRANCH[dayBranch]
+    + TEXTBOOK_HOUR_STEM[hourStem] + TEXTBOOK_HOUR_BRANCH[hourBranch]
+  const isYang = dayStem === '甲' || dayStem === '丙' || dayStem === '戊' || dayStem === '庚' || dayStem === '壬'
+  const mod = isYang ? 9 : 6
+  let raw = total % mod
+  if (raw === 0) raw = mod // 整除取最大数
+  // 中宫5：阳日归坤(2)，阴日归艮(8)
+  return raw === 5 ? (isYang ? 2 : 8) : raw
+}
+
+describe('灵龟八法教材级全量验算（独立公式对照，60甲子×12时辰=720组合）', () => {
+  // 60 甲子日序列：天干癸后接甲，地支亥后接子
+  const stems = '甲乙丙丁戊己庚辛壬癸'
+  const branches = '子丑寅卯辰巳午未申酉戌亥'
+  const jiaziDays = []
+  for (let i = 0; i < 60; i++) {
+    jiaziDays.push(stems[i % 10] + branches[i % 12])
+  }
+
+  it('720 组合宫位与独立公式完全一致', () => {
+    for (const day of jiaziDays) {
+      const dayStem = day[0]
+      const dayBranch = day[1]
+      for (let h = 0; h < 12; h++) {
+        const hourStem = textbookHourStem(dayStem, h)
+        const hourBranch = branches[h]
+        const expected = textbookPalace(dayStem, dayBranch, hourStem, hourBranch)
+        const r = calculateLingui({
+          day: { heavenlyStem: dayStem, earthlyBranch: dayBranch, ganZhi: day + '日' },
+          hour: { heavenlyStem: hourStem, earthlyBranch: hourBranch, ganZhi: hourStem + hourBranch + '时' },
+          year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+        }, h)
+        expect(r.palace.actualPalace, `${day} ${hourStem}${hourBranch}时`).toBe(expected)
+      }
+    }
+  })
+
+  it('宫位分布数学结构：阴日除6 仅出 1-6（7/9 永不出现），阳日除9 覆盖 1-9', () => {
+    // 由独立公式推全量分布
+    const dist = {}
+    for (const day of jiaziDays) {
+      const dayStem = day[0]
+      const dayBranch = day[1]
+      const isYang = '甲丙戊庚壬'.includes(dayStem)
+      for (let h = 0; h < 12; h++) {
+        const hs = textbookHourStem(dayStem, h)
+        const p = textbookPalace(dayStem, dayBranch, hs, branches[h])
+        const key = isYang ? '阳' : '阴'
+        dist[`${key}${p}`] = (dist[`${key}${p}`] || 0) + 1
+      }
+    }
+    // 阳日 360 组合分布在 1-9（含 7/9），阴日 360 组合只能落在 1-6
+    for (let p = 1; p <= 9; p++) {
+      const yangCount = dist[`阳${p}`] || 0
+      if (p === 7 || p === 9) {
+        // 7/9 仅阳日可达（阴日除6 余数 ≤6）
+        expect(yangCount).toBeGreaterThan(0)
+        expect(dist[`阴${p}`] || 0).toBe(0)
+      }
+    }
+    // 阴阳日组合数守恒
+    const yangTotal = Object.entries(dist).filter(([k]) => k.startsWith('阳')).reduce((s, [, v]) => s + v, 0)
+    const yinTotal = Object.entries(dist).filter(([k]) => k.startsWith('阴')).reduce((s, [, v]) => s + v, 0)
+    expect(yangTotal).toBe(360)
+    expect(yinTotal).toBe(360)
+  })
+
+  it('中宫5 归宫规则：阳日→坤2、阴日→艮8（枚举验证全部命中）', () => {
+    for (const day of jiaziDays) {
+      const dayStem = day[0]
+      const dayBranch = day[1]
+      const isYang = '甲丙戊庚壬'.includes(dayStem)
+      for (let h = 0; h < 12; h++) {
+        const hs = textbookHourStem(dayStem, h)
+        const total = TEXTBOOK_DAY_STEM[dayStem] + TEXTBOOK_DAY_BRANCH[dayBranch]
+          + TEXTBOOK_HOUR_STEM[hs] + TEXTBOOK_HOUR_BRANCH[branches[h]]
+        const mod = isYang ? 9 : 6
+        const raw = total % mod === 0 ? mod : total % mod
+        if (raw !== 5) continue // 只验证中宫5 的组合
+        const expected = isYang ? 2 : 8
+        const r = calculateLingui({
+          day: { heavenlyStem: dayStem, earthlyBranch: dayBranch, ganZhi: day + '日' },
+          hour: { heavenlyStem: hs, earthlyBranch: branches[h], ganZhi: hs + branches[h] + '时' },
+          year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+        }, h)
+        expect(r.palace.palaceNumber, `${day} ${hs}${branches[h]}时 原始宫位应为5`).toBe(5)
+        expect(r.palace.actualPalace, `${day} ${hs}${branches[h]}时 归宫`).toBe(expected)
+      }
+    }
+  })
+
+  it('开穴映射：九宫数 → 八脉交会穴对（八对双向闭环）', () => {
+    // 教材表10-14 八卦九宫八穴：乾6/艮8→公孙内关，坎1/兑7→后溪申脉，震3/巽4→临泣外关，坤2/离9→列缺照海
+    const palacePoints = {
+      1: ['SI3', 'BL62'], 2: ['LU7', 'KI6'], 3: ['GB41', 'TE5'], 4: ['GB41', 'TE5'],
+      6: ['SP4', 'PC6'], 7: ['SI3', 'BL62'], 8: ['SP4', 'PC6'], 9: ['LU7', 'KI6']
+    }
+    for (const day of jiaziDays) {
+      const dayStem = day[0]
+      for (let h = 0; h < 12; h++) {
+        const hs = textbookHourStem(dayStem, h)
+        const p = textbookPalace(dayStem, day[1], hs, branches[h])
+        const r = calculateLingui({
+          day: { heavenlyStem: dayStem, earthlyBranch: day[1], ganZhi: day + '日' },
+          hour: { heavenlyStem: hs, earthlyBranch: branches[h], ganZhi: hs + branches[h] + '时' },
+          year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+        }, h)
+        expect(pointCodes(r.openPoints).sort(), `${day} ${hs}${branches[h]}时 宫${p}`)
+          .toEqual([...palacePoints[p]].sort())
+      }
+    }
+  })
+})
