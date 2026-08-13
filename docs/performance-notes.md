@@ -73,6 +73,12 @@
 
 ## 5. 已知边界与待办
 
-- [ ] `lunar-javascript` 按需裁剪评估（首屏最大收益点，需验证可拆性）
+- [x] ~~`lunar-javascript` 按需裁剪评估~~（2026-08-14 完成，结论：**不裁剪**）
+  - 实测：lunar.js 单文件 8538 行 / 425KB（未压缩）/ UMD 无 module 字段 → Vite 无法摇树；库无子模块拆分
+  - 项目仅用 `Lunar.fromDate` + 干支 getter（约 12 个方法），但农历表/节气/子时语义依赖库整体正确性
+  - 收益：gzip 后 lunar 约 28KB，占主 chunk（196.8KB gzip）约 14%；极端裁剪省 ~14KB gzip
+  - 风险：手工裁剪 8.5k 行 UMD 极易破坏历法正确性（任何日期都要回归），维护成本高
+  - 结论：**高风险低收益，维持现状**。若未来首屏焦虑，优先评估「构建期替代库」而非裁剪
 - [ ] `results` 按 method 拆分 computed（当前 naziMode 切换连带全量重建，毫秒级，低优先）
 - [ ] CI 恢复（git 历史显示曾按用户要求移除 workflow，恢复前需确认）
+- [ ] 产物级回归已固化：`scripts/verify-mp-isolation.cjs`（MP 非 classic 零残留，挂 test:builds）
