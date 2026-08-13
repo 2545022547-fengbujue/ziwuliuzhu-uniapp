@@ -117,8 +117,20 @@ def subset_font(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--source-dir", type=Path, default=Path(r"<FONT_SOURCE_DIR>"))
+    parser.add_argument(
+        "--source-dir",
+        type=Path,
+        default=None,
+        help="完整字体源目录（需含 WenYuanSerifSC-Medium.ttf、WenYuanSerifSC-Bold.ttf、"
+        "楷体_GB2312.ttf、LXGWZhenKaiSlabGB-Regular.ttf、AaDunHuangFeiTian-XKT.ttf）；"
+        "缺省时读环境变量 FONT_SOURCE_DIR，再缺省为项目内 fonts-source/",
+    )
     args = parser.parse_args()
+
+    source_dir = args.source_dir
+    if source_dir is None:
+        env_dir = os.environ.get("FONT_SOURCE_DIR")
+        source_dir = Path(env_dir) if env_dir else PROJECT_ROOT / "fonts-source"
 
     characters = collect_characters()
     # 楷体会用于导航标题、方法标题、穴位名和说明正文。过去只打包一份
@@ -131,25 +143,25 @@ def main() -> None:
 
     jobs = [
         (
-            args.source_dir / "WenYuanSerifSC-Medium.ttf",
+            source_dir / "WenYuanSerifSC-Medium.ttf",
             FONT_DIR / "wenjinmincho-subset-v6.ttf",
             "文渊宋体 Medium",
             characters,
         ),
         (
-            args.source_dir / "WenYuanSerifSC-Bold.ttf",
+            source_dir / "WenYuanSerifSC-Bold.ttf",
             FONT_DIR / "WenYuanSerifSC-Bold-subset-v2.ttf",
             "文渊宋体 Bold",
             characters,
         ),
         (
-            args.source_dir / "楷体_GB2312.ttf",
+            source_dir / "楷体_GB2312.ttf",
             FONT_DIR / "kaiti-gb2312.ttf",
             "楷体 GB2312",
             kaiti_characters,
         ),
         (
-            args.source_dir / "LXGWZhenKaiSlabGB-Regular.ttf",
+            source_dir / "LXGWZhenKaiSlabGB-Regular.ttf",
             FONT_DIR / "LXGWZhenKaiSlabGB-subset.ttf",
             "LXGW ZhenKai Slab GB",
             characters,
@@ -158,7 +170,7 @@ def main() -> None:
         # 覆盖全部 1364 个项目汉字，仅 emoji/装饰符号按设计回退系统字体。
         # 注意：字体标注 Non-Commercial Use，仅限非商业用途。
         (
-            args.source_dir / "AaDunHuangFeiTian-XKT.ttf",
+            source_dir / "AaDunHuangFeiTian-XKT.ttf",
             FONT_DIR / "dunhuang-xingkai-subset.ttf",
             "敦煌飞天行楷",
             characters,
