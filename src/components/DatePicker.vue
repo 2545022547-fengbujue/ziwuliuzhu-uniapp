@@ -140,15 +140,30 @@ const parseDate = (dateStr) => {
     const today = new Date()
     return { year: today.getFullYear(), month: today.getMonth(), day: today.getDate() }
   }
-  const [y, m, d] = dateStr.split('-')
+  // 防御：外部传入的日期字符串格式非法（如持久化脏数据 "abc"、"2026/05/24"）时
+  // 回退到今天，避免 Number() 产生 NaN 后污染日历网格（年/月/日全部 NaN 白屏）。
+  const parts = String(dateStr).split('-')
+  if (parts.length !== 3) {
+    const today = new Date()
+    return { year: today.getFullYear(), month: today.getMonth(), day: today.getDate() }
+  }
+  const [y, m, d] = parts.map(Number)
+  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) {
+    const today = new Date()
+    return { year: today.getFullYear(), month: today.getMonth(), day: today.getDate() }
+  }
   // m-1：传入 "05" 时 JS Date.getMonth() 期望的是 4（0-11）
-  return { year: Number(y), month: Number(m) - 1, day: Number(d) }
+  return { year: y, month: m - 1, day: d }
 }
 
 // 初始化当前显示的年/月/日（从 props 解析）
 const initial = parseDate(props.value)
 const currentYear = ref(initial.year)    // 当前显示的年份
 const currentMonth = ref(initial.month)  // 当前显示的月份（0-11）
+// 选中状态记录完整年月日三元组：selected 高亮必须年/月/日全等，
+// 否则切月后会把「另一月的同一天」错误标成选中（如选中 5/24 切到 6 月，6/24 被高亮）。
+const selectedYear = ref(initial.year)
+const selectedMonth = ref(initial.month)
 const selectedDay = ref(initial.day)     // 当前选中的日期（1-31）
 
 // 今天的日期（用于标记"今日"样式）
@@ -190,7 +205,10 @@ const calendarDays = computed(() => {
     days.push({
       empty: false,
       date: d,
-      selected: d === selectedDay.value,  // 是否为当前选中日期
+      // 是否为当前选中日期：年月日三元组全等才算选中（避免跨月错位高亮）
+      selected: currentYear.value === selectedYear.value
+        && currentMonth.value === selectedMonth.value
+        && d === selectedDay.value,
       today: currentYear.value === todayYear && currentMonth.value === todayMonth && d === todayDate  // 是否为今天
     })
   }
@@ -252,6 +270,9 @@ function nextMonth() {
  */
 function selectDay(day) {
   if (day.empty) return  // 空格子不可选
+  // 记录选中时的年月（selected 高亮按三元组匹配）
+  selectedYear.value = currentYear.value
+  selectedMonth.value = currentMonth.value
   selectedDay.value = day.date
 }
 

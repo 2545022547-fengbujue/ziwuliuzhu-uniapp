@@ -102,7 +102,10 @@ const emit = defineEmits(['change', 'close'])
 const hourOptions = HOUR_OPTIONS
 
 // 当前选中的时辰索引（初始值从 props 传入）
-const selectedIndex = ref(props.value)
+// 防御：非法值（NaN/越界/负数）钳制到合法区间 0-11，避免无高亮或数组越界
+const selectedIndex = ref(
+  Number.isInteger(props.value) && props.value >= 0 && props.value <= 11 ? props.value : 0
+)
 
 /**
  * 点击时辰项

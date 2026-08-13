@@ -42,7 +42,7 @@ describe('useAppStore - 手动查询流程', () => {
 
   it('queryTime 进入手动模式并计算全部方法结果', () => {
     const s = useAppStore()
-    s.queryTime(new Date(2026, 4, 26), 6)
+    s.switchToManualMode(new Date(2026, 4, 26), 6)
     expect(s.isManualMode).toBe(true)
     // 五类方法均产出结果；纳甲序列恒为 12 项
     expect(s.results.najia.dailySequence).toHaveLength(12)
@@ -54,7 +54,7 @@ describe('useAppStore - 手动查询流程', () => {
 
   it('庚子日辛巳时（闭穴时辰）：默认无合日互用，开启后出现 alternativePoints', () => {
     const s = useAppStore()
-    s.queryTime(new Date(2026, 4, 26), 5)
+    s.switchToManualMode(new Date(2026, 4, 26), 5)
     expect(s.results.najia.isClosed).toBe(true)
     expect(s.results.najia.alternativePoints).toBeNull()
 
@@ -66,7 +66,7 @@ describe('useAppStore - 手动查询流程', () => {
 
   it('switchToAutoMode 退出手动并强制刷新', () => {
     const s = useAppStore()
-    s.queryTime(new Date(2026, 4, 26), 6)
+    s.switchToManualMode(new Date(2026, 4, 26), 6)
     s.switchToAutoMode()
     expect(s.isManualMode).toBe(false)
   })

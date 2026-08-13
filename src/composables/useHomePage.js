@@ -131,7 +131,7 @@ export function useHomePage() {
     // 用本地时间构造 Date，避免 new Date("YYYY-MM-DD") 的 UTC 陷阱（会变成 08:00）
     const parts = selectedDateStr.value.split('-')
     const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 0, 0, 0)
-    store.queryTime(date, selectedHourIdx.value)
+    store.switchToManualMode(date, selectedHourIdx.value)
   }
 
   /** 启动定时器（每分钟检查一次），比每秒更新节省约 60 倍 CPU 和电量消耗 */

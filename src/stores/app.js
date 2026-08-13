@@ -241,12 +241,6 @@ export const useAppStore = defineStore('app', () => {
     visualClock.value = new Date()
   }
 
-  function queryTime(date, hour) {
-    selectedDate.value = date
-    selectedHour.value = hour
-    isManualMode.value = true
-  }
-
   function switchToAutoMode() {
     isManualMode.value = false
     // 切换回自动模式，强制更新时间
@@ -281,8 +275,12 @@ export const useAppStore = defineStore('app', () => {
     activeMethod.value = method
   }
 
+  /**
+   * 设置纳子法模式（'daily' 一日六十六穴 | 'bumu' 补母泻子）。
+   * 防御：非法值（含持久化脏数据）钳制回 'daily'，模板按 === 'bumu' 判断可安全降级。
+   */
   function setNaziMode(mode) {
-    naziMode.value = mode
+    naziMode.value = mode === 'bumu' ? 'bumu' : 'daily'
   }
 
   function togglePointCode(enabled) {
@@ -348,9 +346,9 @@ export const useAppStore = defineStore('app', () => {
     if (!chrome) return
     try {
       const {
-        homeIconPath = '/static/tabbar/home.png',
+        homeIconPath = '/static/tabbar/home-green.png',
         homeSelectedIconPath,
-        settingIconPath = '/static/tabbar/setting.png',
+        settingIconPath = '/static/tabbar/setting-green.png',
         settingSelectedIconPath,
         ...style
       } = chrome
@@ -420,7 +418,6 @@ export const useAppStore = defineStore('app', () => {
     // Actions
     updateCurrentTime,
     refreshVisualClock,
-    queryTime,
     switchToAutoMode,
     switchToManualMode,
     updateLongitude,
