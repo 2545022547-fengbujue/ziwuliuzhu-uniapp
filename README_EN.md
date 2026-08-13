@@ -54,19 +54,19 @@ Traditional Chinese medical text style: Kaiti (楷体) for titles, Songti (宋�
 
 ```bash
 npm install
-npm run dev:h5
-npm run build:h5
-npm run build:mp-weixin
-npm run fonts:base64
-node tests/verify-lingui-fix.js
-node tests/verify-algorithms.js
+npm run dev:h5            # Dev preview → http://localhost:5174
+npm run build:h5          # H5 build
+npm run build:mp-weixin   # WeChat Mini Program build
+npm run test:builds       # Dual-end build + MP isolation check + app build
+npm test                  # 254 vitest unit tests + data gates (algorithms/data/fonts)
+npm run fonts:base64      # Sync Mini Program base64 font module after TTF changes
 ```
 
 - The App product version is sourced from `versionName` / `versionCode` in `src/manifest.json`; keep `package.json` in sync.
 - `patches/*.patch` files are applied by `patch-package` during `postinstall` to patch deprecated API usage in Mini Program dependencies.
 - After changing TTF files, run `npm run fonts:base64` to sync the generated base64 module used by Mini Program `loadFontFace`.
 - The current DCloud Vue3 toolchain pins the `@dcloudio/vite-plugin-uni` peer dependency to exactly `vite@5.2.8` (verified in 2026-06; newer alpha builds still pin 5.2.8). Vite/esbuild findings from `npm audit` are mainly dev-server/build-tooling risks; do not run `npm audit fix --force`. Keep the dev server limited to local/trusted networks and wait for DCloud to relax or upgrade Vite.
-- This repository currently has no `npm test` script; run the `node tests/...` verification scripts directly.
+- Algorithm correctness is guarded by a five-layer verification system (golden cases / structural invariants / data contracts / authoritative examples / textbook & paper formulas). See `docs/` navigation and AGENTS.md.
 
 ## Tech Stack
 

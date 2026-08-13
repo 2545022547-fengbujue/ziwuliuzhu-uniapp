@@ -40,6 +40,11 @@ src/assets/fonts/_sources/
 
 # 设计文档仅留本地（不推 GitHub）
 子午流注uniapp-UI结构说明.md
+# 2026-08-14 文档归位 docs/ 后的本地文档目录（保留设计：内部文档不推送远程）
+docs/architecture/
+docs/design-history/
+docs/dev-environment/
+docs/code-snapshots/
 
 # Python 脚本缓存
 __pycache__/

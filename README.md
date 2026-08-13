@@ -28,7 +28,7 @@
 
 ## 主题系统
 
-4套主题按组件适配当前主题，H5/App 运行时切换：
+**经典四色**（按 `theme` 切换，微信小程序仅支持宣纸色）：
 
 | 主题 | 名称 | 适用平台 |
 |------|------|----------|
@@ -37,8 +37,10 @@
 | green | 青瓷天青 | H5/App |
 | red | 朱砂丹霞 | H5/App |
 
-- **微信小程序**：仅支持 yellow，不显示主题切换入口
-- **H5/App**：支持4主题切换
+**六套独立 UI 风格**（按 `uiStyle` 切换，仅 H5/App）：现代简约、水墨意境、莫兰迪、水彩画风、动物岛、像素冒险。主题目录统一在 `src/config/themes.js`，视觉差异由 `src/styles/ui-*.scss` 命名空间覆盖实现。
+
+- **微信小程序**：仅经典四色中的宣纸色，不显示风格切换入口
+- **H5/App**：8 种外观运行时切换（含过渡动画，毫秒级，见 `docs/performance-notes.md`）
 
 ## 字体方案：楷题宋文
 
@@ -54,19 +56,19 @@
 
 ```bash
 npm install
-npm run dev:h5
-npm run build:h5
-npm run build:mp-weixin
-npm run fonts:base64
-node tests/verify-lingui-fix.js
-node tests/verify-algorithms.js
+npm run dev:h5            # 开发预览 → http://localhost:5174
+npm run build:h5          # H5 构建（构建前先 rm -rf dist/build/h5）
+npm run build:mp-weixin   # 微信小程序构建
+npm run test:builds       # 双端构建 + MP 产物隔离校验 + app 构建
+npm test                  # vitest 254 条单测 + 数据门禁（算法/数据/字体回归）
+npm run fonts:base64      # 修改字体 TTF 后同步小程序 base64 字体模块
 ```
 
 - App 产品版本以 `src/manifest.json` 的 `versionName` / `versionCode` 为准；`package.json` 版本保持同步。
 - `patches/*.patch` 由 `patch-package` 在 `postinstall` 阶段自动应用，用于修复小程序端依赖中的废弃 API 调用。
 - 修改字体 TTF 后先运行 `npm run fonts:base64`，同步小程序端 `loadFontFace` 使用的 base64 生成模块。
 - 当前 DCloud Vue3 工具链将 `@dcloudio/vite-plugin-uni` 的 peer 依赖精确锁定为 `vite@5.2.8`（2026-06 核验，新版 alpha 仍锁定 5.2.8）。`npm audit` 中 Vite/esbuild 相关项主要属于开发服务器与构建链风险；不要直接运行 `npm audit fix --force`，优先限制 dev server 只在本机/可信网络使用，并等待 DCloud 放宽或升级 Vite。
-- 仓库目前没有 `npm test` 脚本，算法校验需直接运行上面的 `node tests/...` 脚本。
+- 算法正确性由五层防护保证（黄金用例/结构不变量/数据契约/权威范例/教材论文公式），详见 `docs/` 文档导航与 AGENTS.md。
 
 ## 技术栈
 
@@ -88,38 +90,43 @@ node tests/verify-algorithms.js
 ```
 src/
 ├── services/        # 算法层
-│   ├── ganzhi.js    # 干支计算（真太阳时校正、子时翻转）
-│   ├── najia.js     # 纳甲法（返本还原、合日互用、反克法）
+│   ├── ganzhi.js    # 干支计算（真太阳时校正、子时翻转、五鼠遁）
+│   ├── najia.js     # 纳甲法（返本还原、遇输过原、合日互用、反克法）
 │   ├── nazi.js      # 纳子法（六十六穴、补母泻子）
 │   ├── lingui.js    # 灵龟八法（后天八卦）
 │   └── feiteng.js   # 飞腾八法（先天八卦）
+├── composables/     # 页面共享逻辑（useHomePage/useSettingPage/useRootClasses/useSystemInfo）
 ├── data/            # 数据层
 │   ├── constants.js         # 天干地支/五行/经脉常量
 │   ├── eight-points.js      # 八脉八穴共享数据
 │   ├── fanke-points.js      # 反克特殊穴位
 │   ├── special-points.js    # 五输穴数据
-│   └ acupuncture-points-gb2021.json # 穴位库（GB/T 2021）
-├── stores/          # Pinia 状态管理
-│   └ app.js         # 真太阳时/主题/纳子法模式/反克显示模式持久化
-├── pages/           # 页面
-│   ├── index/       # 取穴页（时间选择 + 结果展示）
-│   └ setting/       # 设置页（全屏弹窗：方法说明、关于）
-├── components/      # 组件
-│   ├── ResultPanel.vue     # 取穴结果卡片（含闭穴警告）
-│   ├── PointDetail.vue     # 穴位详情弹窗（楷题宋文）
-│   ├── CityPicker.vue      # 城市选择器（真太阳时）
-│   ├── DatePicker.vue      # 日历面板（三端统一）
-│   ├── TimePicker.vue      # 时辰选择面板（三端统一）
-│   └ AppNavbar.vue         # 顶部自定义导航栏
-├── styles/          # 全局样式
-│   ├── variables.scss      # SCSS变量
-│   ├── themes.scss         # 主题CSS变量定义
-│   └ index.scss            # 全局样式 + 字体声明
+│   └── acupuncture-points-gb2021.json # 穴位库（GB/T 2021）
+├── config/          # 主题目录单一事实来源（themes.js）
+├── stores/          # Pinia 状态管理（app.js：算法编排 + 外观 + 持久化 schema 版本化）
+├── pages/           # 页面壳层（v-if 分发主题组件 + provide 注入）
+├── views/           # 14 个主题薄壳组件 + _shared/ 公共布局（HomeLayout/SettingLayout/ThemeSwitch）
+├── components/      # 共享业务组件（ResultPanel/PointGrid/PointDetail/DatePicker/TimePicker/CityPicker/AppNavbar/ThemeTransitionOverlay）
+├── styles/          # 全局样式（themes.scss + ui-*.scss 命名空间覆盖，index.scss 控制 @use 顺序）
 ├── assets/fonts/    # 字体文件（子集化TTF）与小程序base64中间产物
-└── static/tabbar/   # TabBar图标（4组主题图标）
+└── static/tabbar/   # TabBar图标（各外观主题图标）
 ```
 
-根目录还包含 `scripts/`（字体重建、资源处理脚本）、`patches/`（patch-package 补丁）和 `tests/`（算法校验脚本）。
+根目录还包含 `scripts/`（字体重建、资源处理、校验脚本）、`patches/`（patch-package 补丁）、`tests/`（vitest 测试与数据校验）、`docs/`（文档）。
+
+## 文档导航
+
+| 文档 | 内容 |
+|------|------|
+| `docs/architecture/UI结构说明.md` | UI 结构与组件体系详解（经典四色+六套外观、主题切换、平台边界） |
+| `docs/design-history/2026-08-12设计与优化.md` | 2026-08-10~12 设计/实现/验证历史记录 |
+| `docs/guides/AI快速入手指南.md` | AI/开发者快速上手（技术栈、结构、约定速览） |
+| `docs/performance-notes.md` | 性能优化量化与决策（主题切换毫秒级、异步预取、lunar 裁剪评估） |
+| `docs/references/` | 算法验证权威论文（佟佳恒纳甲四定律、张雨辰干支公式） |
+| `docs/dev-environment/国内镜像源使用教程.md` | 国内开发环境/镜像配置 |
+| `docs/code-snapshots/` | Repomix 代码打包产物（旧版归档；最新版由 git hook 生成于 `项目目录/20260426183326/`） |
+| `CHANGELOG.md` | 版本变更记录 |
+| `AGENTS.md` | 面向 AI 的完整协作文档（算法概念、测试体系、工程教训；本地文件不推送） |
 
 ## 作者
 
