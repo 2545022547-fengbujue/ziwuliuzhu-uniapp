@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: $tcm-bg;
+  background-color: var(--theme-bg, #F8F4EF);
 }
 
 .nav-placeholder {
@@ -33,7 +33,7 @@
 .ganzhi-card {
   margin: $spacing-md;
   padding: $spacing-lg;
-  background: $tcm-bg-light;
+  background: var(--theme-surface, #FFFDF5);
   border-radius: 32rpx;
   box-shadow: 0 8rpx 32rpx rgba(139, 69, 19, 0.08);
 }
@@ -47,13 +47,13 @@
 
 .ganzhi-title {
   font-size: 26rpx;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
 }
 
 .ganzhi-toggle {
   display: flex;
   gap: 8rpx;
-  background: $tcm-bg;
+  background: var(--theme-bg, #F8F4EF);
   border-radius: 20rpx;
   padding: 4rpx;
 }
@@ -79,7 +79,7 @@
 
 .toggle-text {
   font-size: 24rpx;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
 }
 
 /* === 手动模式控件 === */
@@ -99,7 +99,7 @@
 
 .control-label {
   font-size: 28rpx;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
 }
 
 .picker-btn {
@@ -108,7 +108,7 @@
   border: 1rpx solid var(--theme-border);
   border-radius: 16rpx;
   font-size: $font-size-sm;
-  color: $tcm-text;
+  color: var(--theme-text, #2C2C2C);
   min-width: 240rpx;
   text-align: center;
 }
@@ -144,12 +144,12 @@
 
 .datetime-text {
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 .datetime-value {
   font-size: $font-size-xs;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
 }
 
 /* === 干支标签显示 === */
@@ -189,7 +189,7 @@
   display: flex;
   margin: 0 $spacing-md $spacing-md;
   padding: 10rpx;
-  background: $tcm-bg-light;
+  background: var(--theme-surface, #FFFDF5);
   border-radius: 28rpx;
   box-shadow: 0 6rpx 24rpx rgba(139, 69, 19, 0.06);
   gap: 8rpx;
@@ -228,7 +228,7 @@
 
 .method-name {
   font-size: 24rpx;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
   transition: all 0.25s ease;
 }
 
@@ -342,18 +342,18 @@
 
 .fanke-icon {
   font-size: 40rpx;
-  color: $tcm-secondary;
+  color: var(--theme-secondary, #5B8C3E);
 }
 
 .fanke-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: $tcm-secondary;
+  color: var(--theme-secondary, #5B8C3E);
 }
 
 .fanke-desc {
   font-size: 26rpx;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
   margin-left: 8rpx;
 }
 
@@ -377,7 +377,7 @@
 
 .divider-text {
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 .compare-grid {

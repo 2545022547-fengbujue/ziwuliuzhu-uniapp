@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: $tcm-bg;
+  background-color: var(--theme-bg, #F8F4EF);
 }
 
 .nav-placeholder {
@@ -30,7 +30,7 @@
 }
 
 .setting-card {
-  background: $tcm-bg-light;
+  background: var(--theme-surface, #FFFDF5);
   border-radius: $radius-lg;
   box-shadow: $shadow-sm;
   padding: $spacing-lg;
@@ -43,7 +43,7 @@
   gap: $spacing-sm;
   font-size: $font-size-base;
   font-weight: 600;
-  color: $tcm-text;
+  color: var(--theme-text, #2C2C2C);
   margin-bottom: $spacing-lg;
 }
 
@@ -86,7 +86,7 @@
 .card-desc {
   display: block;
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
   line-height: 1.5;
   margin-top: -20rpx;
   margin-bottom: 28rpx;
@@ -97,7 +97,7 @@
 .solar-desc {
   display: block;
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
   line-height: 1.5;
   margin-top: -16rpx;
   margin-bottom: 14rpx;
@@ -208,23 +208,23 @@
 
 .setting-label {
   font-size: $font-size-sm;
-  color: $tcm-text;
+  color: var(--theme-text, #2C2C2C);
 }
 
 .setting-hint {
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 .setting-value {
   font-size: $font-size-sm;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
 }
 
 .setting-tip {
   padding: $spacing-sm 0 0;
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
   line-height: 1.6;
 
   &.inline {
@@ -237,7 +237,7 @@
   align-items: center;
   gap: $spacing-xs;
   font-size: $font-size-sm;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
 }
 
 .city-picker-btn {
@@ -258,7 +258,7 @@
 
 .picker-arrow {
   font-size: 18rpx;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 .theme-current {
@@ -280,7 +280,7 @@
 
 .theme-expand-arrow {
   font-size: 20rpx;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
   transition: transform 0.25s ease;
   padding: 8rpx;
 }
@@ -470,12 +470,12 @@
 .ui-style-name {
   font-size: $font-size-sm;
   font-weight: 600;
-  color: $tcm-text;
+  color: var(--theme-text, #2C2C2C);
 }
 
 .ui-style-desc {
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 .ui-style-check {
@@ -493,12 +493,12 @@
 .theme-name {
   font-size: $font-size-sm;
   font-weight: 600;
-  color: $tcm-text;
+  color: var(--theme-text, #2C2C2C);
 }
 
 .theme-desc {
   font-size: $font-size-xs;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
 }
 
 /* === 方法说明 === */
@@ -523,12 +523,12 @@
 .method-name {
   font-size: $font-size-sm;
   font-weight: 600;
-  color: $tcm-text;
+  color: var(--theme-text, #2C2C2C);
 }
 
 .method-detail {
   font-size: $font-size-xs;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
   line-height: 1.8;
   padding-left: 40rpx;
 }
@@ -538,7 +538,7 @@
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
   z-index: 999;
-  background: $tcm-bg;
+  background: var(--theme-bg, #F8F4EF);
   animation: overlayFadeIn 0.2s ease-out;
 }
 
@@ -598,7 +598,7 @@
 
 /* 方法说明弹窗内容 */
 .method-card {
-  background: $tcm-bg-light;
+  background: var(--theme-surface, #FFFDF5);
   border-radius: $radius-lg;
   box-shadow: $shadow-sm;
   padding: $spacing-lg;
@@ -639,12 +639,12 @@
 
 .app-version {
   font-size: $font-size-sm;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
   margin-top: $spacing-sm;
 }
 
 .desc-card {
-  background: $tcm-bg-light;
+  background: var(--theme-surface, #FFFDF5);
   border-radius: $radius-lg;
   box-shadow: $shadow-sm;
   padding: $spacing-xl $spacing-lg;
@@ -653,7 +653,7 @@
 
 .desc-text {
   font-size: $font-size-sm;
-  color: $tcm-text-secondary;
+  color: var(--theme-text-secondary, #666666);
   line-height: 2.2;
   text-align: justify;
 }
@@ -668,14 +668,14 @@
 .disclaimer-label {
   font-size: $font-size-xs;
   font-weight: 600;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
   margin-bottom: $spacing-sm;
   display: block;
 }
 
 .disclaimer-text {
   font-size: 22rpx;
-  color: $tcm-text-hint;
+  color: var(--theme-text-hint, #999999);
   line-height: 1.9;
   text-align: justify;
 }
