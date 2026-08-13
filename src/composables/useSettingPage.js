@@ -1,4 +1,4 @@
-﻿import { ref, computed, onUnmounted } from 'vue'
+﻿import { ref, computed, inject, onUnmounted } from 'vue'
 import { onShow, onHide, onBackPress } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
@@ -46,6 +46,7 @@ export function useSettingPage() {
     return activeClassic ? `当前：${activeClassic.name}` : '古典宣纸、暗夜幽光、青瓷天青、朱砂丹霞'
   })
   let visualClockTimer = null
+  let solarPickerTimer = null
   let themeTransitionApplyTimer = null
   let themeTransitionCloseTimer = null
   let themeTransitionEndTimer = null
@@ -82,6 +83,8 @@ export function useSettingPage() {
   })
 
   onUnmounted(() => {
+    stopVisualClockTimer()
+    if (solarPickerTimer) clearTimeout(solarPickerTimer)
     clearThemeTransitionTimers()
   })
 
@@ -89,7 +92,8 @@ export function useSettingPage() {
   function onSolarTimeToggle(e) {
     store.toggleTrueSolarTime(e.detail.value)
     if (e.detail.value) {
-      setTimeout(() => {
+      clearTimeout(solarPickerTimer)
+      solarPickerTimer = setTimeout(() => {
         openCityPicker()
       }, 100)
     }
@@ -127,11 +131,13 @@ export function useSettingPage() {
     const needsTransition = targetStyle === 'animal' || targetStyle === 'ink'
     const isAlreadyActive = store.appearanceOptions.some(item => item.id === optionId && item.active)
 
-    if (!needsTransition || isAlreadyActive || themeTransitionVisible.value) {
+    if (!needsTransition || isAlreadyActive) {
       if (!isAlreadyActive) store.setAppearance(optionId)
       return
     }
 
+    // 过渡动画进行中再点其它需过渡主题：清掉旧过渡链、按新目标重启播放，
+    // 避免旧遮罩的 close/end 定时器继续执行，盖住刚选中的新风格。
     clearThemeTransitionTimers()
     themeTransitionKind.value = targetStyle
     themeTransitionClosing.value = false
@@ -190,6 +196,7 @@ export function useSettingPage() {
     store,
     navHeight,
     safeBottom,
+    statusBarHeight,
     cityPickerRef,
     showMethods,
     showAbout,
@@ -217,4 +224,20 @@ export function useSettingPage() {
     goMethods,
     goAbout
   }
+}
+
+/**
+ * useSetting - 主题设置页组件侧的注入包装
+ *
+ * 必须在设置页壳层（pages/setting/setting.vue，provide('setting')）的子组件中调用。
+ * 相比裸写 inject('setting')，本包装提供契约兜底：注入缺失时立即抛错，
+ * 避免主题组件因拼写错误静默拿到 undefined 导致白屏。
+ * 返回结构 = useSettingPage() 的返回值（见上方 return）。
+ */
+export function useSetting() {
+  const setting = inject('setting')
+  if (!setting) {
+    throw new Error('[useSetting] 未找到注入的 setting：请确认组件挂在设置页壳层 pages/setting/setting.vue 下')
+  }
+  return setting
 }

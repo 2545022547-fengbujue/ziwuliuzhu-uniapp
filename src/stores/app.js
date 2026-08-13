@@ -291,8 +291,15 @@ export const useAppStore = defineStore('app', () => {
   const currentResults = computed(() => results.value[activeMethod.value])
 
   const activeTheme = computed(() => {
+    // #ifdef MP-WEIXIN
+    // 小程序端 themes.scss 仅保留 .theme-yellow 变量块（black/green/red 被 #ifndef MP-WEIXIN 排除），
+    // 强制回退古典宣纸，避免根类 theme-green 却无对应 CSS 变量导致 var(--theme-*) 全部失效。
+    return 'yellow'
+    // #endif
+    // #ifndef MP-WEIXIN
     // H5/App 遇到空值或已下架的历史主题时同样回退青瓷，保证首次状态与异常兜底一致。
     return supportsThemeSwitch && isKnownTheme(theme.value) ? theme.value : 'green'
+    // #endif
   })
 
   // 兜底校验：持久化值非法（如风格已下架）时回退经典界面

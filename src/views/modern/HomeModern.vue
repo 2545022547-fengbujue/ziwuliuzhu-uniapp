@@ -2,7 +2,7 @@
   <!--
     现代简约主题首页
     说明：本组件只负责现代简约主题的完整页面（模板 + 样式），
-    业务逻辑统一由 useHomePage() 提供并通过 inject('home') 注入。
+    业务逻辑统一由 useHomePage() 提供并通过 useHome() 注入。
     视觉差异由全局 ui-modern.scss 的 .ui-modern 命名空间覆盖实现。
   -->
   <view class="page ui-modern">
@@ -172,14 +172,14 @@
 </template>
 
 <script setup>
-import { inject } from 'vue'
+import { useHome } from '@/composables/useHomePage.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
 import DatePicker from '@/components/DatePicker.vue'
 import TimePicker from '@/components/TimePicker.vue'
 
-const home = inject('home')
+const home = useHome()
 </script>
 
 <style lang="scss" scoped>

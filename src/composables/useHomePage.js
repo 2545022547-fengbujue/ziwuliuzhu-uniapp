@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, inject, onMounted, onUnmounted } from 'vue'
 // onShow/onHide/onBackPress 是 uni-app 页面生命周期，用于暂停/恢复定时器、拦截返回键
 import { onShow, onHide, onBackPress } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
@@ -47,7 +47,7 @@ export function useHomePage() {
       return `${y}年${m}月${day}日 ${h}:00`
     }
     // 依赖 minuteTick 触发重新计算；开启真太阳时时显示校正后的有效时间。
-    void minuteTick.value
+    minuteTick.value
     const d = store.effectiveCurrentTime
     const y = d.getFullYear()
     const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -217,8 +217,22 @@ export function useHomePage() {
     onDatePickerChange,
     onTimePickerChange,
     handleQuery,
-    confirmQuery,
-    startTimer,
-    stopTimer
+    confirmQuery
   }
+}
+
+/**
+ * useHome - 主题首页组件侧的注入包装
+ *
+ * 必须在首页壳层（pages/index/index.vue，provide('home')）的子组件中调用。
+ * 相比裸写 inject('home')，本包装提供契约兜底：注入缺失时立即抛错，
+ * 避免主题组件因拼写错误静默拿到 undefined 导致白屏。
+ * 返回结构 = useHomePage() 的返回值（见上方 return）。
+ */
+export function useHome() {
+  const home = inject('home')
+  if (!home) {
+    throw new Error('[useHome] 未找到注入的 home：请确认组件挂在首页壳层 pages/index/index.vue 下')
+  }
+  return home
 }

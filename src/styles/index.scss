@@ -15,6 +15,8 @@
 @use 'themes';
 // 新界面风格（ui-modern / ui-ink / ui-morandi / ui-watercolor / ui-animal / ui-pixel）：
 // 必须在 themes 之后引入，同特异性 !important 规则靠顺序取胜
+// 非经典主题仅 H5/App 使用，小程序端不编译（见工作区约定"除经典四色外不考虑小程序"）
+// #ifndef MP-WEIXIN
 @use 'modern';
 @use 'ui-ink';
 @use 'ui-morandi';
@@ -22,6 +24,7 @@
 @use 'ui-animal';
 @use 'ui-pixel';
 @use 'ui-point-code';
+// #endif
 
 /* === 楷体字体 === */
 /* App端（Android）：打包内置字体，解决系统无楷体问题 */

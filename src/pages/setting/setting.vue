@@ -13,12 +13,14 @@
     注意：微信小程序不支持 <component :is>，故使用 v-if/v-else-if 链。
   -->
   <SettingClassic v-if="store.activeUiStyle === 'classic'" />
+  <!-- #ifndef MP-WEIXIN -->
   <SettingModern v-else-if="store.activeUiStyle === 'modern'" />
   <SettingInk v-else-if="store.activeUiStyle === 'ink'" />
   <SettingMorandi v-else-if="store.activeUiStyle === 'morandi'" />
   <SettingWatercolor v-else-if="store.activeUiStyle === 'watercolor'" />
   <SettingAnimal v-else-if="store.activeUiStyle === 'animal'" />
   <SettingPixel v-else-if="store.activeUiStyle === 'pixel'" />
+  <!-- #endif -->
   <SettingClassic v-else />
 </template>
 
@@ -27,12 +29,15 @@ import { provide, reactive } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { useSettingPage } from '@/composables/useSettingPage.js'
 import SettingClassic from '@/views/classic/SettingClassic.vue'
+// 非经典主题仅 H5/App 使用，小程序端不编译（见工作区约定"除经典四色外不考虑小程序"）
+// #ifndef MP-WEIXIN
 import SettingModern from '@/views/modern/SettingModern.vue'
 import SettingInk from '@/views/ink/SettingInk.vue'
 import SettingMorandi from '@/views/morandi/SettingMorandi.vue'
 import SettingWatercolor from '@/views/watercolor/SettingWatercolor.vue'
 import SettingAnimal from '@/views/animal/SettingAnimal.vue'
 import SettingPixel from '@/views/pixel/SettingPixel.vue'
+// #endif
 
 const store = useAppStore()
 

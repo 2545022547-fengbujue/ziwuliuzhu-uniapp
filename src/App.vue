@@ -26,11 +26,13 @@ export default {
     const store = useAppStore()
     store.applyThemeChrome()
 
-    // 监听 theme / uiStyle 变化，自动更新 tabBar
+    // 监听 theme / uiStyle 变化，自动更新 tabBar（防抖合并连续切换）
+    let chromeTimer = null
     watch(
       () => [store.theme, store.uiStyle],
       () => {
-        setTimeout(() => store.applyThemeChrome(), 50)
+        clearTimeout(chromeTimer)
+        chromeTimer = setTimeout(() => store.applyThemeChrome(), 50)
       }
     )
     // #endif

@@ -5,7 +5,7 @@
     四色共用同一套布局，仅通过 theme-* 根类切换配色变量。
 
     说明：本组件只负责经典主题的完整页面（模板 + 样式），
-    业务逻辑统一由 useHomePage() 提供并通过 inject('home') 注入。
+    业务逻辑统一由 useHomePage() 提供并通过 useHome() 注入。
   -->
   <view class="page" :class="`theme-${home.store.activeTheme}`">
     <!-- 导航栏 -->
@@ -136,7 +136,7 @@
 
     <!-- 手动查询确认弹窗 -->
     <view v-if="home.showQueryConfirm" class="confirm-overlay" @tap="home.showQueryConfirm = false">
-      <view class="confirm-popup" :class="`theme-${home.store.activeTheme}`" @tap.stop>
+      <view class="confirm-popup" @tap.stop>
         <text class="confirm-title">确认查询</text>
         <view class="confirm-info">
           <text class="confirm-label">日期</text>
@@ -177,17 +177,17 @@
 <script setup>
 /**
  * 经典主题首页。
- * 从页面壳层 inject('home') 获取共享业务状态与方法，
+ * 从页面壳层 useHome() 获取共享业务状态与方法，
  * 本组件只维护经典主题的页面结构与样式，改动不影响其它主题页面。
  */
-import { inject } from 'vue'
+import { useHome } from '@/composables/useHomePage.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
 import DatePicker from '@/components/DatePicker.vue'
 import TimePicker from '@/components/TimePicker.vue'
 
-const home = inject('home')
+const home = useHome()
 </script>
 
 <style lang="scss" scoped>

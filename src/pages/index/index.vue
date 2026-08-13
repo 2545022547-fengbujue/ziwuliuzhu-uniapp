@@ -13,12 +13,14 @@
     注意：微信小程序不支持 <component :is>，故使用 v-if/v-else-if 链。
   -->
   <HomeClassic v-if="store.activeUiStyle === 'classic'" />
+  <!-- #ifndef MP-WEIXIN -->
   <HomeModern v-else-if="store.activeUiStyle === 'modern'" />
   <HomeInk v-else-if="store.activeUiStyle === 'ink'" />
   <HomeMorandi v-else-if="store.activeUiStyle === 'morandi'" />
   <HomeWatercolor v-else-if="store.activeUiStyle === 'watercolor'" />
   <HomeAnimal v-else-if="store.activeUiStyle === 'animal'" />
   <HomePixel v-else-if="store.activeUiStyle === 'pixel'" />
+  <!-- #endif -->
   <HomeClassic v-else />
 </template>
 
@@ -27,12 +29,15 @@ import { provide, reactive } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { useHomePage } from '@/composables/useHomePage.js'
 import HomeClassic from '@/views/classic/HomeClassic.vue'
+// 非经典主题仅 H5/App 使用，小程序端不编译（见工作区约定"除经典四色外不考虑小程序"）
+// #ifndef MP-WEIXIN
 import HomeModern from '@/views/modern/HomeModern.vue'
 import HomeInk from '@/views/ink/HomeInk.vue'
 import HomeMorandi from '@/views/morandi/HomeMorandi.vue'
 import HomeWatercolor from '@/views/watercolor/HomeWatercolor.vue'
 import HomeAnimal from '@/views/animal/HomeAnimal.vue'
 import HomePixel from '@/views/pixel/HomePixel.vue'
+// #endif
 
 const store = useAppStore()
 

@@ -7,19 +7,6 @@
       <view :style="{ height: setting.navHeight + 'px' }" class="nav-placeholder"></view>
       <scroll-view scroll-y class="page-scroll" :show-scrollbar="false">
         <view class="setting-content">
-          <view v-if="setting.store.activeUiStyle === 'animal'" class="animal-friends-setting" aria-hidden="true">
-            <image
-              class="animal-friends-setting-image"
-              src="/static/themes/animal/animal-friends.png"
-              mode="widthFix"
-            />
-            <text class="animal-friends-setting-label">欢迎来到动物岛</text>
-          </view>
-          <view v-if="setting.store.activeUiStyle === 'pixel'" class="pixel-setting-banner" aria-hidden="true">
-            <text class="pixel-setting-icon">⚙</text>
-            <view><text>OPTIONS</text><text>冒险者设置</text></view>
-            <text class="pixel-setting-cursor">▶</text>
-          </view>
           <!-- ========== 真太阳时设置区域 ========== -->
           <view class="setting-card solar-card">
             <view class="card-title">
@@ -228,7 +215,7 @@
           <view :style="{ height: setting.safeBottom + 60 + 'px' }"></view>
         </view>
       </scroll-view>
-      <CityPicker ref="setting.cityPickerRef" />
+      <CityPicker :ref="el => (setting.cityPickerRef = el)" />
   
       <ThemeTransitionOverlay
         v-if="setting.themeTransitionVisible"
@@ -239,7 +226,7 @@
       <!-- 取穴方法说明弹窗 -->
       <view v-if="setting.showMethods" class="fullscreen-overlay" @tap="setting.showMethods = false">
         <view class="fullscreen-panel" @tap.stop>
-          <view class="fullscreen-header" :style="{ paddingTop: statusBarHeight + 'px' }">
+          <view class="fullscreen-header" :style="{ paddingTop: setting.statusBarHeight + 'px' }">
             <view class="close-btn" @tap="setting.showMethods = false">
               <text class="close-icon">✕</text>
             </view>
@@ -265,7 +252,7 @@
       <!-- 关于弹窗 -->
       <view v-if="setting.showAbout" class="fullscreen-overlay" @tap="setting.showAbout = false">
         <view class="fullscreen-panel" @tap.stop>
-          <view class="fullscreen-header" :style="{ paddingTop: statusBarHeight + 'px' }">
+          <view class="fullscreen-header" :style="{ paddingTop: setting.statusBarHeight + 'px' }">
             <view class="close-btn" @tap="setting.showAbout = false">
               <text class="close-icon">✕</text>
             </view>
@@ -277,7 +264,7 @@
               <view class="logo-area">
                 <text class="logo-icon">☯</text>
                 <text class="app-name">子午流注取穴</text>
-                <text class="app-setting.version">v{{ setting.version }}</text>
+                <text class="app-version">v{{ setting.version }}</text>
               </view>
               <!-- 应用简介 -->
               <view class="desc-card">
@@ -301,12 +288,12 @@
 </template>
 
 <script setup>
-import { inject } from 'vue'
+import { useSetting } from '@/composables/useSettingPage.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import CityPicker from '@/components/CityPicker.vue'
 import ThemeTransitionOverlay from '@/components/ThemeTransitionOverlay.vue'
 
-const setting = inject('setting')
+const setting = useSetting()
 </script>
 
 <style lang="scss" scoped>

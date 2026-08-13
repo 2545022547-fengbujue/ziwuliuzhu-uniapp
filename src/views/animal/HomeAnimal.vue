@@ -1,7 +1,7 @@
 <template>
   <!--
     动物岛主题首页
-    说明：本组件只负责动物岛主题的完整页面，业务逻辑由 useHomePage 通过 inject('home') 注入。
+    说明：本组件只负责动物岛主题的完整页面，业务逻辑由 useHomePage 通过 useHome() 注入。
     视觉差异由全局 ui-animal.scss 的 .ui-animal 命名空间覆盖实现。
   -->
   <view class="page ui-animal">
@@ -178,14 +178,14 @@
 </template>
 
 <script setup>
-import { inject } from 'vue'
+import { useHome } from '@/composables/useHomePage.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import PointDetail from '@/components/PointDetail.vue'
 import DatePicker from '@/components/DatePicker.vue'
 import TimePicker from '@/components/TimePicker.vue'
 
-const home = inject('home')
+const home = useHome()
 </script>
 
 <style lang="scss" scoped>
