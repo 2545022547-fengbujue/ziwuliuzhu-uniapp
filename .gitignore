@@ -43,3 +43,5 @@ src/assets/fonts/_sources/
 
 # Python 脚本缓存
 __pycache__/
+
+build/
