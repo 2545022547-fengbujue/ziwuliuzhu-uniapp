@@ -59,11 +59,11 @@
             @tap.stop="selectedCity = city.name"
           >
             <view class="city-item-left">
-              <text class="city-abbr">{{ city.abbr.toUpperCase() }}</text>
+              <text class="city-abbr">{{ (city.abbr || "").toUpperCase() }}</text>
               <text class="city-name-text">{{ city.name }}</text>
               <text class="city-province">（{{ city.province }}）</text>
             </view>
-            <text class="city-longitude">{{ city.longitude.toFixed(2) }}°E</text>
+            <text class="city-longitude">{{ Number(city.longitude || 0).toFixed(2) }}°E</text>
           </view>
           <view v-if="searchResults.length === 0" class="empty-tip">
             <text>未找到匹配的城市</text>
@@ -96,10 +96,10 @@
                 @tap.stop="selectedCity = city.name"
               >
                 <view class="city-item-left">
-                  <text class="city-abbr">{{ city.abbr.toUpperCase() }}</text>
+                  <text class="city-abbr">{{ (city.abbr || "").toUpperCase() }}</text>
                   <text class="city-name-text">{{ city.name }}</text>
                 </view>
-                <text class="city-longitude">{{ city.longitude.toFixed(2) }}°E</text>
+                <text class="city-longitude">{{ Number(city.longitude || 0).toFixed(2) }}°E</text>
               </view>
             </view>
           </view>
