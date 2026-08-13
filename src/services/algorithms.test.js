@@ -38,6 +38,41 @@ function makeGanZhi(date, hourIndex) {
 
 const pointCodes = (points) => (points || []).map(p => p.code)
 
+/** 各日开井时辰索引（徐凤歌诀阳进阴退：甲戌乙酉丙申丁未戊午己巳庚辰辛卯壬寅癸亥） */
+const JING_HOUR_BY_STEM = {
+  '甲': 10, '乙': 9, '丙': 8, '丁': 7, '戊': 6, '己': 5, '庚': 4, '辛': 3, '壬': 2, '癸': 11
+}
+
+/**
+ * 纳甲法测试构造器（值日周期语义）。
+ *
+ * 重要背景：纳甲值日周期不以自然日切割——教材表10-10 的「甲日」周期从甲日甲戌
+ * （开井）延续到乙日甲申（气纳三焦），其中丙子/戊寅/庚辰/壬午/甲申 是「乙日」
+ * （自然日）的时辰，但仍属甲日值日周期。因此测试必须传入「值日周期日干」，
+ * 由本函数推导对应的自然日日干，才能模拟 getGanZhi → calculateNajia 真实链路。
+ *
+ * 自然日干推导：若当前时辰已过/等于当日开井时辰（hourIdx >= jingHour）→ 值日=当日干；
+ * 否则（hourIdx < jingHour）→ 值日=前一日干，自然日干需取「值日日的次日」。
+ *
+ * @param {string} periodDayStem - 值日周期日干（如 '甲' 表示甲日胆经值日）
+ * @param {string} gz - 开穴时辰干支（如 '丙子'）
+ * @param {number} hourIdx - 时辰索引
+ */
+function mkNajia(periodDayStem, gz, hourIdx) {
+  const STEMS = '甲乙丙丁戊己庚辛壬癸'
+  const periodIdx = STEMS.indexOf(periodDayStem)
+  // 真实链路中 getGanZhi 按自然日（23:00 换日）返回日干：
+  // hourIdx >= 开井时辰 → 当日干；否则 → 周期日干已在昨日开井后，自然日干=次日
+  const naturalStem = hourIdx >= JING_HOUR_BY_STEM[periodDayStem]
+    ? periodDayStem
+    : STEMS[(periodIdx + 1) % 10]
+  return {
+    day: { heavenlyStem: naturalStem, earthlyBranch: '子', ganZhi: naturalStem + '子日' },
+    hour: { heavenlyStem: gz[0], earthlyBranch: gz[1], ganZhi: gz + '时' },
+    year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+  }
+}
+
 describe('干支计算（黄金值）', () => {
   it('2026-05-26 为庚子日，午时（idx6）为壬午', () => {
     const gz = makeGanZhi(new Date(2026, 4, 26), 6)
@@ -547,62 +582,239 @@ describe('纳甲法教材级验算（表10-10 甲胆 + 表10-11 乙肝，22 时�
     { gz: '乙未', h: 7, exp: ['PC8'] }
   ]
 
-  const mkDay = (dayStem, dayBranch) => ({
-    day: { heavenlyStem: dayStem, earthlyBranch: dayBranch, ganZhi: dayStem + dayBranch + '日' },
-    hour: null, year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
-  })
-
-  it.each(T1010)('甲日 $gz 时开穴 = [$exp]', ({ gz, h, exp }) => {
-    const d = mkDay('甲', '子')
-    const r = calculateNajia({
-      ...d,
-      hour: { heavenlyStem: gz[0], earthlyBranch: gz[1], ganZhi: gz + '时' }
-    }, h)
+  it.each(T1010)('甲日周期 $gz 时开穴 = [$exp]', ({ gz, h, exp }) => {
+    // 甲日值日周期：甲戌为甲日子时…不，甲戌是甲日戌时（开井），
+    // 丙子/戊寅/庚辰/壬午/甲申 是乙日（自然日）的时辰但仍属甲日周期——由 mkNajia 推导自然日干
+    const r = calculateNajia(mkNajia('甲', gz, h), h)
     expect(pointCodes(r.openPoints).sort(), `${gz}时`).toEqual([...exp].sort())
   })
 
-  it.each(T1011)('乙日 $gz 时开穴 = [$exp]', ({ gz, h, exp }) => {
-    const d = mkDay('乙', '丑')
-    const r = calculateNajia({
-      ...d,
-      hour: { heavenlyStem: gz[0], earthlyBranch: gz[1], ganZhi: gz + '时' }
-    }, h)
+  it.each(T1011)('乙日周期 $gz 时开穴 = [$exp]', ({ gz, h, exp }) => {
+    const r = calculateNajia(mkNajia('乙', gz, h), h)
     expect(pointCodes(r.openPoints).sort(), `${gz}时`).toEqual([...exp].sort())
   })
 
   it('返本还原/遇输过原 type 标记：主穴为输穴、原穴带专用标记', () => {
-    // 甲日戊寅：陷谷(主·输穴) + 丘墟(胆经原穴·返本还原)
-    const r1 = calculateNajia({
-      day: { heavenlyStem: '甲', earthlyBranch: '子', ganZhi: '甲子日' },
-      hour: { heavenlyStem: '戊', earthlyBranch: '寅', ganZhi: '戊寅时' },
-      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
-    }, 2)
+    // 甲日值日周期戊寅时（自然日乙日寅时）：陷谷(主·输穴) + 丘墟(胆经原穴·返本还原)
+    const r1 = calculateNajia(mkNajia('甲', '戊寅', 2), 2)
     expect(r1.openPoints.find(p => p.code === 'ST43')?.type).toBe('输穴')
     expect(r1.openPoints.find(p => p.code === 'GB40')?.type).toBe('原穴（返本还原）')
-    // 乙日己丑：太白(主·输穴) + 太冲(肝经原穴·遇输过原)
-    const r2 = calculateNajia({
-      day: { heavenlyStem: '乙', earthlyBranch: '丑', ganZhi: '乙丑日' },
-      hour: { heavenlyStem: '己', earthlyBranch: '丑', ganZhi: '己丑时' },
-      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
-    }, 1)
+    // 乙日值日周期己丑时（自然日丙日丑时）：太白(主·输穴) + 太冲(肝经原穴·遇输过原)
+    const r2 = calculateNajia(mkNajia('乙', '己丑', 1), 1)
     expect(r2.openPoints.find(p => p.code === 'SP3')?.type).toBe('输穴')
     expect(r2.openPoints.find(p => p.code === 'LR3')?.type).toBe('原穴（遇输过原）')
   })
 
   it('气纳三焦/血归包络：日干重见时开三焦/心包经穴（表10-10/10-11 末时辰）', () => {
-    // 甲申（甲日重见甲）：气纳三焦→液门 TE2
-    const r1 = calculateNajia({
-      day: { heavenlyStem: '甲', earthlyBranch: '子', ganZhi: '甲子日' },
-      hour: { heavenlyStem: '甲', earthlyBranch: '申', ganZhi: '甲申时' },
-      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
-    }, 8)
+    // 甲申（甲日周期重见甲，自然日乙日申时）：气纳三焦→液门 TE2
+    const r1 = calculateNajia(mkNajia('甲', '甲申', 8), 8)
     expect(r1.openPoints.find(p => p.code === 'TE2')?.type).toContain('三焦')
-    // 乙未（乙日重见乙）：血归包络→劳宫 PC8
-    const r2 = calculateNajia({
-      day: { heavenlyStem: '乙', earthlyBranch: '丑', ganZhi: '乙丑日' },
-      hour: { heavenlyStem: '乙', earthlyBranch: '未', ganZhi: '乙未时' },
-      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
-    }, 7)
+    // 乙未（乙日周期重见乙，自然日丙日未时）：血归包络→劳宫 PC8
+    const r2 = calculateNajia(mkNajia('乙', '乙未', 7), 7)
     expect(r2.openPoints.find(p => p.code === 'PC8')?.type).toContain('包络')
+  })
+})
+
+/**
+ * ============================================================
+ * 纳甲法时辰干支 vs 徐凤《子午流注逐日按时定穴歌》全量对照（2026-08-14）
+ *
+ * 背景（重要，勿按自然日五鼠遁理解）：
+ * 值日周期不以自然日切割——甲日胆经值日从甲日甲戌（开井）开始，
+ * 顺推到乙日甲申（气纳三焦），跨两个自然日。因此开穴时辰的干支必须
+ * 从「开井时辰」起连续顺推（每时辰干支各+1），而非从当日子时起按五鼠遁排。
+ * 此前代码按后者导致 30/60 处干支错位（如甲日荥穴误标甲子、应为丙子），
+ * 本对照为永久回归防线。
+ * ============================================================
+ */
+
+describe('纳甲法时辰干支与徐凤歌诀全量对照（10日×6时=60处）', () => {
+  // 徐凤《子午流注逐日按时定穴歌》：每日子 6 个开穴时辰（歌诀原文顺序）
+  const SONG_HOURS = {
+    '甲': ['甲戌', '丙子', '戊寅', '庚辰', '壬午', '甲申'],
+    '乙': ['乙酉', '丁亥', '己丑', '辛卯', '癸巳', '乙未'],
+    '丙': ['丙申', '戊戌', '庚子', '壬寅', '甲辰', '丙午'],
+    '丁': ['丁未', '己酉', '辛亥', '癸丑', '乙卯', '丁巳'],
+    '戊': ['戊午', '庚申', '壬戌', '甲子', '丙寅', '戊辰'],
+    '己': ['己巳', '辛未', '癸酉', '乙亥', '丁丑', '己卯'],
+    '庚': ['庚辰', '壬午', '甲申', '丙戌', '戊子', '庚寅'],
+    '辛': ['辛卯', '癸巳', '乙未', '丁酉', '己亥', '辛丑'],
+    '壬': ['壬寅', '甲辰', '丙午', '戊申', '庚戌', '壬子'],
+    '癸': ['癸亥', '乙丑', '丁卯', '己巳', '辛未', '癸酉']
+  }
+  const BRANCH_IDX = { '子': 0, '丑': 1, '寅': 2, '卯': 3, '辰': 4, '巳': 5, '午': 6, '未': 7, '申': 8, '酉': 9, '戌': 10, '亥': 11 }
+
+  it.each(Object.entries(SONG_HOURS))('$0 值日周期 6 个开穴时辰与歌诀一致', (periodStem, expectedHours) => {
+    for (const gz of expectedHours) {
+      const h = BRANCH_IDX[gz[1]]
+      const r = calculateNajia(mkNajia(periodStem, gz, h), h)
+      const seq = r.dailySequence[h]
+      expect(seq.hourStem + seq.hourBranch, `${periodStem}周期 h${h}`).toBe(gz)
+      expect(seq.isOpen, `${periodStem}周期 ${gz}时应为开穴时辰`).toBe(true)
+    }
+  })
+
+  it('跨日顺推自洽：甲日开井(甲戌)后荥穴在丙子（非甲子，勿按自然日五鼠遁）', () => {
+    // 歌诀原文「甲日戌时胆窍阴，丙子时中前谷荣」——丙子是从甲戌跨夜顺推2时辰，
+    // 自然日为乙日子时（乙日起丙子），值日周期仍为甲日
+    const r = calculateNajia(mkNajia('甲', '丙子', 0), 0)
+    // 子时（h0）是荥穴步：开小肠荥前谷 SI2
+    expect(r.dailySequence[0].points.map(p => p.code)).toEqual(['SI2'])
+    expect(r.dailySequence[0].hourStem + r.dailySequence[0].hourBranch).toBe('丙子')
+    // 甲日从甲戌起顺推 12 时辰完整序列：甲戌乙亥丙子丁丑戊寅己卯庚辰辛巳壬午癸未甲申乙酉
+    const stems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸', '甲', '乙']
+    const branches = ['戌', '亥', '子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉']
+    stems.forEach((s, i) => {
+      expect(r.dailySequence[(10 + i) % 12].hourStem, `甲日顺推+${i} 天干`).toBe(s)
+      expect(r.dailySequence[(10 + i) % 12].hourBranch, `甲日顺推+${i} 地支`).toBe(branches[i])
+    })
+  })
+})
+
+/**
+ * ============================================================
+ * 返本还原/遇输过原完整语义验证（2026-08-14 深度推敲）
+ *
+ * 教材定义（《针灸学》正文）：
+ * "当开的穴是输穴时，同时要开值日经的原穴，这一规律称返本还原。
+ *  '本'指的是本日的值日经，'原'指的是值日经的原穴。
+ *  一般开原穴的时辰，是在开井穴以后的4个时辰。
+ *  若为阴经，则以'输'代之，称遇输过原。"
+ *
+ * 徐凤歌诀逐日佐证：
+ *   甲日：戊寅陷谷阳明俞，返本丘墟木在寅（阳日开输+值日经胆原丘墟）
+ *   壬日：丙午小肠后溪俞，返求京骨本原寻，三焦寄有阳池穴（阳日+三焦寄穴）
+ *   癸日：丁卯俞穴神门是，本寻肾水太溪原，包络大陵原并过（阴日+包络寄穴）
+ *
+ * 语义要点：
+ * 1. 返本还原（阳日）：输穴步开「值日经」的原穴（如甲日胆原丘墟）
+ * 2. 遇输过原（阴日）：阴经以输为原，输穴步开值日经的输穴即原穴（如乙日肝原太冲）
+ * 3. 壬日三焦寄穴阳池、癸日包络寄穴大陵：值日经原穴之外再加开寄穴
+ * ============================================================
+ */
+
+describe('纳甲法返本还原/遇输过原完整语义', () => {
+  const codes = pts => (pts || []).map(p => p.code).sort()
+  const typeOf = (pts, code) => (pts || []).find(p => p.code === code)?.type
+
+  it('阳日返本还原：甲日戊寅(输)同时开胃输陷谷+胆原丘墟，丘墟带返本还原标记', () => {
+    // 值日周期甲日、自然日乙日寅时（戊寅）——mkNajia 推导自然日干
+    const r = calculateNajia(mkNajia('甲', '戊寅', 2), 2)
+    expect(codes(r.openPoints)).toEqual(['GB40', 'ST43'])
+    expect(typeOf(r.openPoints, 'ST43')).toBe('输穴')     // 主穴=胃经输穴
+    expect(typeOf(r.openPoints, 'GB40')).toBe('原穴（返本还原）') // 附加=胆经原穴
+  })
+
+  it('阴日遇输过原：乙日己丑(输)同时开脾输太白+肝原太冲，太冲带遇输过原标记', () => {
+    // 值日周期乙日、自然日丙日丑时（己丑）——mkNajia 推导
+    const r = calculateNajia(mkNajia('乙', '己丑', 1), 1)
+    expect(codes(r.openPoints)).toEqual(['LR3', 'SP3'])
+    expect(typeOf(r.openPoints, 'SP3')).toBe('输穴')
+    expect(typeOf(r.openPoints, 'LR3')).toBe('原穴（遇输过原）') // 阴经以输代原
+  })
+
+  it('开原穴时辰=开井后4个时辰（教材正文）；10日输穴时辰对照徐凤歌诀', () => {
+    // 甲日开井甲戌(h10) → 输穴戊寅(h2)，(2-10+12)%12=4 → 恰为开井后第4个时辰
+    const r = calculateNajia(mkNajia('甲', '戊寅', 2), 2)
+    expect(r.dailySequence[2].hourStem + r.dailySequence[2].hourBranch).toBe('戊寅')
+    // 乙日开井乙酉(h9) → 输穴己丑(h1)，(1-9+12)%12=4 → 开井后第4个时辰
+    const r2 = calculateNajia(mkNajia('乙', '己丑', 1), 1)
+    expect(r2.dailySequence[1].hourStem + r2.dailySequence[1].hourBranch).toBe('己丑')
+  })
+
+  it('壬日三焦寄穴阳池：输穴步开膀胱原京骨 + 三焦寄阳池（歌诀"三焦寄有阳池穴"）', () => {
+    const r = calculateNajia(mkNajia('壬', '丙午', 6), 6)
+    expect(codes(r.openPoints)).toEqual(['BL64', 'SI3', 'TE4']) // 后溪+京骨+阳池
+    expect(typeOf(r.openPoints, 'TE4')).toBe('原穴（三焦寄穴）')
+    expect(typeOf(r.openPoints, 'BL64')).toBe('原穴（返本还原）')
+  })
+
+  it('癸日包络寄穴大陵：输穴步开肾原太溪 + 包络寄大陵（歌诀"包络大陵原并过"）', () => {
+    const r = calculateNajia(mkNajia('癸', '丁卯', 3), 3)
+    expect(codes(r.openPoints)).toEqual(['HT7', 'KI3', 'PC7']) // 神门+太溪+大陵
+    expect(typeOf(r.openPoints, 'PC7')).toBe('原穴（包络寄穴）')
+    expect(typeOf(r.openPoints, 'KI3')).toBe('原穴（遇输过原）')
+  })
+
+  it('非输穴时辰不开原穴：甲日庚辰(经)只开阳溪，无丘墟', () => {
+    const r = calculateNajia(mkNajia('甲', '庚辰', 4), 4)
+    expect(codes(r.openPoints)).toEqual(['LI5'])
+    expect(r.openPoints.some(p => p.code === 'GB40')).toBe(false)
+  })
+})
+
+/**
+ * ============================================================
+ * 值日周期跨夜推导（2026-08-14 修复跨夜 bug 后固化）
+ *
+ * 背景：纳甲值日周期不以自然日切割。getGanZhi 在 23:00 按子时换日（如 5/20 23:30
+ * 返回乙日子时丙子），但值日周期判定「当前时辰是否已过当日开井时辰」：
+ *   - 已过（hourIdx >= jingHour）→ 值日=当日干
+ *   - 未过（hourIdx < jingHour）→ 值日=前一日干（仍在前日周期内）
+ * 例：5/20 甲日 23:30（自然日乙、h0 子时）→ 乙日开井酉(h9)，h0<9 → 值日=甲
+ *     → 应开甲日周期丙子荥前谷（徐凤歌诀"丙子时中前谷荣"），而非乙日周期闭穴。
+ * ============================================================
+ */
+
+describe('纳甲法值日周期跨夜推导（23:00 后仍属前日周期）', () => {
+  const STEMS = '甲乙丙丁戊己庚辛壬癸'
+
+  it('甲日深夜（自然乙日子时）：值日仍为甲，开丙子荥前谷 SI2（歌诀丙子时中前谷荣）', () => {
+    // 模拟 getGanZhi(5/20 23:30) 返回的自然日干支：乙日丙子时
+    const r = calculateNajia({
+      day: { heavenlyStem: '乙', earthlyBranch: '子', ganZhi: '乙子日' },
+      hour: { heavenlyStem: '丙', earthlyBranch: '子', ganZhi: '丙子时' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 0)
+    expect(r.dayMeridian.code).toBe('GB')  // 值日经=胆（甲日），非肝（乙日）
+    expect(r.dayStem).toBe('甲')
+    expect(pointCodes(r.openPoints)).toEqual(['SI2']) // 荥前谷
+    expect(r.isClosed).toBe(false)
+  })
+
+  it('乙日清晨（自然乙日寅时）：值日仍为甲，开戊寅输陷谷+返本还原丘墟', () => {
+    const r = calculateNajia({
+      day: { heavenlyStem: '乙', earthlyBranch: '子', ganZhi: '乙子日' },
+      hour: { heavenlyStem: '戊', earthlyBranch: '寅', ganZhi: '戊寅时' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 2)
+    expect(r.dayStem).toBe('甲')
+    expect(pointCodes(r.openPoints).sort()).toEqual(['GB40', 'ST43'])
+  })
+
+  it('乙日酉时（h9=开井）：值日切为乙，开乙酉井大敦 LR1', () => {
+    const r = calculateNajia({
+      day: { heavenlyStem: '乙', earthlyBranch: '子', ganZhi: '乙子日' },
+      hour: { heavenlyStem: '乙', earthlyBranch: '酉', ganZhi: '乙酉时' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 9)
+    expect(r.dayStem).toBe('乙')
+    expect(pointCodes(r.openPoints)).toEqual(['LR1'])
+  })
+
+  it('癸日亥时（h11=开井）：值日切为癸，开癸亥井涌泉 KI1', () => {
+    const r = calculateNajia({
+      day: { heavenlyStem: '癸', earthlyBranch: '子', ganZhi: '癸子日' },
+      hour: { heavenlyStem: '癸', earthlyBranch: '亥', ganZhi: '癸亥时' },
+      year: { ganZhi: 'X' }, month: { ganZhi: 'X' }
+    }, 11)
+    expect(r.dayStem).toBe('癸')
+    expect(pointCodes(r.openPoints)).toEqual(['KI1'])
+  })
+
+  it('值日周期推导逻辑完备：10日×12时辰 值日周期日干跨日无缝', () => {
+    // 独立验证：有效值日 = (h >= jingHour) ? 当日干 : 前一日干
+    // 检查跨日连续性：前一日 h11 与当日 h0 的有效值日应相同（同一周期延续）
+    const jingHour = { '甲': 10, '乙': 9, '丙': 8, '丁': 7, '戊': 6, '己': 5, '庚': 4, '辛': 3, '壬': 2, '癸': 11 }
+    const prevStem = s => STEMS[(STEMS.indexOf(s) + 9) % 10]
+    for (let i = 0; i < 10; i++) {
+      const day = STEMS[i]
+      const prevDay = prevStem(day)
+      // 前一日 h11（亥时）的有效值日
+      const effPrevH11 = 11 >= jingHour[prevDay] ? prevDay : prevStem(prevDay)
+      // 当日 h0（子时）的有效值日
+      const effCurrH0 = 0 >= jingHour[day] ? day : prevStem(day)
+      expect(effPrevH11, `${prevDay}日h11 与 ${day}日h0 周期连续`).toBe(effCurrH0)
+    }
   })
 })

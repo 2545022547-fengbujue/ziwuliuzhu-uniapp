@@ -92,24 +92,38 @@ export function calculateNajia(ganzhi, hourIndex, options = {}) {
   const dayBranch = ganzhi.day.earthlyBranch
   const hourStem = ganzhi.hour.heavenlyStem
   const hourBranch = ganzhi.hour.earthlyBranch
-  
-  // 1. 确定值日经络
-  const dayMeridian = DAY_MERIDIAN_MAP[dayStem]
+
+  // === 值日周期日干推导（重要，勿按自然日理解） ===
+  // 纳甲值日周期不以自然日切割：甲日胆经值日从甲日甲戌（开井）开始，
+  // 顺推到乙日甲申（气纳三焦）结束，跨越两个自然日。因此"值日经"不能直接用
+  // getGanZhi 按自然日（23:00 换日）推算的日干，而要根据「开井时辰边界」判定：
+  //   - 当前时辰已过/等于当日开井时辰（hourIndex >= jingHour）→ 值日经 = 当日干
+  //   - 当前时辰在当日开井之前（hourIndex < jingHour）→ 值日经 = 前一日干
+  //     （因为此刻仍处在前一日的值日周期内，如甲日子时实为癸日周期收尾）
+  // 例：5/20 甲日 23:30（自然日已换乙、h0 子时）→ 乙日开井酉(h9)，h0<9 → 值日仍为甲，
+  //     应开甲日周期丙子荥前谷（徐凤歌诀"丙子时中前谷荣"），而非乙日周期（乙日子时无穴）。
+  const jingHourOfDay = calculateJingHour(dayStem)
+  const effectiveDayStem = hourIndex >= jingHourOfDay
+    ? dayStem
+    : HEAVENLY_STEMS[(getStemIndex(dayStem) + 9) % 10] // 前一日干（干支表逆推1位）
+
+  // 1. 确定值日经络（使用值日周期日干，非自然日日干）
+  const dayMeridian = DAY_MERIDIAN_MAP[effectiveDayStem]
   // 异常输入保护：本层返回空结果避免异常传播，配合 store 层 try-catch 形成双重防御
   if (!dayMeridian) {
-    console.error(`[纳甲法] 未知的日天干：${dayStem}，返回空结果`)
+    console.error(`[纳甲法] 未知的日天干：${effectiveDayStem}（原始 ${dayStem}），返回空结果`)
     return {
       method: 'najia', methodName: '纳甲法', date: '', hourIndex,
       hourName: HOUR_NAMES[hourIndex], hourGanZhi: '',
       dayMeridian: null, openPoints: [], isClosed: true,
       alternativePoints: null, dailySequence: [],
-      dayStem, dayBranch, hourStem, hourBranch
+      dayStem: effectiveDayStem, dayBranch, hourStem, hourBranch
     }
   }
-  
-  // 2. 计算当日所有开穴（完整流注顺序）
+
+  // 2. 计算当日所有开穴（完整流注顺序，基于值日周期日干）
   const openedPoints = new Set()
-  const dailySequence = calculateDailySequence(dayStem, dayMeridian, openedPoints)
+  const dailySequence = calculateDailySequence(effectiveDayStem, dayMeridian, openedPoints)
   
   // 3. 获取当前时辰的开穴（hourIndex 已在函数开头验证）
   const currentHourData = dailySequence[hourIndex]
@@ -120,9 +134,10 @@ export function calculateNajia(ganzhi, hourIndex, options = {}) {
   
   // 5. 合日互用是用户可选的闭穴补充方案。默认关闭时不计算、不返回替代穴位，
   // 避免用户把合日穴误认为本日原法开穴；开启后仅在纳甲法本身闭穴时计算。
+  // 注意：合日互用基于「值日周期日干」（甲己合、乙庚合…），与值日经同源。
   let alternativePoints = null
   if (isClosed && enableHeRiHuYong) {
-    alternativePoints = getHeRiHuYong(dayStem, ganzhi, hourIndex)
+    alternativePoints = getHeRiHuYong(effectiveDayStem, ganzhi, hourIndex)
   }
   
   return {
@@ -138,7 +153,7 @@ export function calculateNajia(ganzhi, hourIndex, options = {}) {
     isClosed,
     alternativePoints,
     dailySequence,
-    dayStem,
+    dayStem: effectiveDayStem,
     dayBranch,
     hourStem,
     hourBranch
@@ -151,12 +166,28 @@ export function calculateNajia(ganzhi, hourIndex, options = {}) {
  * 核心逻辑：
  * 1. 阳日阳时开阳经穴，阴日阴时开阴经穴
  * 2. 每日6个有效时辰，前5步"经生经、穴生穴"，第6步气纳三焦/血归包络
+ * 
+ * 时辰干支推算（重要，勿按自然日五鼠遁）：
+ * - 值日周期不以自然日切割：甲日胆经值日从甲日甲戌（开井）开始，
+ *   一直顺推到乙日甲申（气纳三焦），跨越两个自然日。
+ * - 因此本序列的时辰干支必须从「开井时辰」起连续顺推（每时辰干支各+1），
+ *   而不是从当日子时起按五鼠遁排——两者在开井之后会错位两个天干
+ *   （例：甲日顺推得丙子时开荥，五鼠遁子时起算会误标为甲子时）。
+ * - 验证基准：徐凤《子午流注逐日按时定穴歌》全 60 个开穴时辰（10日×6时）
+ *   与「开井时辰 + offset(0,2,4,6,8,10) 顺推」序列完全一致。
  */
 function calculateDailySequence(dayStem, dayMeridian, openedPoints = new Set()) {
   const sequence = []
   const yinYang = dayMeridian.yinYang
   const jingHour = calculateJingHour(dayStem)
   const startStemIndex = WU_SHU_DUN[dayStem] || 0
+
+  // 开井时辰的干支起点（天干/地支索引）：
+  //   天干 = 五鼠遁起点顺推 jingHour 个（甲日：0+10=10≡0 → 甲）
+  //   地支 = jingHour（甲日=10 → 戌）
+  // 之后每个时辰 offset=(hour-jingHour+12)%12，干支各 +offset（跨日连续，不回头）
+  const jingStemIndex = (startStemIndex + jingHour) % 10
+  const jingBranchIndex = jingHour
 
   // 预缓存：同一天内经脉链和五输穴不变，避免每时辰重复计算
   const meridianChain = getDayMeridianChain(dayMeridian)
@@ -168,8 +199,10 @@ function calculateDailySequence(dayStem, dayMeridian, openedPoints = new Set()) 
   })
 
   for (let hour = 0; hour < 12; hour++) {
-    const hourStemIndex = (startStemIndex + hour) % 10
-    const hourBranchIndex = hour
+    // 相对开井时辰的顺推步数（0-11；hour 在开井之前时按跨日回绕）
+    const offset = (hour - jingHour + 12) % 12
+    const hourStemIndex = (jingStemIndex + offset) % 10
+    const hourBranchIndex = (jingBranchIndex + offset) % 12
 
     const hourStem = HEAVENLY_STEMS[hourStemIndex]
     const hourBranch = EARTHLY_BRANCHES[hourBranchIndex]
