@@ -15,8 +15,6 @@
     "test": "npm run test:unit && node scripts/run-validation.cjs",
     "test:unit": "vitest run",
     "fonts:verify": "python scripts/verify-font-subsets.py",
-    "audit:privacy": "python scripts/audit-repo-privacy.py --scope all",
-    "audit:privacy:tree": "python scripts/audit-repo-privacy.py --scope tree",
     "test:builds": "npm run build:h5 && npm run build:mp-weixin && node scripts/verify-mp-isolation.cjs && npm run build:app"
   },
   "dependencies": {

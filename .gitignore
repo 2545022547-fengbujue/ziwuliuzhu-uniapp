@@ -57,5 +57,8 @@ build/
 # 本地安全校验工具（模式定义含本机用户名/工作区路径，不推远程；本地 pre-commit 仍生效）
 scripts/verify-push-safety.cjs
 .githooks/pre-commit
+# 本地隐私审计工具（2026-08-14 起本地化，与 verify-push-safety 一致；本地 pre-push 仍生效）
+scripts/audit-repo-privacy.py
+.githooks/pre-push
 # 本地隐私敏感词配置（含真实用户名/路径，不推远程；audit-repo-privacy.py 读取）
 .privacy-patterns.local.json
