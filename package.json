@@ -47,6 +47,7 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-alpha-5020320260803001",
     "@dcloudio/uni-stacktracey": "3.0.0-alpha-5020320260803001",
     "@dcloudio/vite-plugin-uni": "3.0.0-alpha-5020320260803001",
+    "@resvg/resvg-js": "^2.6.2",
     "@vue/runtime-core": "3.5.41",
     "@vue/test-utils": "^2.4.11",
     "happy-dom": "^15.11.7",

@@ -63,7 +63,7 @@ npm run dev:h5            # 开发预览 → http://localhost:5174
 npm run build:h5          # H5 构建（构建前先 rm -rf dist/build/h5）
 npm run build:mp-weixin   # 微信小程序构建
 npm run test:builds       # 三端构建 + MP 产物隔离校验（h5 → mp-weixin → app）
-npm test                  # vitest 269 条单测 + 数据门禁（算法/数据/字体回归）
+npm test                  # vitest 273 条单测 + 数据门禁（算法/数据/字体回归）
 npm run fonts:base64      # 修改字体 TTF 后同步小程序 base64 字体模块
 ```
 
