@@ -30,17 +30,37 @@ import { useAppStore } from '@/stores/app.js'
 import { useHomePage } from '@/composables/useHomePage.js'
 // classic 常驻（唯一需兼容微信小程序的主题；小程序端仅保留此组件）
 import HomeClassic from '@/views/classic/HomeClassic.vue'
-// 非经典主题仅 H5/App 使用：
-//   - 小程序端：条件编译整体排除（不编译、不打包）
-//   - H5/App：defineAsyncComponent + 动态 import 异步加载，首次切到该主题才拉取，
-//     首包不再包含 6 套主题的代码与静态资源（主题切换时由设置页过渡遮罩掩盖加载瞬间）
-// #ifndef MP-WEIXIN
-const HomeModern = defineAsyncComponent(() => import('@/views/modern/HomeModern.vue'))
-const HomeInk = defineAsyncComponent(() => import('@/views/ink/HomeInk.vue'))
-const HomeMorandi = defineAsyncComponent(() => import('@/views/morandi/HomeMorandi.vue'))
-const HomeWatercolor = defineAsyncComponent(() => import('@/views/watercolor/HomeWatercolor.vue'))
-const HomeAnimal = defineAsyncComponent(() => import('@/views/animal/HomeAnimal.vue'))
-const HomePixel = defineAsyncComponent(() => import('@/views/pixel/HomePixel.vue'))
+// 非经典主题仅 H5/App 使用，小程序端条件编译整体排除（不编译、不打包）。
+// 加载策略按平台区分：
+//   - App：本地包无网络成本，必须静态 import。动态 import 会触发 Rollup code-splitting，
+//     而 uni-app 的 App 构建固定 output.format=iife，二者冲突（Build failed）。
+//   - H5：defineAsyncComponent + 动态 import 异步加载，首包不包含 6 套主题代码。
+// #ifdef APP-PLUS
+import HomeModern from '@/views/modern/HomeModern.vue'
+import HomeInk from '@/views/ink/HomeInk.vue'
+import HomeMorandi from '@/views/morandi/HomeMorandi.vue'
+import HomeWatercolor from '@/views/watercolor/HomeWatercolor.vue'
+import HomeAnimal from '@/views/animal/HomeAnimal.vue'
+import HomePixel from '@/views/pixel/HomePixel.vue'
+// #endif
+// #ifdef H5
+import ThemeLoadFallback from '@/views/_shared/ThemeLoadFallback.vue'
+const asyncTheme = (loader) => defineAsyncComponent({
+  loader,
+  timeout: 10000,
+  errorComponent: ThemeLoadFallback,
+  onError(error, retry, fail, attempts) {
+    // 网络瞬时抖动自动重试一次；仍失败则渲染 ThemeLoadFallback，而不是白屏
+    if (attempts <= 1) retry()
+    else fail()
+  }
+})
+const HomeModern = asyncTheme(() => import('@/views/modern/HomeModern.vue'))
+const HomeInk = asyncTheme(() => import('@/views/ink/HomeInk.vue'))
+const HomeMorandi = asyncTheme(() => import('@/views/morandi/HomeMorandi.vue'))
+const HomeWatercolor = asyncTheme(() => import('@/views/watercolor/HomeWatercolor.vue'))
+const HomeAnimal = asyncTheme(() => import('@/views/animal/HomeAnimal.vue'))
+const HomePixel = asyncTheme(() => import('@/views/pixel/HomePixel.vue'))
 // #endif
 
 const store = useAppStore()

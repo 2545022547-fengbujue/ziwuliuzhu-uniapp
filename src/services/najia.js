@@ -78,8 +78,9 @@ export function calculateNajia(ganzhi, hourIndex, options = {}) {
       alternativePoints: null, dailySequence: []
     }
   }
-  // hourIndex 范围验证
-  if (hourIndex < 0 || hourIndex > 11) {
+  // hourIndex 验证：必须是 0-11 的整数（NaN/1.5 等非法输入同样闭穴返回，
+  // 避免 dailySequence[1.5] 取到 undefined 后继续渲染半损坏结果）
+  if (!Number.isInteger(hourIndex) || hourIndex < 0 || hourIndex > 11) {
     console.warn(`[纳甲法] 无效的时辰索引 ${hourIndex}`)
     return {
       method: 'najia', methodName: '纳甲法', date: '', hourIndex,

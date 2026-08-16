@@ -30,38 +30,53 @@ function initSystemInfo() {
   if (initialized) return
   initialized = true
 
+  // 读取逻辑抽成两个分支函数：微信优先用新分离 API，但旧基础库可能没有这些函数，
+  // 一旦缺失或抛错必须回退 uni.getSystemInfoSync()，否则单例会永远停留在默认值。
+  const readViaWx = () => {
+    const windowInfo = wx.getWindowInfo()
+    const deviceInfo = wx.getDeviceInfo()
+
+    statusBarHeight.value = windowInfo.statusBarHeight || 20
+    screenWidth.value = windowInfo.screenWidth || 375
+    screenHeight.value = windowInfo.screenHeight || 667
+    windowHeight.value = windowInfo.windowHeight || windowInfo.screenHeight || 667
+    platform.value = deviceInfo.platform || ''
+
+    if (windowInfo.safeAreaInsets && windowInfo.safeAreaInsets.bottom !== undefined) {
+      safeAreaBottom.value = windowInfo.safeAreaInsets.bottom
+    } else if (windowInfo.safeArea && windowInfo.safeArea.bottom !== undefined) {
+      safeAreaBottom.value = windowInfo.screenHeight - windowInfo.safeArea.bottom
+    }
+  }
+
+  const readViaUni = () => {
+    const systemInfo = uni.getSystemInfoSync()
+    statusBarHeight.value = systemInfo.statusBarHeight || 20
+    screenWidth.value = systemInfo.screenWidth || 375
+    screenHeight.value = systemInfo.screenHeight || 667
+    windowHeight.value = systemInfo.windowHeight || systemInfo.screenHeight || 667
+    platform.value = systemInfo.platform || ''
+
+    if (systemInfo.safeAreaInsets && systemInfo.safeAreaInsets.bottom !== undefined) {
+      safeAreaBottom.value = systemInfo.safeAreaInsets.bottom
+    } else if (systemInfo.safeArea && systemInfo.safeArea.bottom !== undefined) {
+      safeAreaBottom.value = systemInfo.screenHeight - systemInfo.safeArea.bottom
+    }
+  }
+
   try {
-    // 微信小程序：使用新分离API（避免弃用警告）
-    if (typeof wx !== 'undefined') {
-      const windowInfo = wx.getWindowInfo()
-      const deviceInfo = wx.getDeviceInfo()
-
-      statusBarHeight.value = windowInfo.statusBarHeight || 20
-      screenWidth.value = windowInfo.screenWidth || 375
-      screenHeight.value = windowInfo.screenHeight || 667
-      windowHeight.value = windowInfo.windowHeight || windowInfo.screenHeight || 667
-      platform.value = deviceInfo.platform || ''
-
-      // 安全区域
-      if (windowInfo.safeAreaInsets && windowInfo.safeAreaInsets.bottom !== undefined) {
-        safeAreaBottom.value = windowInfo.safeAreaInsets.bottom
-      } else if (windowInfo.safeArea && windowInfo.safeArea.bottom !== undefined) {
-        safeAreaBottom.value = windowInfo.screenHeight - windowInfo.safeArea.bottom
+    // 微信小程序：使用新分离API（避免弃用警告）；能力检测失败时回退 uni 兼容 API
+    if (typeof wx !== 'undefined' &&
+        typeof wx.getWindowInfo === 'function' &&
+        typeof wx.getDeviceInfo === 'function') {
+      try {
+        readViaWx()
+      } catch (e) {
+        console.warn('[系统信息] 微信新分离 API 读取失败，回退 uni API', e)
+        readViaUni()
       }
     } else {
-      // 其他平台：使用uni-app兼容API
-      const systemInfo = uni.getSystemInfoSync()
-      statusBarHeight.value = systemInfo.statusBarHeight || 20
-      screenWidth.value = systemInfo.screenWidth || 375
-      screenHeight.value = systemInfo.screenHeight || 667
-      windowHeight.value = systemInfo.windowHeight || systemInfo.screenHeight || 667
-      platform.value = systemInfo.platform || ''
-
-      if (systemInfo.safeAreaInsets && systemInfo.safeAreaInsets.bottom !== undefined) {
-        safeAreaBottom.value = systemInfo.safeAreaInsets.bottom
-      } else if (systemInfo.safeArea && systemInfo.safeArea.bottom !== undefined) {
-        safeAreaBottom.value = systemInfo.screenHeight - systemInfo.safeArea.bottom
-      }
+      readViaUni()
     }
   } catch (e) {
     console.error('[系统信息获取失败]', e)

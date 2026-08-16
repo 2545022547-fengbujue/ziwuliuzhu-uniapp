@@ -65,7 +65,7 @@ const STEM_GUA_MAP = {
  * @returns {Object} 取穴结果
  */
 export function calculateFeiteng(ganzhi, hourIndex) {
-  if (hourIndex < 0 || hourIndex > 11) {
+  if (!Number.isInteger(hourIndex) || hourIndex < 0 || hourIndex > 11) {
     console.warn(`飞腾八法：无效的时辰索引 ${hourIndex}`)
     return { method: 'feiteng', methodName: '飞腾八法', openPoints: [] }
   }

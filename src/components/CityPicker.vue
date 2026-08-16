@@ -215,8 +215,11 @@ function handleOverlayTap() {
   popupTapped.value = false
 }
 
-function handlePopupTap(e) {
-  // 标记点击了 popup 内部，阻止 overlay 关闭
+function handlePopupTap() {
+  // 标记点击了 popup 内部，阻止 overlay 关闭。
+  // 挂在 popup 根节点而不是逐个 @tap.stop 子元素：搜索框、tip 区、分组头部等
+  // 区域此前没有标记，点击会冒泡到 overlay 被误判为“点击遮罩”而关闭弹窗。
+  // 带 @tap.stop 的子元素不会冒泡到 overlay，行为不受影响。
   popupTapped.value = true
   // 延时重置标记
   tapTimer = setTimeout(() => { popupTapped.value = false }, 100)
@@ -256,8 +259,15 @@ function toggleProvince(name) {
 let confirmCallback = null
 
 function open(callback) {
+  // 防御重入：清理上一次 open/手动聚焦可能残留的定时器，
+  // 避免“快速关闭再打开”后旧 timer 在错误的弹窗生命周期内改写状态。
+  if (openTimer) { clearTimeout(openTimer); openTimer = null }
+  if (focusTimer) { clearTimeout(focusTimer); focusTimer = null }
+  if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null }
+
   show.value = true
-  selectedCity.value = ''
+  // 打开时预选 store 中已保存的城市，用户可直接确认；搜索模式会按输入重新选中。
+  selectedCity.value = store.selectedCity || ''
   searchText.value = ''
   expandedProvinces.value = []
   inputFocused.value = false
@@ -272,6 +282,8 @@ function open(callback) {
 
 function close() {
   if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null }
+  if (openTimer) { clearTimeout(openTimer); openTimer = null }
+  if (focusTimer) { clearTimeout(focusTimer); focusTimer = null }
   inputFocused.value = false
   show.value = false
   selectedCity.value = ''

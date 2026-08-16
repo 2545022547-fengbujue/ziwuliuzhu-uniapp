@@ -82,10 +82,20 @@
 import { ref, computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { HOUR_OPTIONS } from '@/utils/date.js'
+// #ifdef H5 || APP-PLUS
 import { getInkPickerBackground } from '@/utils/ink-backgrounds.js'
+// #endif
 
 const store = useAppStore()
-const inkPickerBackground = computed(() => getInkPickerBackground(store.inkBackgroundPeriod))
+// 水墨背景仅 H5/App 使用；MP 端不 import 背景模块，避免把 6 张背景图打进小程序包。
+const inkPickerBackground = computed(() => {
+  // #ifdef H5 || APP-PLUS
+  return getInkPickerBackground(store.inkBackgroundPeriod)
+  // #endif
+  // #ifndef H5 || APP-PLUS
+  return ''
+  // #endif
+})
 
 /**
  * 接收父组件传入的当前时辰索引

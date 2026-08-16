@@ -28,8 +28,9 @@
  *   - 页面内视觉（--theme-* 变量）由 src/styles/themes.scss + ui-*.scss 定义，
  *     本文件不重复持有色值，避免双源漂移。
  *
- * 4. 条件编译说明：THEME_OPTIONS 中 black/green/red 用 // #ifdef H5 || APP-PLUS
- *    包裹。uni-app 会对 src 下所有 js 做条件编译预处理，故迁移到本文件后行为不变；
+ * 4. 条件编译说明：THEME_OPTIONS 中 black/green/red 使用 #ifdef H5 || APP-PLUS
+ *    / #endif 指令包裹。注意：本 JSDoc 注释中不要书写以 // 或 /* 开头的
+ *    #ifdef/#ifndef/#endif 字面量，uni-app 条件编译预处理会把它当作真实指令配对解析。
  *    小程序端 activeTheme 由 store 强制回退 'yellow'（见 app.js 内注释）。
  * ============================================================
  */
@@ -94,7 +95,10 @@ export const THEME_CHROME = {
 // id 与全局样式 ui-<id>.scss 的 .ui-<id> 命名空间一一对应；
 // swatch 字段对应 setting-base.scss 中 .theme-swatch.<swatch> 的取色样式。
 // 注释统一说明设计意图，避免把「主色替换」误当成一套完整风格。
+// 独立 UI 风格仅 H5/App 编译：小程序壳层、样式均已排除对应分支，
+// 若这里不裁剪，MP 设置页会渲染「点击后不生效」的无效选项。
 export const UI_STYLE_OPTIONS = [
+  // #ifdef H5 || APP-PLUS
   // 现代简约：实际采用柔和新拟物语言，通过明暗双阴影塑造轻浮雕层次。
   { id: 'modern', name: '现代简约', desc: '柔和浮雕，轻盈有序', swatch: 'modern' },
   // 水墨意境：白宣纸、墨色笔触与克制的印色点睛，并按时段切换山水背景。
@@ -107,21 +111,26 @@ export const UI_STYLE_OPTIONS = [
   { id: 'animal', name: '动物森友会', desc: '双狸迎宾，悠闲岛屿生活', swatch: 'animal' },
   // 复古像素：遵循 Pixelium Design 的硬边轮廓、有限色板和 4px 像素节奏。
   { id: 'pixel', name: '复古像素', desc: '掌机像素，怀旧冒险', swatch: 'pixel' }
+  // #endif
 ]
+// MP-WEIXIN 等其它平台经条件编译裁剪后为空目录，store.appearanceOptions 自动只呈现经典主题。
 
 // === 每种新风格的主色（用于 switch 等原生组件着色）===
 // 与 store.themeSwitchColor 联动；页面内主色走 --theme-primary 变量，不在此重复。
 export const UI_STYLE_PRIMARY = {
+  // #ifdef H5 || APP-PLUS
   modern: '#4F46E5',
   ink: '#2F4A48',
   morandi: '#A98282',
   watercolor: '#4A6FA5',
   animal: '#19AFA2',
   pixel: '#5B6EE1'
+  // #endif
 }
 
 // === 每种新风格的 TabBar 配色；可按风格同时覆盖普通与选中图标 ===
 export const UI_STYLE_CHROME = {
+  // #ifdef H5 || APP-PLUS
   modern: {
     backgroundColor: '#FFFFFF',
     color: '#9CA3AF',
@@ -182,4 +191,5 @@ export const UI_STYLE_CHROME = {
     settingIconPath: '/static/tabbar/setting-pixel.png',
     settingSelectedIconPath: '/static/tabbar/setting-pixel-active.png'
   }
+  // #endif
 }

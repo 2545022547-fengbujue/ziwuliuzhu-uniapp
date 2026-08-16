@@ -40,6 +40,22 @@ describe('useAppStore - 初始状态', () => {
     clearUniStorage()
   })
 
+  it('子时跨自然日：visualClock/显示时间继续走，不因 currentHour 未变而停在 23:xx', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 4, 26, 23, 10, 0))
+    const s = useAppStore()
+    expect(s.currentHour).toBe(0)
+
+    // 到次日 00:30：时辰索引仍为 0，优化逻辑允许 currentTime 不更新，
+    // 但显示用的 visualClock 必须推进，否则界面分钟停留在 23:10。
+    vi.setSystemTime(new Date(2026, 4, 27, 0, 30, 0))
+    s.updateCurrentTime()
+    expect(s.currentHour).toBe(0)
+    expect(s.effectiveCurrentTime.getHours()).toBe(0)
+    expect(s.effectiveCurrentTime.getMinutes()).toBe(30)
+    vi.useRealTimers()
+  })
+
   it('默认外观：classic + 主题回退 yellow（非 H5 构建环境 supportsThemeSwitch=false）', () => {
     const s = useAppStore()
     expect(s.activeUiStyle).toBe('classic')

@@ -53,7 +53,7 @@
           <text class="month-arrow prev">◀</text>
         </view>
         <!-- currentMonth 是 0-11，显示时需 +1 -->
-        <text class="month-text">{{ currentMonth + 1 }}月{{ selectedDay }}日</text>
+        <text class="month-text">{{ monthTitle }}</text>
         <view class="month-nav" @tap="nextMonth">
           <text class="month-arrow next">▶</text>
         </view>
@@ -117,10 +117,28 @@
  */
 import { ref, computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
+// #ifdef H5 || APP-PLUS
 import { getInkPickerBackground } from '@/utils/ink-backgrounds.js'
+// #endif
+
+// 手动查询的合理年份窗口：
+// - 下限/上限避免用户把年份翻到极端值，lunar-javascript 虽能算，但显示与
+//   new Date(y, ...) 的 0-99 特殊映射（自动 +1900）会产生“显示 0001 年、
+//   实际按 1901 年计算”的错位；
+// - 2100 对中医取穴参考已足够宽裕。
+const MIN_YEAR = 1900
+const MAX_YEAR = 2100
 
 const store = useAppStore()
-const inkPickerBackground = computed(() => getInkPickerBackground(store.inkBackgroundPeriod))
+// 水墨背景仅 H5/App 使用；MP 端不 import 背景模块，避免把 6 张背景图打进小程序包。
+const inkPickerBackground = computed(() => {
+  // #ifdef H5 || APP-PLUS
+  return getInkPickerBackground(store.inkBackgroundPeriod)
+  // #endif
+  // #ifndef H5 || APP-PLUS
+  return ''
+  // #endif
+})
 
 // 接收父组件传入的当前日期值（格式：YYYY-MM-DD）
 const props = defineProps({
@@ -148,7 +166,16 @@ const parseDate = (dateStr) => {
     return { year: today.getFullYear(), month: today.getMonth(), day: today.getDate() }
   }
   const [y, m, d] = parts.map(Number)
-  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) {
+  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d) ||
+      y < MIN_YEAR || y > MAX_YEAR) {
+    const today = new Date()
+    return { year: today.getFullYear(), month: today.getMonth(), day: today.getDate() }
+  }
+  // 防御不完整日期（如 2026-13-45 / 2026-02-30）：用 Date 回环校验，避免
+  // new Date(y, m-1, d) 静默进位到其它月份，导致标题月与 currentMonth 状态错位。
+  const candidate = new Date(y, m - 1, d)
+  if (m < 1 || m > 12 || d < 1 || d > 31 ||
+      candidate.getFullYear() !== y || candidate.getMonth() !== m - 1 || candidate.getDate() !== d) {
     const today = new Date()
     return { year: today.getFullYear(), month: today.getMonth(), day: today.getDate() }
   }
@@ -165,6 +192,17 @@ const currentMonth = ref(initial.month)  // 当前显示的月份（0-11）
 const selectedYear = ref(initial.year)
 const selectedMonth = ref(initial.month)
 const selectedDay = ref(initial.day)     // 当前选中的日期（1-31）
+
+// 标题只在「浏览中的月份」与「选中日期所在月份」一致时才显示日号。
+// 切到其它月份浏览时只显示“6月”，不再显示“6月24日”这种把旧选中日拼进新月份
+// 的误导标题（确认按钮始终按选中日期输出，见 confirm()）。
+const monthTitle = computed(() => {
+  const base = `${currentMonth.value + 1}月`
+  if (currentYear.value === selectedYear.value && currentMonth.value === selectedMonth.value) {
+    return `${base}${selectedDay.value}日`
+  }
+  return base
+})
 
 // 今天的日期（用于标记"今日"样式）
 const today = new Date()
@@ -228,6 +266,7 @@ const calendarDays = computed(() => {
  * 年份切换：减一年
  */
 function prevYear() {
+  if (currentYear.value <= MIN_YEAR) return
   currentYear.value--
 }
 
@@ -235,6 +274,7 @@ function prevYear() {
  * 年份切换：加一年
  */
 function nextYear() {
+  if (currentYear.value >= MAX_YEAR) return
   currentYear.value++
 }
 
@@ -287,11 +327,12 @@ function close() {
  * 确认选择：格式化为 YYYY-MM-DD 返回给父组件
  */
 function confirm() {
-  // 月份补零：5 → "05"
-  const month = String(currentMonth.value + 1).padStart(2, '0')
-  // 日期补零：9 → "09"
+  // 使用「选中日期」自己的年月，而不是面板当前浏览的年月：
+  // 否则用户切到其它月份但未点选任何日期就按确定，会输出“浏览月 + 旧选中日”的错拼日期
+  // （例：选中 5/24 → 切到 6 月 → 直接确定，修复前会输出 2026-06-24）。
+  const month = String(selectedMonth.value + 1).padStart(2, '0')
   const day = String(selectedDay.value).padStart(2, '0')
-  const dateStr = `${currentYear.value}-${month}-${day}`
+  const dateStr = `${selectedYear.value}-${month}-${day}`
   emit('change', dateStr)
   emit('close')
 }

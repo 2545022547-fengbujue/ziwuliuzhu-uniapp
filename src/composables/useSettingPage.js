@@ -1,4 +1,4 @@
-﻿import { ref, computed, inject, onUnmounted } from 'vue'
+import { ref, computed, inject, onUnmounted } from 'vue'
 import { onShow, onHide, onBackPress } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
@@ -91,8 +91,9 @@ export function useSettingPage() {
 
   /** 真太阳时开关变化回调，开启时自动弹出城市选择 */
   function onSolarTimeToggle(e) {
-    store.toggleTrueSolarTime(e.detail.value)
-    if (e.detail.value) {
+    const enabled = Boolean(e?.detail?.value)
+    store.toggleTrueSolarTime(enabled)
+    if (enabled) {
       clearTimeout(solarPickerTimer)
       solarPickerTimer = setTimeout(() => {
         openCityPicker()
@@ -102,26 +103,26 @@ export function useSettingPage() {
 
   /** 反克法显示开关；关闭后不再把结果合并到纳甲法面板。 */
   function onFankeToggle(e) {
-    store.toggleFanke(e.detail.value)
+    store.toggleFanke(Boolean(e?.detail?.value))
   }
 
   /** 合日互用开关；切换后 store.results 会基于同一日期时辰立即重新计算。 */
   function onHeRiHuYongToggle(e) {
-    store.toggleHeRiHuYong(e.detail.value)
+    store.toggleHeRiHuYong(Boolean(e?.detail?.value))
   }
 
   /** 穴位编码显示开关；状态持久化后同时作用于列表和详情标题。 */
   function onPointCodeToggle(e) {
-    store.togglePointCode(e.detail.value)
+    store.togglePointCode(Boolean(e?.detail?.value))
   }
 
   function onGanZhiToggle(e) {
-    store.toggleGanZhi(e.detail.value)
+    store.toggleGanZhi(Boolean(e?.detail?.value))
   }
 
   /** 五行属性显示开关；状态持久化后同时作用于取穴列表与穴位详情。 */
   function onWuXingToggle(e) {
-    store.toggleWuXing(e.detail.value)
+    store.toggleWuXing(Boolean(e?.detail?.value))
   }
 
   /** 选择外观后立即收起列表，让用户清楚看到当前生效项。 */

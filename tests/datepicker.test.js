@@ -91,4 +91,33 @@ describe('DatePicker 日历正确性', () => {
     expect(wrapper.find('.month-text').exists()).toBe(true)
     expect(wrapper.findAll('.day-item').length).toBeGreaterThanOrEqual(28)
   })
+
+  it('切到其它月份后未点选日期直接确定：输出原选中日期而非“浏览月+旧日”', async () => {
+    const wrapper = mountPicker('2026-05-24')
+    await wrapper.find('.month-arrow.next').trigger('tap')
+    // 面板当前浏览 6 月，但选中状态仍是 5/24；标题只显示“6月”，避免把旧日号拼进新月份
+    expect(wrapper.find('.month-text').text()).toBe('6月')
+    await wrapper.find('.action-btn.confirm').trigger('tap')
+    expect(wrapper.emitted('change')[0]).toEqual(['2026-05-24'])
+  })
+
+  it('年份导航限制在 1900-2100，避免 0-99 年份被 Date 构造函数映射到 19xx', async () => {
+    const wrapper = mountPicker('2026-05-24')
+    // 2100 年下点“下一年”不应继续增加
+    for (let i = 0; i < 100; i++) {
+      await wrapper.find('.year-arrow.next').trigger('tap')
+    }
+    expect(wrapper.find('.year-text').text()).toBe('2100年')
+    // 1900 年下点“上一年”不应继续减少
+    for (let i = 0; i < 220; i++) {
+      await wrapper.find('.year-arrow.prev').trigger('tap')
+    }
+    expect(wrapper.find('.year-text').text()).toBe('1900年')
+  })
+
+  it('非法但可解析的日期（2026-02-30）防御：回退今天而非进位到 3 月', () => {
+    const wrapper = mountPicker('2026-02-30')
+    const today = new Date()
+    expect(wrapper.find('.month-text').text()).toBe(`${today.getMonth() + 1}月${today.getDate()}日`)
+  })
 })

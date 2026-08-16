@@ -106,8 +106,8 @@ export function calculateLingui(ganzhi, hourIndex) {
     console.warn('[灵龟八法] 干支信息不完整')
     return { method: 'lingui', methodName: '灵龟八法', openPoints: [], isClosed: true }
   }
-  // hourIndex 范围验证
-  if (hourIndex < 0 || hourIndex > 11) {
+  // hourIndex 验证：必须是 0-11 的整数
+  if (!Number.isInteger(hourIndex) || hourIndex < 0 || hourIndex > 11) {
     console.warn(`[灵龟八法] 无效时辰索引 ${hourIndex}`)
     return { method: 'lingui', methodName: '灵龟八法', openPoints: [], isClosed: true }
   }

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <!--
     设置页壳层（setting.vue）
 
@@ -31,19 +31,42 @@ import { useSettingPage } from '@/composables/useSettingPage.js'
 import { mark } from '@/utils/perf.js'
 // classic 常驻（唯一需兼容微信小程序的主题；小程序端仅保留此组件）
 import SettingClassic from '@/views/classic/SettingClassic.vue'
-// 非经典主题仅 H5/App 使用：
-//   - 小程序端：条件编译整体排除（不编译、不打包）
-//   - H5/App：defineAsyncComponent + 动态 import 异步加载（首包瘦身）
-// #ifndef MP-WEIXIN
-const SettingModern = defineAsyncComponent(() => import('@/views/modern/SettingModern.vue'))
-const SettingInk = defineAsyncComponent(() => import('@/views/ink/SettingInk.vue'))
-const SettingMorandi = defineAsyncComponent(() => import('@/views/morandi/SettingMorandi.vue'))
-const SettingWatercolor = defineAsyncComponent(() => import('@/views/watercolor/SettingWatercolor.vue'))
-const SettingAnimal = defineAsyncComponent(() => import('@/views/animal/SettingAnimal.vue'))
-const SettingPixel = defineAsyncComponent(() => import('@/views/pixel/SettingPixel.vue'))
+// 非经典主题仅 H5/App 使用，小程序端条件编译整体排除（不编译、不打包）。
+// 加载策略按平台区分：
+//   - App：本地包无网络成本，必须静态 import。动态 import 会触发 Rollup code-splitting，
+//     与 uni-app App 构建的 output.format=iife 冲突（Build failed）。
+//   - H5：defineAsyncComponent + 动态 import 异步加载（首包瘦身）。
+// #ifdef APP-PLUS
+import SettingModern from '@/views/modern/SettingModern.vue'
+import SettingInk from '@/views/ink/SettingInk.vue'
+import SettingMorandi from '@/views/morandi/SettingMorandi.vue'
+import SettingWatercolor from '@/views/watercolor/SettingWatercolor.vue'
+import SettingAnimal from '@/views/animal/SettingAnimal.vue'
+import SettingPixel from '@/views/pixel/SettingPixel.vue'
+// #endif
+// #ifdef H5
+import ThemeLoadFallback from '@/views/_shared/ThemeLoadFallback.vue'
+const asyncTheme = (loader) => defineAsyncComponent({
+  loader,
+  timeout: 10000,
+  errorComponent: ThemeLoadFallback,
+  onError(error, retry, fail, attempts) {
+    // 网络瞬时抖动自动重试一次；仍失败则渲染 ThemeLoadFallback，而不是白屏
+    if (attempts <= 1) retry()
+    else fail()
+  }
+})
+const SettingModern = asyncTheme(() => import('@/views/modern/SettingModern.vue'))
+const SettingInk = asyncTheme(() => import('@/views/ink/SettingInk.vue'))
+const SettingMorandi = asyncTheme(() => import('@/views/morandi/SettingMorandi.vue'))
+const SettingWatercolor = asyncTheme(() => import('@/views/watercolor/SettingWatercolor.vue'))
+const SettingAnimal = asyncTheme(() => import('@/views/animal/SettingAnimal.vue'))
+const SettingPixel = asyncTheme(() => import('@/views/pixel/SettingPixel.vue'))
+// #endif
 
+// #ifdef H5
 // ============================================================
-// 主题切换性能优化：异步 chunk 空闲预取
+// 主题切换性能优化：异步 chunk 空闲预取（仅 H5；App 端为静态 import，无需也无法预取）
 // 背景：非 classic 主题走 defineAsyncComponent 异步加载，首次切换需「网络/磁盘加载 + 解析」
 //       （每 chunk 0.2~4.4KB，合计约 28KB），是切换可感知延迟的最大来源。
 // 方案：进入设置页后空闲时（requestIdleCallback，降级 setTimeout）预取全部非 classic

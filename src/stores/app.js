@@ -48,6 +48,9 @@ function isKnownTheme(themeId) {
   return THEME_OPTIONS.some(t => t.id === themeId)
 }
 
+// 主取穴方法白名单（反克法只作为纳甲闭穴补充，不作为可持久化的 activeMethod）
+const ACTIVE_METHODS = ['najia', 'nazi', 'lingui', 'feiteng']
+
 // === 持久化 schema 版本化 ===
 // 动机：pinia-plugin-persist-uni 只做「自动恢复 + 自动保存」，无迁移钩子。
 // 若未来新增/改状态字段语义，旧用户持久化数据可能不兼容。这里用显式版本号 +
@@ -249,9 +252,16 @@ export const useAppStore = defineStore('app', () => {
     return themePrimaryColor.value
   })
 
-  // 自动模式下用于展示的有效时间；开启真太阳时时为校正后的时间
+  /**
+   * 自动模式下用于展示的有效时间；开启真太阳时时为校正后的时间。
+   *
+   * 刻意基于 visualClock 而不是 currentTime：子时跨越自然日 00:00 时，
+   * currentTime 为省算力仍停留在 23:xx（时辰索引同为 0，算法结果已通过
+   * 23:00 子时翻转正确切换）；若显示也读 currentTime，00:00-00:59 的界面
+   * 会一直停在 23:xx。visualClock 每分钟刷新，显示时间始终为真实当前时间。
+   */
   const effectiveCurrentTime = computed(() => {
-    return getTrueSolarDate(currentTime.value, longitude.value, useTrueSolarTime.value)
+    return getTrueSolarDate(visualClock.value, longitude.value, useTrueSolarTime.value)
   })
 
   /** 水墨主题的七时段背景。使用设备当地时间，不受手动查询模式影响。 */
@@ -324,7 +334,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   function setActiveMethod(method) {
-    activeMethod.value = method
+    activeMethod.value = ACTIVE_METHODS.includes(method) ? method : 'najia'
   }
 
   /**
@@ -461,9 +471,54 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  /**
+   * 持久化脏数据清洗。
+   *
+   * 背景：pinia-plugin-persist-uni 在 store setup 返回后才执行 $patch 恢复，
+   * 因此这里的调用安排在微任务中（恢复完成后）。只清洗会直接影响计算/渲染
+   * 的字段；theme/uiStyle 已有 activeTheme/activeUiStyle computed 兜底，不重复处理。
+   */
+  function sanitizePersistedState() {
+    if (typeof longitude.value !== 'number' || !Number.isFinite(longitude.value) ||
+        longitude.value < -180 || longitude.value > 180) {
+      longitude.value = APP_CONFIG.defaultLongitude
+    }
+    if (typeof selectedCity.value !== 'string' || !selectedCity.value) {
+      selectedCity.value = APP_CONFIG.defaultCity
+    }
+    if (typeof useTrueSolarTime.value !== 'boolean') {
+      useTrueSolarTime.value = false
+    }
+    if (!ACTIVE_METHODS.includes(activeMethod.value)) {
+      activeMethod.value = 'najia'
+    }
+    if (naziMode.value !== 'bumu') {
+      naziMode.value = 'daily'
+    }
+    if (fankeDisplayMode.value !== 'separate' && fankeDisplayMode.value !== 'merged') {
+      fankeDisplayMode.value = 'merged'
+    }
+    if (typeof useHeRiHuYong.value !== 'boolean') useHeRiHuYong.value = false
+    if (typeof showPointCode.value !== 'boolean') showPointCode.value = true
+    if (typeof showGanZhi.value !== 'boolean') showGanZhi.value = false
+    if (typeof showWuXing.value !== 'boolean') showWuXing.value = true
+  }
+
   // === 初始化 ===
-  updateCurrentTime(true)  // 强制初始化，确保首次加载时间正确
-  ensureSchemaVersion()  // 持久化版本检查（需在恢复完成后、任何状态写入前）
+  updateCurrentTime(true)  // 先用默认/内存值同步初始化，确保 store 一创建就有有效时间
+  ensureSchemaVersion()  // 持久化版本检查（读的是 storage 原始对象，不依赖插件恢复时序）
+
+  // pinia persist 插件在 setup 返回后同步 $patch 恢复持久化状态；微任务在其后运行，
+  // 用恢复后的真太阳时/城市/方法等设置重新校正 currentHour，避免首帧使用默认值算错时辰。
+  const runPostHydrationInit = () => {
+    sanitizePersistedState()
+    updateCurrentTime(true)
+  }
+  if (typeof queueMicrotask === 'function') {
+    queueMicrotask(runPostHydrationInit)
+  } else {
+    setTimeout(runPostHydrationInit, 0)
+  }
 
   return {
     // State

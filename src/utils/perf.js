@@ -28,10 +28,12 @@ export function mark(name) {
  * @returns {number|null} 耗时 ms；环境不支持或打点缺失返回 null
  */
 export function measure(startMark, endMark, label) {
-  if (!hasPerf) return null
+  // 生产环境直接跳过：既不 console，也不调用 performance.measure，
+  // 避免为“不会有观察者”的埋点付出任何计算成本。
+  if (!hasPerf || !canLog) return null
   try {
     const m = performance.measure(label, startMark, endMark)
-    if (canLog) console.info(`[perf] ${label}: ${m.duration.toFixed(1)}ms`)
+    console.info(`[perf] ${label}: ${m.duration.toFixed(1)}ms`)
     return m.duration
   } catch (e) {
     // start/end mark 缺失（如首次挂载无切换动作）时静默跳过
@@ -39,7 +41,8 @@ export function measure(startMark, endMark, label) {
   }
 }
 
-// 浏览器调试入口：console 里敲 __perf.measure('a', 'b', '自定义') 即可
-if (typeof window !== 'undefined') {
+// 浏览器调试入口（仅开发环境）：console 里敲 __perf.measure('a', 'b', '自定义') 即可。
+// 生产环境不挂载，避免把内部埋点命名空间暴露给线上用户/第三方脚本。
+if (typeof window !== 'undefined' && !isProd) {
   window.__perf = { mark, measure }
 }

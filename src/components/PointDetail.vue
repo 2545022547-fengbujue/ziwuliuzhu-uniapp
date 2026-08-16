@@ -186,11 +186,16 @@ function getSecureRandomIndex(length) {
     const unbiasedLimit = range - (range % length)
     const randomValue = new Uint32Array(1)
 
-    do {
-      cryptoApi.getRandomValues(randomValue)
-    } while (randomValue[0] >= unbiasedLimit)
-
-    return randomValue[0] % length
+    try {
+      do {
+        cryptoApi.getRandomValues(randomValue)
+      } while (randomValue[0] >= unbiasedLimit)
+      return randomValue[0] % length
+    } catch (e) {
+      // 部分 App WebView 暴露 crypto.getRandomValues 但调用会抛错；
+      // 落入下方兼容回退，而不是让整个穴位详情弹窗渲染失败。
+      console.warn('[PointDetail] Web Crypto 不可用，使用时间种子回退', e)
+    }
   }
 
   // 部分小程序/App WebView 不提供 Web Crypto；混合高精度时间作为兼容回退。

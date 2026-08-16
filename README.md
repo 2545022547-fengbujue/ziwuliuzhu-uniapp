@@ -48,21 +48,32 @@
 
 | 字体 | 用途 | 加载方式 |
 |------|------|----------|
-| 楷体_GB2312（子集化122KB） | 标题、穴位名、干支标签 | 小程序: `font-loader.js` 从生成的 base64 模块加载；H5/App: @font-face |
-| 文源宋体（子集化226KB） | 弹窗正文、经络/类别/五行 | 小程序: `font-loader.js` 从生成的 base64 模块加载；H5/App: @font-face |
-| 文源宋体Bold（子集化23KB） | 正文加粗区域 | 小程序: 未单独动态加载，回退到常规宋体/系统字体；H5/App: @font-face |
+| 楷体_GB2312（子集化约375KB） | 标题、穴位名、干支标签 | 小程序: `font-loader.js` 从生成的 base64 模块加载；H5/App: @font-face |
+| 文源宋体（子集化约843KB） | 弹窗正文、经络/类别/五行 | 小程序: `font-loader.js` 从生成的 base64 模块加载；H5/App: @font-face |
+| 文源宋体Bold（子集化约848KB） | 正文加粗区域 | 小程序: 未单独动态加载，回退到常规宋体/系统字体；H5/App: @font-face |
+| LXGW ZhenKai Slab GB（子集化约820KB） | 水墨/莫兰迪/水彩主题标题 | H5/App: @font-face（小程序端仅作回退） |
+| 华文行楷（子集化约610KB） | 水墨主题主展示字体 | H5/App: @font-face |
 
 ## 开发与验证
 
 ```bash
 npm install
+pip install -r requirements-dev.txt   # 字体回归门禁需要 Python fonttools（受管控环境建议用 venv）
 npm run dev:h5            # 开发预览 → http://localhost:5174
 npm run build:h5          # H5 构建（构建前先 rm -rf dist/build/h5）
 npm run build:mp-weixin   # 微信小程序构建
-npm run test:builds       # 双端构建 + MP 产物隔离校验 + app 构建
-npm test                  # vitest 254 条单测 + 数据门禁（算法/数据/字体回归）
+npm run test:builds       # 三端构建 + MP 产物隔离校验（h5 → mp-weixin → app）
+npm test                  # vitest 258 条单测 + 数据门禁（算法/数据/字体回归）
 npm run fonts:base64      # 修改字体 TTF 后同步小程序 base64 字体模块
 ```
+
+### 常见环境问题
+
+- **Alpine/musl 容器报 `Cannot find module @rollup/rollup-linux-x64-musl`**：npm 的 optionalDependencies 安装缺陷，临时安装一次即可：`npm install --no-save @rollup/rollup-linux-x64-musl@4.14.3`。
+- **`pip install fonttools` 报 externally-managed-environment（PEP 668）**：创建项目内虚拟环境：
+  `python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt`；运行测试时用 `PATH="$(pwd)/.venv/bin:$PATH" npm test`。
+- **`npm test` 的字体门禁缺依赖时会直接给出安装命令**，不再输出裸 `ModuleNotFoundError`。
+- **开发服务器默认监听 `0.0.0.0`**（`vite.config.js`），会把页面暴露到局域网；仅在可信网络使用，或临时改为 `host: '127.0.0.1'`。
 
 - App 产品版本以 `src/manifest.json` 的 `versionName` / `versionCode` 为准；`package.json` 版本保持同步。
 - `patches/*.patch` 由 `patch-package` 在 `postinstall` 阶段自动应用，用于修复小程序端依赖中的废弃 API 调用。

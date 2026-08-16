@@ -45,8 +45,8 @@ export function getTrueSolarDate(date, longitude = 116.407, useTrueSolarTime = f
     console.warn('[真太阳时] 无效的日期参数，返回原始值')
     return date
   }
-  // 未启用校正 / 经度缺失 / 非数字：不校正直接返回（与 getGanZhi 的经度兜底保持一致）
-  if (!useTrueSolarTime || longitude == null || typeof longitude !== 'number') return date
+  // 未启用校正 / 经度缺失 / 非数字 / NaN：不校正直接返回（与 getGanZhi 的经度兜底保持一致）
+  if (!useTrueSolarTime || longitude == null || typeof longitude !== 'number' || !Number.isFinite(longitude)) return date
   // 经度越界（防御：直接调用本函数时无上层校验，如 store.effectiveCurrentTime）回退默认北京经度，
   // 避免 (longitude-120)*4 产生离谱分钟偏移（如 longitude=1000 → 3520 分钟 ≈ 2.4 天）
   const safeLongitude = longitude < -180 || longitude > 180 ? 116.407 : longitude
@@ -65,8 +65,9 @@ export function getTrueSolarDate(date, longitude = 116.407, useTrueSolarTime = f
  * @returns {Object} 干支信息
  */
 export function getGanZhi(date, longitude = 116.407, useTrueSolarTime = false) {
-  // 参数验证：longitude 应在有效范围内
-  if (typeof longitude === 'number' && (longitude < -180 || longitude > 180)) {
+  // 参数验证：longitude 应是有效范围内的有限数字（NaN 同样回退）
+  if ((typeof longitude === 'number' && !Number.isFinite(longitude)) ||
+      (typeof longitude === 'number' && (longitude < -180 || longitude > 180))) {
     console.warn(`[干支] 经度超出范围 ${longitude}，应为 -180 到 180`)
     longitude = 116.407  // 回退默认值
   }
