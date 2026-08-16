@@ -231,7 +231,7 @@
       :closing="setting.themeTransitionClosing"
     />
 
-    <!-- 取穴方法说明弹窗：顶部按「关于」弹窗样式（books 书籍图标 + 标题），下方方法卡片列表 -->
+    <!-- 取穴方法说明弹窗 -->
     <view v-if="setting.showMethods" class="fullscreen-overlay" @tap="setting.showMethods = false">
       <view class="fullscreen-panel" @tap.stop>
         <view class="fullscreen-header" :style="{ paddingTop: setting.statusBarHeight + 'px' }">
@@ -241,28 +241,16 @@
           <text class="fullscreen-title">取穴方法说明</text>
         </view>
         <scroll-view scroll-y class="fullscreen-body" :show-scrollbar="false">
-          <view class="about-content-inner">
-            <!-- 顶部图标：books 书籍图标（H5 SVG / App PNG）；MP 用 📖 兜底 -->
-            <view class="logo-area">
-              <!-- #ifdef H5 || APP-PLUS -->
-              <view class="logo-icon-books"><SettingIcon name="books" /></view>
-              <!-- #endif -->
-              <!-- #ifndef H5 || APP-PLUS -->
-              <text class="logo-icon">📖</text>
-              <!-- #endif -->
-              <text class="app-name">四法精要</text>
+          <view
+            v-for="m in setting.methodDescs"
+            :key="m.id"
+            class="method-card"
+          >
+            <view class="method-header">
+              <text class="method-icon">{{ m.icon }}</text>
+              <text class="method-name">{{ m.name }}</text>
             </view>
-            <view
-              v-for="m in setting.methodDescs"
-              :key="m.id"
-              class="method-card"
-            >
-              <view class="method-header">
-                <text class="method-icon">{{ m.icon }}</text>
-                <text class="method-name">{{ m.name }}</text>
-              </view>
-              <text class="method-detail">{{ m.desc }}</text>
-            </view>
+            <text class="method-detail">{{ m.desc }}</text>
           </view>
           <view :style="{ height: setting.safeBottom + 20 + 'px' }"></view>
         </scroll-view>
