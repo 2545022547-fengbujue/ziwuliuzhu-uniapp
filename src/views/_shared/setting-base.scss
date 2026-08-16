@@ -609,6 +609,15 @@
   margin-bottom: $spacing-lg;
 }
 
+/* 关于弹窗 logo：books 书籍图标（H5 SVG / App PNG）容器，尺寸与 ☯ emoji 一致；
+   子组件 SettingIcon 根元素带本组件 data-v，scoped 规则可命中 */
+.logo-icon-books {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: $spacing-lg;
+  color: var(--theme-primary);
+}
+
 .app-name {
   font-size: 44rpx;
   font-weight: 700;

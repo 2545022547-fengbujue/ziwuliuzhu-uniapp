@@ -18,7 +18,7 @@ const fs = require('fs')
 const path = require('path')
 
 const THEMES = ['modern', 'ink', 'morandi', 'watercolor', 'animal', 'pixel']
-const SLOTS = ['solar', 'style', 'personal', 'methods', 'about']
+const SLOTS = ['solar', 'style', 'personal', 'books', 'methods', 'about']
 const ROOT = path.join(__dirname, '..')
 const OUT_DIR = path.join(ROOT, 'src', 'assets', 'icons')
 

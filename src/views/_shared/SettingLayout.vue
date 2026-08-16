@@ -268,9 +268,15 @@
         </view>
         <scroll-view scroll-y class="fullscreen-body" :show-scrollbar="false">
           <view class="about-content-inner">
-            <!-- Logo区域 -->
+            <!-- Logo区域：H5/App 用 books 书籍图标（H5 内联 SVG 跟随主题色 / App 主题色 PNG）；
+                 微信小程序不支持内联 SVG，保持 ☯ emoji 兜底 -->
             <view class="logo-area">
+              <!-- #ifdef H5 || APP-PLUS -->
+              <view class="logo-icon-books"><SettingIcon name="books" /></view>
+              <!-- #endif -->
+              <!-- #ifndef H5 || APP-PLUS -->
               <text class="logo-icon">☯</text>
+              <!-- #endif -->
               <text class="app-name">子午流注取穴</text>
               <text class="app-version">v{{ setting.version }}</text>
             </view>
@@ -304,6 +310,7 @@ import AppNavbar from '@/components/AppNavbar.vue'
 import CityPicker from '@/components/CityPicker.vue'
 import ThemeTransitionOverlay from '@/components/ThemeTransitionOverlay.vue'
 import ThemeSwitch from '@/views/_shared/ThemeSwitch.vue'
+import SettingIcon from '@/components/SettingIcon.vue'
 
 // 壳层注入的共享业务状态与方法（契约见 useSettingPage.js）
 const setting = useSetting()
