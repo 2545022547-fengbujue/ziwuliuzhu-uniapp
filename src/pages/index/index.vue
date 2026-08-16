@@ -45,8 +45,11 @@ import HomePixel from '@/views/pixel/HomePixel.vue'
 // #endif
 // #ifdef H5
 import ThemeLoadFallback from '@/views/_shared/ThemeLoadFallback.vue'
+import ThemeLoading from '@/views/_shared/ThemeLoading.vue'
 const asyncTheme = (loader) => defineAsyncComponent({
   loader,
+  loadingComponent: ThemeLoading,
+  delay: 150,
   timeout: 10000,
   errorComponent: ThemeLoadFallback,
   onError(error, retry, fail, attempts) {
