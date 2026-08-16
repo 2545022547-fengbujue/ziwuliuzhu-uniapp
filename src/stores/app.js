@@ -33,6 +33,7 @@ import { calculateLingui } from '@/services/lingui.js'
 import { calculateFeiteng } from '@/services/feiteng.js'
 import { getHourIndexFromDate } from '@/utils/date.js'
 import { APP_CONFIG } from '@/config/index.js'
+import { CITIES } from '@/data/city-coordinates.js'
 import { THEME_OPTIONS, THEME_CHROME, UI_STYLE_OPTIONS, UI_STYLE_PRIMARY, UI_STYLE_CHROME } from '@/config/themes.js'
 
 function isKnownUiStyle(styleId) {
@@ -43,6 +44,13 @@ let supportsThemeSwitch = false
 // #ifdef H5 || APP-PLUS
 supportsThemeSwitch = true
 // #endif
+
+// 测试钩子：vitest 环境无条件编译宏，supportsThemeSwitch 恒为 false，
+// activeUiStyle/activeTheme 会回退 classic/green；测试用它翻转以覆盖主题派生逻辑。
+// 生产代码不调用，默认值不受影响。
+export function __setSupportsThemeSwitchForTest(value) {
+  supportsThemeSwitch = value
+}
 
 function isKnownTheme(themeId) {
   return THEME_OPTIONS.some(t => t.id === themeId)
@@ -57,6 +65,8 @@ const ACTIVE_METHODS = ['najia', 'nazi', 'lingui', 'feiteng']
 // 迁移注册表保证可平滑升级；当前 v1 是首个带版本的格式，旧数据视为 v0。
 const SCHEMA_VERSION = 1
 const PERSIST_KEY = 'ziwuliuzhu-app'  // 与 persist.strategies[0].key 保持一致
+// 生产零日志约定（perf.js 同款判断）：迁移等开发期诊断信息仅开发环境输出
+const isProd = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'production'
 /** 迁移注册表：{ 目标版本: (旧数据对象) => 新数据对象 }。v1 为基线，无破坏性变更。 */
 const SCHEMA_MIGRATIONS = {
   1: (data) => data
@@ -328,7 +338,11 @@ export const useAppStore = defineStore('app', () => {
   // 真太阳时开关变化同理：自动模式刷新时间；手动模式不受该设置影响
   function toggleTrueSolarTime(enabled) {
     useTrueSolarTime.value = enabled
-    if (!enabled) longitude.value = APP_CONFIG.defaultLongitude
+    if (!enabled) {
+      // 经度回退北京时城市必须同步回退，否则界面显示旧城市（如上海）却按北京经度计算
+      longitude.value = APP_CONFIG.defaultLongitude
+      selectedCity.value = APP_CONFIG.defaultCity
+    }
     // 开关变化可能导致时辰跳变，强制更新
     if (!isManualMode.value) updateCurrentTime(true)
   }
@@ -459,7 +473,7 @@ export const useAppStore = defineStore('app', () => {
       const saved = typeof raw === 'string' ? JSON.parse(raw) : raw
       const from = Number(saved?.schemaVersion ?? 0)
       if (from >= SCHEMA_VERSION) return
-      console.info(`[持久化] schema v${from} → v${SCHEMA_VERSION}`)
+      if (!isProd) console.info(`[持久化] schema v${from} → v${SCHEMA_VERSION}`)
       let data = saved
       for (let v = from + 1; v <= SCHEMA_VERSION; v++) {
         const migrate = SCHEMA_MIGRATIONS[v]
@@ -483,7 +497,8 @@ export const useAppStore = defineStore('app', () => {
         longitude.value < -180 || longitude.value > 180) {
       longitude.value = APP_CONFIG.defaultLongitude
     }
-    if (typeof selectedCity.value !== 'string' || !selectedCity.value) {
+    if (typeof selectedCity.value !== 'string' || !selectedCity.value ||
+        !CITIES.some(c => c.name === selectedCity.value)) {
       selectedCity.value = APP_CONFIG.defaultCity
     }
     if (typeof useTrueSolarTime.value !== 'boolean') {

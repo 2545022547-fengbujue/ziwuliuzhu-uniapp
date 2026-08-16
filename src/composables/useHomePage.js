@@ -83,9 +83,9 @@ export function useHomePage() {
       store.showFanke
   })
 
-  // 其他方法对比列表（排除当前选中的方法）
+  // 其他方法对比列表（排除当前选中的方法；含纳甲，避免 activeMethod 非纳甲时对比区恒缺纳甲）
   const otherMethods = computed(() => {
-    return ['nazi', 'lingui', 'feiteng'].filter(m => m !== store.activeMethod)
+    return METHODS.map(m => m.id).filter(m => m !== store.activeMethod)
   })
 
   // 自动更新定时器
@@ -96,7 +96,7 @@ export function useHomePage() {
     store.switchToAutoMode()
   }
 
-  /** 切换到手动模式，初始化为当前时间 */
+  /** 切换到手动模式，初始化为当前时间（与 confirmQuery 一致用所选日期 00:00 构造） */
   function switchToManual() {
     const now = new Date()
     const hourIdx = getHourIndexFromDate(now)
@@ -104,7 +104,12 @@ export function useHomePage() {
     selectedHourIdx.value = hourIdx
     confirmedDateStr.value = selectedDateStr.value
     confirmedHourIdx.value = hourIdx
-    store.switchToManualMode(now, hourIdx)
+    // 修复：23:00-23:59 进入手动时若把含时刻的 now 直接传入，getGanZhi 会因子时翻转
+    // 把日干支按次日算，与 UI「子时按所选日期 00:00-00:59 计」矛盾，且点查询确认前后
+    // 干支与算法结果整体跳变。与 confirmQuery 统一用所选日期 00:00 构造。
+    const parts = selectedDateStr.value.split('-')
+    const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 0, 0, 0)
+    store.switchToManualMode(date, hourIdx)
   }
 
   /** 日期选择面板回调（三端统一使用） */

@@ -16,13 +16,13 @@
   -->
   <view class="points-grid">
     <view
-      v-for="point in points"
-      :key="`${keyPrefix}-${point.code}`"
+      v-for="(point, idx) in points"
+      :key="`${keyPrefix}-${idx}-${point.code || ''}`"
       class="point-btn"
       :class="{ 'point-btn-code-hidden': !store.showPointCode, 'point-btn-wuxing-hidden': !store.showWuXing }"
       @tap="store.selectPoint(point)"
     >
-      <text class="point-name" :class="{ 'name-long': point.name.length >= 3 }">{{ point.name }}</text>
+      <text class="point-name" :class="{ 'name-long': (point.name || '').length >= 3 }">{{ point.name }}</text>
       <text v-if="store.showPointCode" class="point-code">{{ point.code }}</text>
       <view v-if="store.showWuXing && point.wuxing" class="wuxing-tag" :style="getWuxingStyle(point.wuxing)">
         <text class="wuxing-text" :style="{ color: getWuxingColor(point.wuxing) }">{{ point.wuxing }}</text>

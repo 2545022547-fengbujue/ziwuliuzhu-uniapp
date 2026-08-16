@@ -55,22 +55,8 @@
   flex-shrink: 0;
 }
 
-// 内联矢量图标容器（替换 emoji 符号）：跟随卡片标题主题色，垂直居中
-.card-icon-svg {
-  width: 40rpx;
-  height: 40rpx;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: inherit;
-}
-
-.svg-icon {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+// 内联矢量图标容器（替换 emoji 符号）与 .svg-icon、.card-compact .picker-arrow
+// 已移至 SettingLayout.vue 的全局样式块：插槽内容由主题薄壳页编译，scoped 规则不命中。
 
 .card-title-collapsible {
   justify-content: space-between;
@@ -178,13 +164,6 @@
 
   .setting-label {
     font-size: $font-size-base;
-  }
-
-  // 右侧导航箭头改用 caret-circle-right 内联 SVG；限定在本卡片内，不影响真太阳时城市选择器的文本箭头
-  .picker-arrow {
-    width: 36rpx;
-    height: 36rpx;
-    font-size: 0;
   }
 }
 

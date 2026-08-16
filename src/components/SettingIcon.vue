@@ -93,7 +93,9 @@ const store = useAppStore()
 
 const pngSrc = computed(() => {
   // #ifdef APP-PLUS
-  return pngMap[props.name]?.[store.activeUiStyle] || ''
+  // about 与 methods 同图（H5 分支共用 v-else），App 映射统一走 methods
+  const iconKey = props.name === 'about' ? 'methods' : props.name
+  return pngMap[iconKey]?.[store.activeUiStyle] || ''
   // #endif
   // #ifndef APP-PLUS
   return ''

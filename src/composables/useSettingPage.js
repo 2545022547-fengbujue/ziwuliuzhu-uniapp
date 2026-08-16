@@ -81,6 +81,8 @@ export function useSettingPage() {
 
   onHide(() => {
     stopVisualClockTimer()
+    // 100ms 延迟打开 CityPicker 的定时器：切 tab 时若不清理，会在隐藏页面弹出选择器
+    if (solarPickerTimer) clearTimeout(solarPickerTimer)
   })
 
   onUnmounted(() => {
@@ -136,6 +138,9 @@ export function useSettingPage() {
     const isAlreadyActive = store.appearanceOptions.some(item => item.id === optionId && item.active)
 
     if (!needsTransition || isAlreadyActive) {
+      // 非过渡风格或已激活：先清掉可能残留的过渡遮罩定时器（过渡动画播放中切到
+      // modern 等非过渡风格时，旧遮罩的 close/end 定时器会继续执行盖住新风格）
+      clearThemeTransitionTimers()
       if (!isAlreadyActive) store.setAppearance(optionId)
       return
     }

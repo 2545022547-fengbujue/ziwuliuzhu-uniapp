@@ -22,6 +22,8 @@ patches/*.backup
 # 字库和base64文件需要跟踪
 !src/assets/fonts/chars_*.txt
 !src/assets/fonts/*-base64.txt
+# MP 字体 base64 生成模块（build:mp-weixin 前置 fonts:base64 重新生成，不入库）
+src/assets/fonts/mp-font-base64.generated.js
 # Python 开发门禁依赖清单（供 pip install -r 使用）
 !requirements-dev.txt
 !patches/

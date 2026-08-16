@@ -322,4 +322,34 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @use '@/views/_shared/setting-base.scss' as *;
+
+// 图标插槽内容由主题薄壳页编译，节点无本组件 data-v，普通 scoped 规则不命中；
+// 必须用 :deep()（父节点带 data-v、目标不加）才能命中插槽内的 .card-icon-svg/.svg-icon。
+// 注：uni-app vite 插件会把组件内所有 <style> 块都加 scopeId，故不能用「非 scoped 块」实现全局。
+:deep(.card-icon-svg) {
+  width: 40rpx;
+  height: 40rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+:deep(.svg-icon) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+:deep(.card-compact .picker-arrow) {
+  width: 36rpx;
+  height: 36rpx;
+  font-size: 0;
+}
+
+:deep(.solar-card .card-icon-svg) {
+  width: 32rpx;
+  height: 32rpx;
+}
 </style>

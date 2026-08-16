@@ -279,10 +279,11 @@ function nextYear() {
 }
 
 /**
- * 月份切换：减一月（跨年时需同时减年份）
+ * 月份切换：减一月（跨年时需同时减年份；到 MIN_YEAR 不再跨年，避免 1900-01 → 1899-12 绕过钳制）
  */
 function prevMonth() {
   if (currentMonth.value === 0) {
+    if (currentYear.value <= MIN_YEAR) return
     // 1月减1 → 12月，年份减1
     currentMonth.value = 11
     currentYear.value--
@@ -292,10 +293,11 @@ function prevMonth() {
 }
 
 /**
- * 月份切换：加一月（跨年时需同时加年份）
+ * 月份切换：加一月（跨年时需同时加年份；到 MAX_YEAR 不再跨年）
  */
 function nextMonth() {
   if (currentMonth.value === 11) {
+    if (currentYear.value >= MAX_YEAR) return
     // 12月加1 → 1月，年份加1
     currentMonth.value = 0
     currentYear.value++

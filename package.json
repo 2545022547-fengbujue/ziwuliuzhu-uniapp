@@ -37,8 +37,7 @@
     "lunar-javascript": "^1.6.0",
     "pinia": "^2.1.0",
     "pinia-plugin-persist-uni": "^1.2.0",
-    "vue": "3.5.41",
-    "vue-i18n": "9.14.4"
+    "vue": "3.5.41"
   },
   "devDependencies": {
     "@dcloudio/types": "3.4.31",
