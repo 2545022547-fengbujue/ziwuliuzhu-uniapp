@@ -8,16 +8,32 @@
     图标一律使用文本/emoji（小程序原生不支持内联 SVG）。
   -->
   <SettingLayout>
-    <template #icon-solar><text class="card-icon">☀</text></template>
+    <!-- 真太阳时/个性化图标与其它主题一致（H5/App 用 SettingIcon 矢量图标，MP 用 emoji 兜底） -->
+    <template #icon-solar>
+      <!-- #ifdef H5 || APP-PLUS -->
+      <view class="card-icon-svg"><SettingIcon name="solar" /></view>
+      <!-- #endif -->
+      <!-- #ifndef H5 || APP-PLUS -->
+      <text class="card-icon">📍</text>
+      <!-- #endif -->
+    </template>
     <template #icon-style><text class="card-icon">🎨</text></template>
     <template #icon-najia><text class="card-icon">☯</text></template>
-    <template #icon-personal><text class="card-icon">👤</text></template>
+    <template #icon-personal>
+      <!-- #ifdef H5 || APP-PLUS -->
+      <view class="card-icon-svg"><SettingIcon name="personal" /></view>
+      <!-- #endif -->
+      <!-- #ifndef H5 || APP-PLUS -->
+      <text class="card-icon">⚙️</text>
+      <!-- #endif -->
+    </template>
     <template #icon-methods><text class="classic-arrow">▶</text></template>
     <template #icon-about><text class="classic-arrow">▶</text></template>
   </SettingLayout>
 </template>
 
 <script setup>
+import SettingIcon from '@/components/SettingIcon.vue'
 import SettingLayout from '@/views/_shared/SettingLayout.vue'
 </script>
 
