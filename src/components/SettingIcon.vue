@@ -17,6 +17,7 @@
   <svg v-else-if="name === 'style'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><line x1="216" y1="128" x2="216" y2="176" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="192" y1="152" x2="240" y2="152" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="80" y1="40" x2="80" y2="88" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="56" y1="64" x2="104" y2="64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="168" y1="184" x2="168" y2="216" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="152" y1="200" x2="184" y2="200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="144" y1="80" x2="176" y2="112" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><rect x="21.49" y="105.37" width="213.02" height="45.25" rx="8" transform="translate(-53.02 128) rotate(-45)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
   <svg v-else-if="name === 'personal'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><circle cx="128" cy="128" r="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path d="M130.05,206.11c-1.34,0-2.69,0-4,0L94,224a104.61,104.61,0,0,1-34.11-19.2l-.12-36c-.71-1.12-1.38-2.25-2-3.41L25.9,147.24a99.15,99.15,0,0,1,0-38.46l31.84-18.1c.65-1.15,1.32-2.29,2-3.41l.16-36A104.58,104.58,0,0,1,94,32l32,17.89c1.34,0,2.69,0,4,0L162,32a104.61,104.61,0,0,1,34.11,19.2l.12,36c.71,1.12,1.38,2.25,2,3.41l31.85,18.14a99.15,99.15,0,0,1,0,38.46l-31.84,18.1c-.65,1.15-1.32,2.29-2,3.41l-.16,36A104.58,104.58,0,0,1,162,224Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
   <svg v-else-if="name === 'books'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><rect x="48" y="40" width="64" height="176" rx="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path d="M217.67,205.77l-46.81,10a8,8,0,0,1-9.5-6.21L128.18,51.8a8.07,8.07,0,0,1,6.15-9.57l46.81-10a8,8,0,0,1,9.5,6.21L223.82,196.2A8.07,8.07,0,0,1,217.67,205.77Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="48" y1="72" x2="112" y2="72" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="48" y1="184" x2="112" y2="184" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="133.16" y1="75.48" x2="195.61" y2="62.06" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="139.79" y1="107.04" x2="202.25" y2="93.62" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="156.39" y1="185.94" x2="218.84" y2="172.52" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
+  <svg v-else-if="name === 'taiji'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path d="M128,32 A96,96 0 0 1 128,128 A96,96 0 0 0 128,224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><circle cx="128" cy="80" r="10" fill="currentColor"/><circle cx="128" cy="176" r="10" fill="currentColor"/></svg>
   <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="svg-icon"><rect width="256" height="256" fill="none"/><circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><polyline points="112 88 152 128 112 168" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
   <!-- #endif -->
 </template>
@@ -51,6 +52,12 @@ import iconBooksMorandi from '@/assets/icons/setting-books-morandi.png'
 import iconBooksWatercolor from '@/assets/icons/setting-books-watercolor.png'
 import iconBooksAnimal from '@/assets/icons/setting-books-animal.png'
 import iconBooksPixel from '@/assets/icons/setting-books-pixel.png'
+import iconTaijiModern from '@/assets/icons/setting-taiji-modern.png'
+import iconTaijiInk from '@/assets/icons/setting-taiji-ink.png'
+import iconTaijiMorandi from '@/assets/icons/setting-taiji-morandi.png'
+import iconTaijiWatercolor from '@/assets/icons/setting-taiji-watercolor.png'
+import iconTaijiAnimal from '@/assets/icons/setting-taiji-animal.png'
+import iconTaijiPixel from '@/assets/icons/setting-taiji-pixel.png'
 import iconMethodsModern from '@/assets/icons/setting-methods-modern.png'
 import iconMethodsInk from '@/assets/icons/setting-methods-ink.png'
 import iconMethodsMorandi from '@/assets/icons/setting-methods-morandi.png'
@@ -81,6 +88,14 @@ const pngMap = {
         watercolor: iconPersonalWatercolor,
         animal: iconPersonalAnimal,
         pixel: iconPersonalPixel
+  },
+  taiji: {
+    modern: iconTaijiModern,
+    ink: iconTaijiInk,
+    morandi: iconTaijiMorandi,
+    watercolor: iconTaijiWatercolor,
+    animal: iconTaijiAnimal,
+    pixel: iconTaijiPixel,
   },
   books: {
     modern: iconBooksModern,

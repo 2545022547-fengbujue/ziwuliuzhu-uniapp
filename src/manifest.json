@@ -8,6 +8,7 @@
     "app-plus" : {
         "usingComponents" : true,
         "modules" : {},
+        "darkmode" : false,
         "splashscreen" : {
             "alwaysShowBeforeRender" : false,
             "autoclose" : true,

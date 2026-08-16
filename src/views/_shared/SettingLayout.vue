@@ -231,7 +231,7 @@
       :closing="setting.themeTransitionClosing"
     />
 
-    <!-- 取穴方法说明弹窗 -->
+    <!-- 取穴方法说明弹窗：顶部按「关于」弹窗样式（books 书籍图标 + 标题），下方方法卡片列表 -->
     <view v-if="setting.showMethods" class="fullscreen-overlay" @tap="setting.showMethods = false">
       <view class="fullscreen-panel" @tap.stop>
         <view class="fullscreen-header" :style="{ paddingTop: setting.statusBarHeight + 'px' }">
@@ -241,16 +241,28 @@
           <text class="fullscreen-title">取穴方法说明</text>
         </view>
         <scroll-view scroll-y class="fullscreen-body" :show-scrollbar="false">
-          <view
-            v-for="m in setting.methodDescs"
-            :key="m.id"
-            class="method-card"
-          >
-            <view class="method-header">
-              <text class="method-icon">{{ m.icon }}</text>
-              <text class="method-name">{{ m.name }}</text>
+          <view class="about-content-inner">
+            <!-- 顶部图标：books 书籍图标（H5 SVG / App PNG）；MP 用 📖 兜底 -->
+            <view class="logo-area">
+              <!-- #ifdef H5 || APP-PLUS -->
+              <view class="logo-icon-books"><SettingIcon name="books" /></view>
+              <!-- #endif -->
+              <!-- #ifndef H5 || APP-PLUS -->
+              <text class="logo-icon">📖</text>
+              <!-- #endif -->
+              <text class="app-name">四法精要</text>
             </view>
-            <text class="method-detail">{{ m.desc }}</text>
+            <view
+              v-for="m in setting.methodDescs"
+              :key="m.id"
+              class="method-card"
+            >
+              <view class="method-header">
+                <text class="method-icon">{{ m.icon }}</text>
+                <text class="method-name">{{ m.name }}</text>
+              </view>
+              <text class="method-detail">{{ m.desc }}</text>
+            </view>
           </view>
           <view :style="{ height: setting.safeBottom + 20 + 'px' }"></view>
         </scroll-view>
@@ -268,11 +280,11 @@
         </view>
         <scroll-view scroll-y class="fullscreen-body" :show-scrollbar="false">
           <view class="about-content-inner">
-            <!-- Logo区域：H5/App 用 books 书籍图标（H5 内联 SVG 跟随主题色 / App 主题色 PNG）；
+            <!-- Logo区域：H5/App 用 taiji 太极图标（H5 内联 SVG 跟随主题色 / App 主题色 PNG）；
                  微信小程序不支持内联 SVG，保持 ☯ emoji 兜底 -->
             <view class="logo-area">
               <!-- #ifdef H5 || APP-PLUS -->
-              <view class="logo-icon-books"><SettingIcon name="books" /></view>
+              <view class="logo-icon-books"><SettingIcon name="taiji" /></view>
               <!-- #endif -->
               <!-- #ifndef H5 || APP-PLUS -->
               <text class="logo-icon">☯</text>

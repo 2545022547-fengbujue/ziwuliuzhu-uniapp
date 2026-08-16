@@ -95,7 +95,7 @@ describe('SettingIcon 图标组件', () => {
     config: { compilerOptions: { isCustomElement: (tag) => ['image', 'view', 'text'].includes(tag) } }
   }
 
-  it.each(['solar', 'style', 'personal', 'books', 'methods', 'about'])('name=%s 渲染唯一 svg（H5 分支）', (name) => {
+  it.each(['solar', 'style', 'personal', 'books', 'taiji', 'methods', 'about'])('name=%s 渲染唯一 svg（H5 分支）', (name) => {
     const wrapper = mount(SettingIcon, { props: { name }, global: globalConfig })
     const svgs = wrapper.findAll('svg')
     expect(svgs.length).toBe(1)
@@ -117,7 +117,7 @@ describe('SettingIcon 图标组件', () => {
   it('App 分支 image src 映射非空（about 走 methods 别名）', () => {
     const store = useAppStore()
     store.uiStyle = 'animal'
-    for (const name of ['solar', 'style', 'personal', 'books', 'methods', 'about']) {
+    for (const name of ['solar', 'style', 'personal', 'books', 'taiji', 'methods', 'about']) {
       const wrapper = mount(SettingIcon, { props: { name }, global: globalConfig })
       const img = wrapper.find('image')
       expect(img.exists(), `${name} 应有 image（App 分支）`).toBe(true)
