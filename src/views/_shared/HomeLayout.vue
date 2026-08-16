@@ -74,6 +74,10 @@
               <text>{{ home.hourLabels[home.selectedHourIdx] }}</text>
             </view>
           </view>
+          <!-- 子时日界说明：手动模式按所选日期的 00:00-00:59 计（审查报告 2.2 文案澄清，算法语义未变） -->
+          <view class="manual-hint">
+            <text class="manual-hint-text">子时按所选日期 00:00-00:59 计；23:00 起属次日子时（自动模式按实际时刻）</text>
+          </view>
           <view class="query-btn" @tap="home.handleQuery">
             <text class="query-btn-text">🔍 查询</text>
           </view>

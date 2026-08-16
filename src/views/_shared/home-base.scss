@@ -133,6 +133,17 @@
   font-weight: 600;
 }
 
+/* 手动模式子时日界说明（审查报告 2.2 文案澄清，主题中立基线） */
+.manual-hint {
+  margin-bottom: $spacing-sm;
+}
+
+.manual-hint-text {
+  font-size: 24rpx;
+  color: var(--theme-text-secondary, #666666);
+  line-height: 1.5;
+}
+
 /* === 当前日期时间 === */
 .current-datetime {
   display: flex;
