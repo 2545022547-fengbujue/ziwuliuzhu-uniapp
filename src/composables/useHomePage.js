@@ -5,7 +5,6 @@ import { useAppStore } from '@/stores/app.js'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import { APP_CONFIG } from '@/config/index.js'
 import { formatDate, getHourIndexFromDate, HOUR_OPTIONS, SHICHEN_START_HOURS } from '@/utils/date.js'
-import { getBeijingDate } from '@/utils/beijing-time.js'
 
 /**
  * useHomePage - 取穴首页共享逻辑（所有主题页面复用）
@@ -64,7 +63,7 @@ export function useHomePage() {
   })
 
   // === 手动模式状态 ===
-  const selectedDateStr = ref(formatDate(getBeijingDate()))  // 手动模式选择的日期（"YYYY-MM-DD" 格式，按北京时间）
+  const selectedDateStr = ref(formatDate(new Date()))  // 手动模式选择的日期（"YYYY-MM-DD" 格式，待确认）
   const selectedHourIdx = ref(0)                         // 手动模式选择的时辰索引（待确认）
   const hourLabels = HOUR_OPTIONS.map(h => h.label)      // 时辰下拉选项标签（"子时 23:00-01:00"）
   const showQueryConfirm = ref(false)                    // 是否显示查询确认弹窗
@@ -97,9 +96,9 @@ export function useHomePage() {
     store.switchToAutoMode()
   }
 
-  /** 切换到手动模式，初始化为当前时间（北京时间） */
+  /** 切换到手动模式，初始化为当前时间 */
   function switchToManual() {
-    const now = getBeijingDate()
+    const now = new Date()
     const hourIdx = getHourIndexFromDate(now)
     selectedDateStr.value = formatDate(now)
     selectedHourIdx.value = hourIdx
