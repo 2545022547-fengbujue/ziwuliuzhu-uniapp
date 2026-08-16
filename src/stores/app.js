@@ -26,6 +26,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { getGanZhi, getTrueSolarDate, HEAVENLY_STEMS, EARTHLY_BRANCHES } from '@/services/ganzhi.js'
+import { getBeijingDate } from '@/utils/beijing-time.js'
 import { WU_SHU_DUN } from '@/data/constants.js'
 import { calculateNajia, calculateFanke } from '@/services/najia.js'
 import { calculateNazi } from '@/services/nazi.js'
@@ -64,11 +65,13 @@ const SCHEMA_MIGRATIONS = {
 
 export const useAppStore = defineStore('app', () => {
   // === 时间状态 ===
-  const currentTime = ref(new Date())
+  // 统一使用北京墙钟（getBeijingDate）：设备时区 ≠ UTC+8 时（海外用户/模拟器/服务器），
+  // 干支、真太阳时、时辰索引若按设备本地时间计算会整体错误。国内设备幂等无变化。
+  const currentTime = ref(getBeijingDate())
   // 仅服务于时间相关的视觉效果，不参与取穴计算，避免每分钟重算全部算法。
-  const visualClock = ref(new Date())
+  const visualClock = ref(getBeijingDate())
   const currentHour = ref(0)
-  const selectedDate = ref(new Date())
+  const selectedDate = ref(getBeijingDate())
   const selectedHour = ref(0)
   const isManualMode = ref(false)
 
@@ -264,7 +267,7 @@ export const useAppStore = defineStore('app', () => {
     return getTrueSolarDate(visualClock.value, longitude.value, useTrueSolarTime.value)
   })
 
-  /** 水墨主题的七时段背景。使用设备当地时间，不受手动查询模式影响。 */
+  /** 水墨主题的七时段背景。使用北京时间（visualClock 已为北京墙钟），不受手动查询模式影响。 */
   const inkBackgroundPeriod = computed(() => {
     const hour = visualClock.value.getHours()
     const minuteOfDay = hour * 60 + visualClock.value.getMinutes()
@@ -286,7 +289,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   function updateCurrentTime(forceUpdate = false) {
-    const now = new Date()
+    const now = getBeijingDate()
     visualClock.value = now
     const newHour = getEffectiveHourIndex(now)
     // 定时器调用时（forceUpdate=false），只在时辰实际变化时才更新，
@@ -300,7 +303,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   function refreshVisualClock() {
-    visualClock.value = new Date()
+    visualClock.value = getBeijingDate()
   }
 
   function switchToAutoMode() {
