@@ -58,7 +58,7 @@ npm run dev:h5            # Dev preview → http://localhost:5174
 npm run build:h5          # H5 build
 npm run build:mp-weixin   # WeChat Mini Program build
 npm run test:builds       # Dual-end build + MP isolation check + app build
-npm test                  # 258 vitest unit tests + data gates (algorithms/data/fonts)
+npm test                  # 269 vitest unit tests + data gates (algorithms/data/fonts)
 npm run fonts:base64      # Sync Mini Program base64 font module after TTF changes
 ```
 
