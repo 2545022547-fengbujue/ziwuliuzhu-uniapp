@@ -107,8 +107,8 @@
             <view class="animal-scene-cloud cloud-one"></view>
             <view class="animal-scene-cloud cloud-two"></view>
             <view class="animal-scene-sun"></view>
-            <view class="animal-scene-tree tree-left"><view></view><view></view><text></text></view>
-            <view class="animal-scene-tree tree-mid"><view></view><view></view><text></text></view>
+            <view class="animal-scene-tree tree-left"><view class="tree-crown"></view><view class="tree-crown tree-crown-b"></view><text class="tree-trunk"></text></view>
+            <view class="animal-scene-tree tree-mid"><view class="tree-crown"></view><view class="tree-crown tree-crown-b"></view><text class="tree-trunk"></text></view>
             <view class="animal-scene-wave wave-back"></view>
             <view class="animal-scene-wave wave-front"></view>
             <view class="animal-scene-grass"></view>
@@ -471,17 +471,17 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   width: 98rpx;
   height: 134rpx;
 }
-.animal-scene-tree view {
+.animal-scene-tree .tree-crown {
   position: absolute;
   left: 50%;
+  top: 0;
   width: 86rpx;
   height: 72rpx;
   border-radius: 50%;
   transform: translateX(-50%);
 }
-.animal-scene-tree view:first-child { top: 0; }
-.animal-scene-tree view:nth-child(2) { top: 38rpx; width: 98rpx; }
-.animal-scene-tree text {
+.animal-scene-tree .tree-crown-b { top: 38rpx; width: 98rpx; }
+.animal-scene-tree .tree-trunk {
   position: absolute;
   left: 50%;
   bottom: 0;
