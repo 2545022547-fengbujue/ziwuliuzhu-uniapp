@@ -276,7 +276,11 @@ defineProps({
 @keyframes ink-brush-write { to { transform: translateX(-50%) scaleX(1); } }
 @keyframes ink-mountain-rise { from { opacity: 0; transform: scaleY(.45); } to { opacity: .28; transform: scaleY(1); } }
 
+/* 仅 H5：prefers-reduced-motion 是浏览器无障碍媒体特性，小程序 WXSS 不支持
+   通配符选择器 *（官方编译器报 unexpected token *），且该特性在小程序端不生效 */
+/* #ifdef H5 */
 @media (prefers-reduced-motion: reduce) {
   .theme-transition * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+/* #endif */
 </style>
