@@ -55,7 +55,8 @@
           </view>
         </view>
 
-        <!-- ========== 外观风格统一切换 ========== -->
+        <!-- #ifndef MP-WEIXIN -->
+        <!-- ========== 外观风格统一切换（微信小程序端不需要切换外观风格，隐藏整块） ========== -->
         <view class="setting-card">
           <view class="card-title">
             <slot name="icon-style"></slot>
@@ -123,6 +124,7 @@
             </view>
           </view>
         </view>
+        <!-- #endif -->
 
         <!-- ========== 特殊取穴（原纳甲法设置） ========== -->
         <view class="setting-card" :class="{ 'card-collapsed': !setting.najiaExpanded }">

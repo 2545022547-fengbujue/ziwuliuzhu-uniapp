@@ -121,7 +121,8 @@
   }
 
   // 行内控件与左侧文字垂直中线对齐，修正开关/图标偏上（跨端通用）
-  switch,
+  // switch 用 .native-switch 类选择器：兼容 H5 渲染的 uni-switch 与 MP 原生 switch（组件 wxss 禁标签选择器）
+  .native-switch,
   .ink-switch,
   .city-picker-btn,
   .setting-value {
@@ -129,7 +130,7 @@
   }
 
   // 开关等比缩小（右侧对齐，缩放后位置不变）
-  switch,
+  .native-switch,
   .ink-switch {
     align-self: center;
     vertical-align: middle;
@@ -137,8 +138,8 @@
     transform-origin: right center;
   }
 
-  // H5 下原生 switch 内部包裹层基线对齐
-  uni-switch,
+  // H5 下原生 switch 内部包裹层基线对齐（native-switch 类同时命中 H5 uni-switch 与 MP 原生 switch）
+  .native-switch,
   .uni-switch-wrapper {
     vertical-align: middle;
   }

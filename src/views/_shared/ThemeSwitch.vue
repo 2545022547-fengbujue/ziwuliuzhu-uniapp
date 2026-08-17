@@ -18,6 +18,7 @@
   -->
   <switch
     v-if="!isInk"
+    class="native-switch"
     :checked="checked"
     @change="onNativeChange"
     :color="setting.store.themeSwitchColor"

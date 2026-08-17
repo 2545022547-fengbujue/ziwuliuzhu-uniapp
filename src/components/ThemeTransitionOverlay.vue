@@ -10,7 +10,7 @@
       <image class="animal-transition-friends" src="/static/themes/animal/animal-friends.png" mode="widthFix" />
       <view class="animal-transition-copy">
         <text class="animal-transition-title">欢迎来到动物岛</text>
-        <view class="animal-loading-dots"><text></text><text></text><text></text></view>
+        <view class="animal-loading-dots"><text class="dot"></text><text class="dot"></text><text class="dot"></text></view>
       </view>
     </view>
 
@@ -21,7 +21,7 @@
       <view class="ink-mountain mountain-front"></view>
       <view class="ink-loading-mark">
         <view class="ink-ring"></view>
-        <text>墨</text>
+        <text class="ink-loading-mark-text">墨</text>
       </view>
       <view class="ink-brush-line"></view>
       <text class="ink-transition-title">墨色入境</text>
@@ -167,15 +167,15 @@ defineProps({
   font-family: 'Arial Rounded MT Bold', 'PingFang SC', sans-serif;
 }
 .animal-loading-dots { display: flex; gap: 14rpx; }
-.animal-loading-dots text {
+.animal-loading-dots .dot {
   width: 18rpx;
   height: 18rpx;
   border-radius: 50%;
   background: #19AFA2;
   animation: animal-dot .72s ease-in-out infinite alternate;
 }
-.animal-loading-dots text:nth-child(2) { animation-delay: .16s; background: #F7CD67; }
-.animal-loading-dots text:nth-child(3) { animation-delay: .32s; background: #82D5BB; }
+.animal-loading-dots .dot:nth-child(2) { animation-delay: .16s; background: #F7CD67; }
+.animal-loading-dots .dot:nth-child(3) { animation-delay: .32s; background: #82D5BB; }
 
 /* Shuimo UI 的呼吸式加载标记，叠加墨迹扩散与落笔。 */
 .ink-transition-stage {
@@ -202,7 +202,7 @@ defineProps({
   justify-content: center;
   animation: ink-heart-beat 1.4s linear infinite alternate;
 }
-.ink-loading-mark text {
+.ink-loading-mark .ink-loading-mark-text {
   position: relative;
   z-index: 2;
   color: #F8F6EF;
