@@ -65,15 +65,15 @@ function initSystemInfo() {
   }
 
   try {
-    // 微信小程序：使用新分离API（避免弃用警告）；能力检测失败时回退 uni 兼容 API
-    if (typeof wx !== 'undefined' &&
-        typeof wx.getWindowInfo === 'function' &&
-        typeof wx.getDeviceInfo === 'function') {
-      try {
-        readViaWx()
-      } catch (e) {
-        console.warn('[系统信息] 微信新分离 API 读取失败，回退 uni API', e)
-        readViaUni()
+    // 微信小程序：只用新分离 API（getWindowInfo/getDeviceInfo），避免 wx.getSystemInfoSync 弃用警告。
+    // 旧基础库缺失新 API 时保持默认值，绝不回退 uni.getSystemInfoSync（内部走 wx.getSystemInfoSync）。
+    if (typeof wx !== 'undefined') {
+      if (typeof wx.getWindowInfo === 'function' && typeof wx.getDeviceInfo === 'function') {
+        try {
+          readViaWx()
+        } catch (e) {
+          console.warn('[系统信息] 微信新分离 API 读取失败，保持默认值', e)
+        }
       }
     } else {
       readViaUni()
