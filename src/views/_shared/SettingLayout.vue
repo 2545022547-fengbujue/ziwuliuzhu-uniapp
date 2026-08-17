@@ -227,11 +227,13 @@
 
     <CityPicker :ref="el => (setting.cityPickerRef = el)" />
 
+    <!-- #ifndef MP-WEIXIN -->
     <ThemeTransitionOverlay
       v-if="setting.themeTransitionVisible"
       :theme="setting.themeTransitionKind"
       :closing="setting.themeTransitionClosing"
     />
+    <!-- #endif -->
 
     <!-- 取穴方法说明弹窗 -->
     <view v-if="setting.showMethods" class="fullscreen-overlay" @tap="setting.showMethods = false">
@@ -304,7 +306,10 @@ import { useRootClasses } from '@/composables/useRootClasses.js'
 import { mark, measure } from '@/utils/perf.js'
 import AppNavbar from '@/components/AppNavbar.vue'
 import CityPicker from '@/components/CityPicker.vue'
+// #ifndef MP-WEIXIN
+// 主题切换过渡遮罩：小程序端不切换外观风格（外观卡片已隐藏），整体排除出小程序包
 import ThemeTransitionOverlay from '@/components/ThemeTransitionOverlay.vue'
+// #endif
 import ThemeSwitch from '@/views/_shared/ThemeSwitch.vue'
 
 // 壳层注入的共享业务状态与方法（契约见 useSettingPage.js）

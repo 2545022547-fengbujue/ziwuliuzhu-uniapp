@@ -7,7 +7,7 @@
       <view class="animal-transition-island"></view>
       <view class="animal-transition-wave wave-a"></view>
       <view class="animal-transition-wave wave-b"></view>
-      <image class="animal-transition-friends" src="/static/themes/animal/animal-friends.png" mode="widthFix" />
+      <image class="animal-transition-friends" :src="animalFriendsImg" mode="widthFix" />
       <view class="animal-transition-copy">
         <text class="animal-transition-title">欢迎来到动物岛</text>
         <view class="animal-loading-dots"><text class="dot"></text><text class="dot"></text><text class="dot"></text></view>
@@ -45,6 +45,8 @@ defineProps({
   theme: { type: String, default: 'animal' },
   closing: { type: Boolean, default: false }
 })
+// 图片放 assets（非 static）：仅被引用的平台才打包；小程序端本组件不编译（设置页 MP 端不挂载）
+import animalFriendsImg from '@/assets/themes/animal/animal-friends.png'
 </script>
 
 <style lang="scss" scoped>

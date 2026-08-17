@@ -49,7 +49,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     radial-gradient(circle at 18rpx 18rpx, rgba(255,255,255,0.58) 0 4rpx, transparent 5rpx) 0 0 / 58rpx 58rpx,
     radial-gradient(ellipse at 8% 9%, rgba(247,205,103,0.48) 0 8%, transparent 25%),
     radial-gradient(ellipse at 94% 32%, rgba(130,213,187,0.34) 0 11%, transparent 29%),
-    url('@/static/themes/animal/island-paper.webp') center top / 100% auto repeat-y,
+    url('@/assets/themes/animal/island-paper.webp') center top / 100% auto repeat-y,
     linear-gradient(180deg, #CDEBDD 0%, #E8F1D7 24%, $animal-cream 56%, #F3E9CB 100%) !important;
 
   /* === 首页双狸迎宾区：角色位于干支卡上方，不遮挡信息 === */
@@ -114,14 +114,6 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
     letter-spacing: 2rpx;
   }
 
-  // 动物主题详情内的角色承载行：虚线边框 + 点状底纹，与普通信息行区分
-  .animal-mascot-row {
-    background:
-      radial-gradient(circle, rgba(255,255,255,.42) 2rpx, transparent 3rpx) 0 0 / 26rpx 26rpx,
-      rgba(130, 213, 187, .30) !important;
-    border: 2rpx dashed rgba(25,175,162,.24);
-  }
-
   /* === 穴位详情底部岛屿场景：透明天空渐变 + 草地 + 树木 + 双层海浪 === */
   // 场景铺满弹窗宽度、无矩形边框，顶部由透明渐变过渡到纸面，只作装饰不遮正文。
   .animal-detail-scene {
@@ -138,9 +130,9 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
 
   .animal-scene-sun { background: $animal-yellow !important; box-shadow: 0 0 0 12rpx rgba(247,205,103,.18); }
   .animal-scene-cloud { background: rgba(255,252,237,.94) !important; }
-  .animal-scene-tree view { background: $animal-green !important; border: 2rpx solid rgba(79,132,91,.18); }
-  .animal-scene-tree view:first-child { background: #9BD59B !important; }
-  .animal-scene-tree text { background: #A8784F !important; border-radius: 5rpx; }
+  .animal-scene-tree .tree-crown { background: $animal-green !important; border: 2rpx solid rgba(79,132,91,.18); }
+  .animal-scene-tree .tree-crown-b { background: #9BD59B !important; }
+  .animal-scene-tree .tree-trunk { background: #A8784F !important; border-radius: 5rpx; }
   .wave-back { background: #9DDDE2 !important; opacity: .72; }
   .wave-front { background: #6EC9D0 !important; opacity: .78; }
   .animal-scene-grass {
@@ -150,8 +142,6 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
       radial-gradient(ellipse at 78% 0, #A8D892 0 11%, transparent 12%),
       $animal-green !important;
   }
-
-  .animal-mascot-corner > .mascot-shell { width: 188rpx; height: 188rpx; }
 
   /* === 导航栏：半透明奶油底 + 虚线分隔 + 毛玻璃 === */
   .navbar {

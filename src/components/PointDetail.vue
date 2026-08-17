@@ -112,9 +112,6 @@
             <view class="animal-scene-wave wave-back"></view>
             <view class="animal-scene-wave wave-front"></view>
             <view class="animal-scene-grass"></view>
-            <view class="animal-mascot-corner">
-              <AnimalMascot :variant="animalMascot.id" />
-            </view>
           </view>
 
           <view v-else style="height: 80rpx;"></view>
@@ -159,7 +156,6 @@
 import { computed, ref } from 'vue'
 import { useAppStore } from '@/stores/app.js'
 import { getWuxingColor } from '@/utils/wuxing.js'
-import AnimalMascot from '@/components/AnimalMascot.vue'
 
 const store = useAppStore()
 const point = computed(() => store.selectedPoint)
@@ -210,23 +206,6 @@ function getSecureRandomIndex(length) {
 }
 
 const watercolorWash = ref(watercolorWashes[getSecureRandomIndex(watercolorWashes.length)])
-
-/**
- * 动物主题守护角色池。
- *
- * - 组件只在 App/H5 独立外观生效，小程序会回退经典主题，不承担兼容成本；
- * - 随机值在 PointDetail 创建时确定，因此同一次弹窗滚动或响应式重绘不会换角色；
- * - 角色仅作右下角静态装饰，不承载穴位语义，也不加入循环动画，避免干扰正文阅读。
- */
-const animalMascots = [
-  { id: 'rabbit' },
-  { id: 'cat' },
-  { id: 'dog' },
-  { id: 'deer' },
-  { id: 'squirrel' },
-  { id: 'owl' }
-]
-const animalMascot = ref(animalMascots[getSecureRandomIndex(animalMascots.length)])
 
 /**
  * 不在详情弹窗生命周期中调用 uni.hideTabBar / uni.showTabBar。
@@ -424,15 +403,6 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   width: 100%;
   margin: 16rpx 0 0;
   overflow: hidden;
-}
-
-.animal-mascot-corner {
-  position: absolute;
-  right: 18rpx;
-  bottom: 12rpx;
-  z-index: 6;
-  display: flex;
-  align-items: flex-end;
 }
 
 .animal-scene-sun {

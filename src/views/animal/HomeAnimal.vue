@@ -9,7 +9,7 @@
       <view class="animal-friends-hero" aria-hidden="true">
         <image
           class="animal-friends-image"
-          src="/static/themes/animal/animal-friends.png"
+          :src="animalFriendsImg"
           mode="widthFix"
         />
       </view>
@@ -19,4 +19,6 @@
 
 <script setup>
 import HomeLayout from '@/views/_shared/HomeLayout.vue'
+// 图片放 assets（非 static）：仅被引用的平台才打包，小程序端不编译本组件故不进包
+import animalFriendsImg from '@/assets/themes/animal/animal-friends.png'
 </script>
