@@ -102,8 +102,8 @@ export const useAppStore = defineStore('app', () => {
 
   // === 反克法显示开关 ===
   // 继续保存历史字段 fankeDisplayMode，避免已有用户升级后丢失设置：
-  // 'separate' 现在表示“开启显示”，'merged' 仅作为旧值兼容并表示“关闭隐藏”。
-  // 新逻辑不再把反克法结果合并进纳甲法面板。
+  // 'separate' 表示“开启显示”，'merged' 仅作为旧值兼容表示“关闭隐藏”。
+  // 开启后反克法结果合并进纳甲法面板（纳甲闭穴时替代显示），不再单独成卡（参考合日互用）。
   const fankeDisplayMode = ref('merged')
   // 合日互用默认关闭：只有用户明确启用后，纳甲法闭穴才计算并展示合日穴位。
   const useHeRiHuYong = ref(false)

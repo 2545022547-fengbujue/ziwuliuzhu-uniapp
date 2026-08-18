@@ -36,6 +36,15 @@
         <PointGrid :points="result.alternativePoints.openPoints" key-prefix="alt" />
       </view>
 
+      <!-- 反克法开穴：纳甲法闭穴、开关开启且反克法确有结果时合并显示，替代闭穴提示（参考合日互用） -->
+      <view v-if="fankeSupplement" class="section">
+        <view class="section-title">
+          <view class="dot fanke"></view>
+          <text>反克法开穴</text>
+        </view>
+        <PointGrid :points="store.results.fanke.openPoints" key-prefix="fanke" />
+      </view>
+
       <!-- 值日/值时经络 -->
       <view v-if="result?.dayMeridian || result?.hourMeridian" class="meridian-row">
         <view v-if="result.dayMeridian" class="tag-primary">
@@ -162,12 +171,20 @@ const alternativeHasOpenPoints = computed(() => {
   return Boolean(result.value?.alternativePoints?.openPoints?.length)
 })
 
+// 反克法合并补充：纳甲法闭穴、开关开启且反克法确有开穴时成立。
+// 仅在纳甲法面板内生效（反克法是纳甲闭穴补充方案），其他主方法不展示。
+const fankeSupplement = computed(() => Boolean(
+  isNajia.value &&
+  result.value?.isClosed &&
+  store.showFanke &&
+  store.results.fanke?.openPoints?.length
+))
+
 const showClosedWarning = computed(() => {
   if (!result.value?.isClosed) return false
   if (isNajia.value) {
-    // 反克法由首页独立补充区按开关控制，不参与纳甲面板的闭穴提示判断。
-    // 合日互用仍属于纳甲法替代结果，有结果时无需再显示纯闭穴提示。
-    return !alternativeHasOpenPoints.value
+    // 纳甲法闭穴时：合日互用或反克法（开关开启且有结果）任一作为替代方案出现，均不再显示纯闭穴提示。
+    return !(alternativeHasOpenPoints.value || fankeSupplement.value)
   }
   return true
 })

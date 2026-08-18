@@ -92,12 +92,13 @@ const store = useAppStore()
   font-size: 32rpx;
 }
 
-// 不显示穴位编码时：二字名略放大到 44rpx，三字名放到 38rpx
+// 只关闭穴位编码时：取穴结果字号（用户指定）二字名 42rpx、三字名 36rpx
+// 注意：这是「仅关编码、五行仍显示」这一态；编码+五行都关仍走下方 42rpx 规则，不受影响。
 .point-btn.point-btn-code-hidden .point-name {
-  font-size: 44rpx;
+  font-size: 42rpx;
 }
 .point-btn.point-btn-code-hidden .point-name.name-long {
-  font-size: 38rpx;
+  font-size: 36rpx;
 }
 
 // 不显示五行属性时：二字名放大到 50rpx，三字名放大到 48rpx

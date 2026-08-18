@@ -32,7 +32,7 @@
       <!-- 城市列表标签 -->
       <view class="city-list-header">
         <text class="city-list-label">
-          {{ searchText ? `搜索结果（${searchResults.length}个）` : `选择省份/地区（34个）` }}
+          {{ searchText ? `搜索结果（${searchResults.length}个）` : `选择省份/地区` }}
         </text>
       </view>
 
@@ -84,7 +84,6 @@
               <view class="province-left">
                 <text class="province-arrow" :class="{ expanded: expandedProvinces.includes(province.name) }">▶</text>
                 <text class="province-name-text">{{ province.name }}</text>
-                <text class="province-count">（{{ province.cities.length }}个）</text>
               </view>
             </view>
             <view v-if="expandedProvinces.includes(province.name)" class="province-cities">

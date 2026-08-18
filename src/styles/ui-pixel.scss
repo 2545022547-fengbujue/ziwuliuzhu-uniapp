@@ -208,6 +208,21 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
     box-shadow: 0 8rpx 0 $px-blue-dark !important;
   }
 
+  // 底部「取消/确定」按钮：像素字体（Fusion Pixel）字形在 em-box 内视觉偏上，
+  // 仅靠 padding 撑高无法垂直居中；用 flex 居中容器 + 文字整体下移补偿，
+  // 与弹窗穴名（.popup .point-name translateY）对齐思路一致。
+  .btn-cancel,
+  .btn-confirm {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+  }
+  .btn-cancel .btn-text,
+  .btn-confirm .btn-text {
+    transform: translateY(2rpx) !important;
+  }
+
   .query-btn:active,
   .confirm-ok:active,
   .point-btn:active {
@@ -285,6 +300,18 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   border: 8rpx solid $px-ink !important;
   border-radius: 0 !important;
   box-shadow: 12rpx 12rpx 0 rgba(63,58,75,.34) !important;
+
+  // 像素字体（Fusion Pixel 等位图体）字形在 em-box 内视觉偏上，导致穴位名整行比左侧
+  // 圆形图标中心偏上；参照水墨主题 .popup .point-name 用 translateY 补偿基线偏移的做法，
+  // 此处整体下移 6rpx 与图标视觉对齐。仅作用于弹窗（.popup 限定），不影响结果面板穴名。
+  .point-name { transform: translateY(6rpx) !important; }
+
+  // 城市列表项文字：像素字体 Fusion Pixel 字形在 em-box 内视觉偏上，原本线贴元素底、文字像“悬”在线上方。
+  // 改为调整文字基线（整体下移）让其视觉落回分隔线，比移动分隔线更自然，也不改点击区与行高；分隔线恢复贴元素底。
+  .province-name-text,
+  .city-name-text {
+    transform: translateY(4rpx) !important;
+  }
 }
 
 .date-picker-panel.ui-pixel,

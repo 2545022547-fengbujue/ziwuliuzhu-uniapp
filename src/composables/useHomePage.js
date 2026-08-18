@@ -75,14 +75,6 @@ export function useHomePage() {
   // 分钟时间戳（自动模式下每分钟递增一次，驱动 currentDateTimeStr 时间字符串刷新，节省电量）
   const minuteTick = ref(0)
 
-  // 是否显示反克法补充：关闭开关后完全隐藏，不再回退为纳甲面板内的合并展示。
-  const showFankeSupplement = computed(() => {
-    return store.activeMethod === 'najia' &&
-      store.results.najia?.isClosed &&
-      store.results.fanke?.openPoints?.length &&
-      store.showFanke
-  })
-
   // 其他方法对比列表（排除当前选中的方法；含纳甲，避免 activeMethod 非纳甲时对比区恒缺纳甲）
   const otherMethods = computed(() => {
     return METHODS.map(m => m.id).filter(m => m !== store.activeMethod)
@@ -220,7 +212,6 @@ export function useHomePage() {
     confirmedDateStr,
     confirmedHourIdx,
     minuteTick,
-    showFankeSupplement,
     otherMethods,
     switchToAuto,
     switchToManual,

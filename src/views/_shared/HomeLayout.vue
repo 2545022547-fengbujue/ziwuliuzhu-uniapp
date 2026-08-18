@@ -126,16 +126,6 @@
         <ResultPanel :method="home.store.activeMethod" />
       </view>
 
-      <!-- 反克法开关开启后，纳甲法闭穴且确有结果时才显示独立补充区。 -->
-      <view v-if="home.showFankeSupplement" class="fanke-supplement">
-        <view class="fanke-header">
-          <text class="fanke-icon">⇄</text>
-          <text class="fanke-title">反克法补充</text>
-          <text class="fanke-desc">（纳甲法闭穴时的替代方案）</text>
-        </view>
-        <ResultPanel method="fanke" />
-      </view>
-
       <!-- 其他方法对比 -->
       <view class="compare-section">
         <view class="compare-divider">
