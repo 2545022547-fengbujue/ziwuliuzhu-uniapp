@@ -1,0 +1,811 @@
+/* ============================================
+   运行时主题
+
+   yellow 保留现有编译期 SCSS 主题；额外主题用页面根节点 class 覆盖高频色彩。
+
+   black 主题基于 UI/UX Pro Max skill 数据：
+   - Dark Mode (OLED): 纯黑 #000000, 文字 #FFFFFF, 对比度 7:1+
+   - Glassmorphism: backdrop-filter blur(15px), rgba背景, 高对比度边框
+   ============================================ */
+@use 'variables' as *;
+
+.theme-yellow {
+  --theme-primary: #8B4513;
+  --theme-primary-dark: #6B3410;
+  --theme-secondary: #5B8C3E;
+  --theme-bg: #F9F2E0;            /* 宣纸白 - CMYK(4,6,15,0) 传统书写质感 */
+  --theme-surface: #FFFDF5;
+  --theme-surface-muted: #F8F4EF;
+  --theme-text: #2C2C2C;
+  --theme-text-secondary: #666666;
+  --theme-text-hint: #999999;
+  --theme-border: rgba(139, 69, 19, 0.12);
+  --theme-shadow: rgba(139, 69, 19, 0.08);
+}
+
+/* #ifndef MP-WEIXIN */
+/*
+   black 主题：OLED纯黑 + 磨砂玻璃效果
+   基于 UI/UX Pro Max skill:
+   - Dark Mode OLED: #000000 背景, 7:1+ 对比度
+   - Glassmorphism: blur 15px, rgba(0,0,0, 0.25) 背景, rgba(255,255,255, 0.35) 边框
+*/
+.theme-black {
+  /* OLED 纯黑背景 */
+  --theme-primary: #0080FF;           /* 电蓝色 - UI/UX Pro Max Glassmorphism 推荐 */
+  --theme-primary-dark: #0066CC;
+  --theme-secondary: #20B2AA;         /* 青绿色 */
+  --theme-bg: #000000;                 /* OLED 纯黑 */
+  --theme-surface: #000000;            /* 纯黑 */
+  --theme-surface-muted: #000000;      /* 纯黑 */
+  --theme-text: #FFFFFF;               /* 纯白文字 - 7:1+ 对比度 */
+  --theme-text-secondary: #E0E0E0;     /* 浅灰次要文字 */
+  --theme-text-hint: #9B9B9B;          /* 提示文字 */
+  --theme-border: rgba(255, 255, 255, 0.35);  /* 高对比度白色边框 */
+  --theme-shadow: rgba(0, 128, 255, 0.12);
+}
+
+.theme-green {
+  --theme-primary: #287B72;           /* 天青釉主色：保留清润感，同时保证白底可读性 */
+  --theme-primary-dark: #1E625C;      /* 深青描边，用于激活态和关键操作 */
+  --theme-secondary: #718D78;         /* 灰竹青点缀，避免跳成鲜绿色 */
+  --theme-bg: #EAF5F0;                /* 带少量蓝相的天青底釉 */
+  --theme-surface: #F8FCF9;           /* 温润瓷白，而非生硬纯白 */
+  --theme-surface-muted: #DCEEE7;     /* 次级信息块的淡釉层 */
+  --theme-text: #173D38;              /* 墨青主文字 */
+  --theme-text-secondary: #506C66;    /* 提高正文和说明文字对比度 */
+  --theme-text-hint: #78928C;         /* 提示文字仍柔和，但不再发灰模糊 */
+  --theme-border: rgba(43, 116, 106, 0.20);
+  --theme-shadow: rgba(48, 105, 95, 0.13);
+}
+
+.theme-red {
+  --theme-primary: #B83A2E;
+  --theme-primary-dark: #8F2A22;
+  --theme-secondary: #C8893D;
+  --theme-bg: #FFF7F1;
+  --theme-surface: #FFFDF8;
+  --theme-surface-muted: #FFEDE3;
+  --theme-text: #35221E;
+  --theme-text-secondary: #6F5B53;
+  --theme-text-hint: #8A756B;
+  --theme-border: rgba(184, 58, 46, 0.14);
+  --theme-shadow: rgba(184, 58, 46, 0.10);
+}
+
+.theme-black,
+.theme-green,
+.theme-red {
+  background-color: var(--theme-bg) !important;
+  color: var(--theme-text) !important;
+
+  .navbar,
+  .panel-header,
+  .query-btn,
+  .confirm-ok,
+  .btn-confirm,
+  .btn-primary,
+  .method-tab.active,
+  .toggle-btn.active {
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%) !important;
+  }
+
+  .ganzhi-card,
+  .method-tabs,
+  .result-panel,
+  .setting-card,
+  .method-card,
+  .desc-card,
+  .info-card,
+  .popup,
+  .confirm-popup,
+  .fullscreen-panel {
+    background: var(--theme-surface) !important;
+    box-shadow: 0 8rpx 28rpx var(--theme-shadow) !important;
+  }
+
+  .manual-controls,
+  .picker-btn,
+  .city-picker-btn,
+  .tag-primary,
+  .ganzhi-tag,
+  .ganzhi-tag-item,
+  .point-btn,
+  .result-ganzhi-hour-tag,
+  .province-cities,
+  .method-item,
+  .location-box,
+  .bumu-tip,
+  .confirm-cancel,
+  .theme-current {
+    background: var(--theme-surface-muted) !important;
+  }
+
+  .search-input,
+  .province-header,
+  .theme-option {
+    background: var(--theme-surface) !important;
+    border-color: var(--theme-border) !important;
+  }
+
+  .nazi-mode-switch {
+    border-color: var(--theme-border) !important;
+  }
+
+  .switch-option {
+    background: var(--theme-surface-muted) !important;
+    color: var(--theme-text-secondary) !important;
+
+    &.active {
+      background: var(--theme-primary) !important;
+      color: var(--theme-surface) !important;
+    }
+  }
+
+  .method-tab.active {
+    .method-icon,
+    .method-name {
+      color: var(--theme-surface) !important;
+    }
+  }
+
+  .toggle-btn.active {
+    .toggle-text {
+      color: var(--theme-surface) !important;
+    }
+  }
+
+  .setting-row,
+  .info-row,
+  .popup-header,
+  .popup-footer,
+  .fullscreen-header,
+  .province-group,
+  .city-item {
+    border-color: var(--theme-border) !important;
+  }
+
+  .card-title,
+  .setting-label,
+  .method-name,
+  .info-label,
+  .popup-title,
+  .city-name-text,
+  .location-text,
+  .method-value {
+    color: var(--theme-text) !important;
+  }
+
+  :global(.popup.theme-black .point-name),
+  :global(.popup.theme-green .point-name),
+  :global(.popup.theme-red .point-name) {
+    color: var(--theme-text) !important;
+  }
+
+  .app-name,
+  .ganzhi-tag-text,
+  .result-ganzhi-hour-text,
+  .theme-name,
+  .fanke-title,
+  .palace-icon,
+  .suggestion-title,
+  .city-name-text,
+  .fullscreen-title {
+    color: var(--theme-primary) !important;
+  }
+
+  .datetime-value,
+  .desc-text,
+  .setting-value,
+  .method-detail,
+  .info-value,
+  .toggle-text,
+  .method-name,
+  .palace-text,
+  .principle-text,
+  .section-title {
+    color: var(--theme-text-secondary) !important;
+  }
+
+  .datetime-text,
+  .app-version,
+  .setting-tip,
+  .picker-arrow,
+  .theme-expand-arrow,
+  .divider-text,
+  .result-ganzhi-date,
+  .result-ganzhi-hour-label,
+  .point-code,
+  .theme-desc,
+  .disclaimer-text,
+  .empty-text {
+    color: var(--theme-text-hint) !important;
+  }
+
+  .divider-line {
+    background: linear-gradient(to right, transparent, var(--theme-border), transparent) !important;
+  }
+
+  .dot.primary,
+  .dot.secondary,
+  .title-dot {
+    background: var(--theme-secondary) !important;
+  }
+}
+
+/* red 主题特殊样式：朱砂丹霞，穴位名称用红色 */
+.theme-red {
+  :global(.popup.theme-red .point-name) {
+    color: #B83A2E !important;
+  }
+}
+
+/*
+   black 主题特殊样式：OLED纯黑 + 磨砂玻璃效果
+   基于 UI/UX Pro Max skill 数据库的专业设计规范
+*/
+.theme-black {
+  /* 磨砂玻璃卡片：backdrop-filter blur + rgba背景 + 高对比度边框 */
+  .navbar {
+    background: #000000 !important;
+    border-bottom: 1rpx solid rgba(255, 255, 255, 0.15) !important;
+  }
+
+  /* 导航栏标题：宋体 */
+  .navbar-title {
+    font-family: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif !important;
+    letter-spacing: 0.05em;
+  }
+
+  /* 磨砂玻璃卡片：backdrop-filter blur + rgba背景 + 高对比度边框 */
+  .ganzhi-card,
+  .result-panel,
+  .setting-card,
+  .method-card,
+  .desc-card,
+  .info-card,
+  .popup,
+  .confirm-popup,
+  .fullscreen-panel {
+    background: rgba(0, 0, 0, 0.25) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 8rpx 32rpx rgba(0, 128, 255, 0.08) !important;
+  }
+
+  /* 确认弹窗额外样式 */
+  .confirm-popup {
+    background: rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+  }
+
+  .confirm-info {
+    border-bottom-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .confirm-value {
+    background: rgba(0, 128, 255, 0.15) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.35) !important;
+  }
+
+  /* 方法切换栏：磨砂玻璃 */
+  .method-tabs {
+    background: rgba(0, 0, 0, 0.25) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.35) !important;
+  }
+
+  /* 按钮类：纯黑 + 金色边框 */
+  .panel-header,
+  .query-btn,
+  .confirm-ok,
+  .btn-confirm,
+  .btn-primary,
+  .method-tab.active,
+  .toggle-btn.active {
+    background: #000000 !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.50) !important;
+    box-shadow: 0 0 12rpx rgba(0, 128, 255, 0.15) !important;
+  }
+
+  .panel-header {
+    border-bottom: 1rpx solid rgba(0, 128, 255, 0.35) !important;
+    background: linear-gradient(180deg, rgba(0, 128, 255, 0.12) 0%, #000000 100%) !important;
+  }
+
+  /* 切换按钮容器 */
+  .ganzhi-toggle,
+  .nazi-mode-switch {
+    background: #000000 !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.40) !important;
+  }
+
+  .toggle-btn,
+  .switch-option {
+    background: transparent !important;
+  }
+
+  .method-tab.active {
+    .method-icon,
+    .method-name {
+      color: var(--theme-primary) !important;
+    }
+  }
+
+  .toggle-btn.active {
+    .toggle-text {
+      color: var(--theme-primary) !important;
+    }
+  }
+
+  .theme-option.active {
+    background: rgba(0, 128, 255, 0.15) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.40) !important;
+  }
+
+  /*
+   * 外观列表的文字样式定义在设置页 scoped 样式中，原先不会完整继承暗夜主题变量，
+   * 因而未选主题名称会落回接近黑色。这里同时覆盖一级风格、经典四色和当前风格卡片。
+   */
+  .ui-style-option .ui-style-name {
+    color: #F2F5F7 !important;
+  }
+
+  .ui-style-option .ui-style-desc {
+    color: #B8C0C8 !important;
+  }
+
+  .ui-style-option.active .ui-style-name {
+    color: #168BFF !important;
+  }
+
+  .ui-style-option.active .ui-style-desc {
+    color: #D5DCE3 !important;
+  }
+
+  /* Switch开关 */
+  switch .uni-switch-input,
+  .uni-switch-input {
+    background-color: #000000 !important;
+    border-color: rgba(0, 128, 255, 0.45) !important;
+  }
+
+  switch .uni-switch-input::before,
+  .uni-switch-input::before {
+    background-color: #000000 !important;
+  }
+
+  switch .uni-switch-input::after,
+  .uni-switch-input::after {
+    background-color: #0080FF !important;
+    box-shadow: 0 0 0 1rpx rgba(0, 128, 255, 0.30) !important;
+  }
+
+  /* 穴位详情弹窗中的胶囊：磨砂玻璃 */
+  .info-item,
+  .location-box,
+  .method-item {
+    background: rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.35) !important;
+  }
+
+  /* 手动模式选择器：磨砂玻璃 */
+  .manual-controls {
+    background: rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.40) !important;
+  }
+
+  .picker-btn {
+    background: rgba(0, 0, 0, 0.50) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.50) !important;
+  }
+
+  .year-nav-btn {
+    background: rgba(0, 0, 0, 0.50) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.40) !important;
+  }
+
+  .year-nav-icon {
+    color: #0080FF !important;
+  }
+
+  .picker-btn text {
+    color: #FFFFFF !important;
+  }
+
+  .control-label {
+    color: #0080FF !important;
+  }
+
+  /* 穴位按钮：磨砂玻璃 */
+  .point-btn {
+    background: rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.35) !important;
+  }
+
+  /* 干支标签 */
+  .ganzhi-tag-item {
+    background: rgba(0, 0, 0, 0.50) !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.35) !important;
+  }
+
+  .result-ganzhi-hour-tag {
+    background: rgba(0, 0, 0, 0.50) !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.40) !important;
+  }
+
+  /* 穴位弹窗标题区域 */
+  .header-icon-wrap {
+    background: rgba(0, 128, 255, 0.15) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.40) !important;
+  }
+
+  .close-btn {
+    background: rgba(0, 0, 0, 0.50) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.40) !important;
+  }
+
+  .close-icon {
+    color: #0080FF !important;
+  }
+
+  /* 其他元素 */
+  .province-cities,
+  .tag-primary,
+  .bumu-tip,
+  .nazi-bumu-tip,
+  .confirm-cancel,
+  .theme-current {
+    background: rgba(0, 0, 0, 0.50) !important;
+    border: 1rpx solid rgba(255, 255, 255, 0.35) !important;
+  }
+
+  .tag-primary text {
+    color: #FFFFFF !important;
+  }
+
+  .bumu-tip-icon,
+  .bumu-tip-text {
+    color: #FFFFFF !important;
+  }
+
+  /* 补泻建议区域 */
+  .suggestion-box {
+    background: rgba(0, 128, 255, 0.12) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.35) !important;
+  }
+
+  /* 九宫信息 */
+  .palace-box {
+    background: rgba(0, 128, 255, 0.10) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.30) !important;
+  }
+
+  /* 纳子法补母泻子说明文字 */
+  .nazi-bumu-tip-text {
+    color: #FFFFFF !important;
+  }
+
+  /* 设置页全屏弹窗 */
+  .fullscreen-overlay {
+    background: #000000 !important;
+  }
+
+  /* 免责声明卡片 */
+  .disclaimer-card {
+    background: rgba(0, 128, 255, 0.12) !important;
+    border: 1rpx solid rgba(0, 128, 255, 0.35) !important;
+  }
+
+  .disclaimer-label {
+    color: #0080FF !important;
+  }
+
+  /* 手动查询确认弹窗 */
+  .confirm-title {
+    color: #0080FF !important;
+  }
+
+  .confirm-label {
+    color: #FFFFFF !important;
+  }
+
+  .confirm-value {
+    color: #0080FF !important;
+  }
+
+  .confirm-cancel text {
+    color: #E0E0E0 !important;
+  }
+}
+
+/*
+   green 主题特殊样式：青瓷温润质感
+   设计理念：宋代青瓷釉面光泽感，柔和通透
+*/
+.theme-green {
+  /*
+   * 页面底釉采用多层低对比渐变：上方偏瓷白、两侧轻微聚青、底部回到天青。
+   * 仅使用 CSS 色层，不增加图片资源，App 与 H5 均可稳定渲染。
+   */
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.72) 0 14%, transparent 36%),
+    radial-gradient(circle at 92% 34%, rgba(183, 220, 211, 0.28) 0 12%, transparent 38%),
+    linear-gradient(180deg, #F1F8F4 0%, #E7F3EE 46%, #DDEDE7 100%) !important;
+
+  /* 导航栏标题：楷体 */
+  .navbar-title {
+    color: #14302C !important;
+    font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif !important;
+  }
+
+  /* 导航栏：青瓷渐变 */
+  .navbar {
+    background:
+      radial-gradient(ellipse at 24% -30%, rgba(255, 255, 255, 0.90) 0 18%, transparent 48%),
+      linear-gradient(180deg, rgba(248, 252, 249, 0.98) 0%, rgba(229, 242, 236, 0.95) 100%) !important;
+    border-bottom: 1rpx solid rgba(43, 116, 106, 0.16) !important;
+    box-shadow: 0 6rpx 18rpx rgba(51, 103, 94, 0.06) !important;
+  }
+
+  /*
+   * 大面积瓷面不采用居中的均匀高光：左上方是柔亮釉光，右下方略微积青，
+   * 中间保留瓷白底色。三层颜色共同形成“釉包在胎体外”的厚度感，而非玻璃透明感。
+   */
+  .ganzhi-card,
+  .result-panel,
+  .setting-card,
+  .method-card,
+  .desc-card,
+  .info-card,
+  .popup,
+  .confirm-popup,
+  .fullscreen-panel {
+    background:
+      radial-gradient(ellipse at 18% -8%, rgba(255, 255, 255, 0.96) 0 10%, rgba(255, 255, 255, 0.36) 28%, transparent 48%),
+      radial-gradient(ellipse at 96% 108%, rgba(154, 202, 191, 0.24) 0 18%, transparent 46%),
+      linear-gradient(145deg, rgba(250, 253, 251, 0.98) 0%, rgba(241, 249, 245, 0.97) 52%, rgba(228, 242, 236, 0.98) 100%) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.18) !important;
+    box-shadow:
+      0 10rpx 26rpx rgba(48, 105, 95, 0.09),
+      0 3rpx 1rpx rgba(255, 255, 255, 0.94) inset,
+      2rpx 0 1rpx rgba(255, 255, 255, 0.56) inset,
+      -2rpx -3rpx 4rpx rgba(102, 158, 146, 0.10) inset !important;
+  }
+
+  /* 方法切换栏：通透感 */
+  .method-tabs {
+    background:
+      radial-gradient(ellipse at 22% -18%, rgba(255, 255, 255, 0.94) 0 12%, transparent 43%),
+      radial-gradient(ellipse at 88% 120%, rgba(154, 202, 191, 0.18) 0 18%, transparent 45%),
+      linear-gradient(180deg, rgba(251, 253, 252, 0.98) 0%, rgba(235, 246, 241, 0.98) 100%) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.16) !important;
+    box-shadow: 0 10rpx 24rpx rgba(48, 105, 95, 0.09) !important;
+  }
+
+  /* 结果面板头部：浅色青瓷渐变 + 深色标题 */
+  .panel-header {
+    background:
+      radial-gradient(ellipse at 16% 0%, rgba(255, 255, 255, 0.58) 0 10%, transparent 42%),
+      radial-gradient(ellipse at 96% 118%, rgba(111, 171, 158, 0.22) 0 18%, transparent 48%),
+      linear-gradient(135deg, rgba(194, 224, 217, 0.88) 0%, rgba(218, 238, 232, 0.80) 56%, rgba(202, 228, 220, 0.86) 100%) !important;
+    border-bottom: 1rpx solid rgba(43, 116, 106, 0.22) !important;
+    box-shadow: 0 2rpx 0 rgba(255, 255, 255, 0.58) inset, 0 -2rpx 4rpx rgba(77, 139, 126, 0.08) inset !important;
+  }
+
+  .header-title,
+  .header-icon {
+    color: #2F7D73 !important;
+  }
+
+  /* 切换容器 */
+  .ganzhi-toggle,
+  .nazi-mode-switch {
+    background: linear-gradient(180deg, #F0F6F2 0%, #E8F4EC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .toggle-btn,
+  .switch-option {
+    background: transparent !important;
+  }
+
+  /* 未激活的方法名字：深青色 */
+  .method-tab:not(.active) .method-name {
+    color: #4A635D !important;
+  }
+
+  .method-tab:not(.active) .method-icon {
+    color: #2F7D73 !important;
+  }
+
+  .method-tab.active {
+    .method-icon,
+    .method-name {
+      color: #FFFFFF !important;
+    }
+  }
+
+  .toggle-btn.active {
+    .toggle-text {
+      color: #FFFFFF !important;
+    }
+  }
+
+  .theme-option.active {
+    background: rgba(47, 125, 115, 0.12) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.40) !important;
+  }
+
+  /* Switch开关：青瓷风格 */
+  switch .uni-switch-input,
+  .uni-switch-input {
+    background-color: #DCF0E4 !important;
+    border-color: rgba(47, 125, 115, 0.30) !important;
+  }
+
+  switch .uni-switch-input::before,
+  .uni-switch-input::before {
+    background-color: #DCF0E4 !important;
+  }
+
+  switch .uni-switch-input::after,
+  .uni-switch-input::after {
+    background-color: #2F7D73 !important;
+    box-shadow: 0 0 0 1rpx rgba(47, 125, 115, 0.25) !important;
+  }
+
+  /* 穴位详情弹窗胶囊 */
+  .info-item,
+  .location-box,
+  .method-item {
+    background:
+      radial-gradient(ellipse at 18% -18%, rgba(255, 255, 255, 0.70) 0 12%, transparent 44%),
+      linear-gradient(145deg, #E2F2EC 0%, #D2E9E0 58%, #C9E3D9 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+    box-shadow: 0 2rpx 0 rgba(255, 255, 255, 0.62) inset, -1rpx -2rpx 3rpx rgba(79, 141, 128, 0.08) inset !important;
+  }
+
+  /* 手动模式选择器 */
+  .manual-controls {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 248, 244, 0.98) 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .picker-btn {
+    background: linear-gradient(135deg, #DCF0E4 0%, #D0E8DC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.30) !important;
+  }
+
+  .year-nav-btn {
+    background: #DCF0E4 !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .year-nav-icon {
+    color: #2F7D73 !important;
+  }
+
+  .picker-btn text {
+    color: #14302C !important;
+  }
+
+  .control-label {
+    color: #2F7D73 !important;
+  }
+
+  /* 穴位按钮 */
+  .point-btn {
+    background:
+      radial-gradient(ellipse at 22% 0%, rgba(255, 255, 255, 0.78) 0 10%, transparent 42%),
+      linear-gradient(145deg, #E8F4F0 0%, #D5EAE3 62%, #CCE4DB 100%) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.22) !important;
+    box-shadow:
+      0 4rpx 10rpx rgba(48, 105, 95, 0.07),
+      0 2rpx 0 rgba(255, 255, 255, 0.86) inset,
+      -1rpx -2rpx 3rpx rgba(80, 140, 127, 0.08) inset !important;
+  }
+
+  /* 干支标签 */
+  .ganzhi-tag-item {
+    background:
+      radial-gradient(ellipse at 24% 0%, rgba(255, 255, 255, 0.70) 0 10%, transparent 44%),
+      linear-gradient(145deg, #E3F2EC 0%, #D0E7DE 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .result-ganzhi-hour-tag {
+    background:
+      radial-gradient(ellipse at 24% 0%, rgba(255, 255, 255, 0.68) 0 10%, transparent 44%),
+      linear-gradient(145deg, #E3F2EC 0%, #D0E7DE 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+  }
+
+  /* 穴位弹窗标题区域 */
+  .header-icon-wrap {
+    background: linear-gradient(145deg, rgba(239, 248, 244, 0.96), rgba(214, 235, 227, 0.92)) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.25) !important;
+    box-shadow: 0 4rpx 12rpx rgba(48, 105, 95, 0.08) !important;
+  }
+
+  .close-btn {
+    background: linear-gradient(145deg, #E7F4EF, #D4EAE2) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.22) !important;
+    box-shadow: 0 4rpx 12rpx rgba(48, 105, 95, 0.08) !important;
+  }
+
+  .close-icon {
+    color: #2F7D73 !important;
+  }
+
+  /* 其他元素 */
+  .province-cities,
+  .tag-primary,
+  .bumu-tip,
+  .nazi-bumu-tip,
+  .confirm-cancel,
+  .theme-current,
+  .info-item {
+    background: linear-gradient(135deg, #DCF0E4 0%, #D0E8DC 100%) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+  }
+
+  .bumu-tip-icon,
+  .bumu-tip-text {
+    color: #14302C !important;
+  }
+
+  /* 补泻建议区域 */
+  .suggestion-box {
+    background: linear-gradient(135deg, rgba(224, 241, 234, 0.88), rgba(210, 233, 224, 0.76)) !important;
+    border: 1rpx solid rgba(43, 116, 106, 0.22) !important;
+  }
+
+  /* 九宫信息 */
+  .palace-box {
+    background: rgba(47, 125, 115, 0.06) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.20) !important;
+  }
+
+  /* 纳子法补母泻子说明文字 */
+  .nazi-bumu-tip-text {
+    color: #14302C !important;
+  }
+
+  /* 设置页全屏弹窗 */
+  .fullscreen-overlay {
+    background: linear-gradient(180deg, #E8F4EC 0%, #F0F6F2 100%) !important;
+  }
+
+  /* 免责声明卡片 */
+  .disclaimer-card {
+    background: rgba(47, 125, 115, 0.08) !important;
+    border: 1rpx solid rgba(47, 125, 115, 0.25) !important;
+  }
+
+  .disclaimer-label {
+    color: #2F7D73 !important;
+  }
+
+  /* 禁止状态 */
+  .point-btn.disabled {
+    background: #E3E8E5 !important;
+    border-color: rgba(47, 125, 115, 0.15) !important;
+  }
+
+  .point-btn.disabled .point-name {
+    color: #85A097 !important;
+  }
+}
+/* #endif */

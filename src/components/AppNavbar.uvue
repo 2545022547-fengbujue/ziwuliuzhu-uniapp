@@ -1,0 +1,96 @@
+<template>
+  <view class="navbar" :style="navbarStyle">
+    <view class="navbar-content">
+      <view class="navbar-title">
+        <text>{{ title }}</text>
+      </view>
+      <view class="navbar-left">
+        <slot name="left"></slot>
+      </view>
+      <view class="navbar-right">
+        <slot name="right"></slot>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup>
+/**
+ * AppNavbar - 自定义导航栏组件
+ *
+ * 功能：
+ *   - 固定在页面顶部，支持自定义标题和背景色
+ *   - 自动适配状态栏高度
+ */
+import { computed } from 'vue'
+import { useSystemInfo } from '@/composables/useSystemInfo.js'
+
+// 蒸汽模式：允许全局主题 class 影响本组件（等价原 scoped 的全局覆盖行为）
+defineOptions({
+  styleIsolation: 'app'
+})
+
+const props = defineProps({
+  /**
+   * 导航栏标题文本
+   * 显示在导航栏中央，默认为空字符串（由页面传入）
+   */
+  title: { type: String, default: '' },
+  /**
+   * 导航栏背景色
+   * 支持主题CSS变量（如 var(--bg-navbar)）或固定颜色值
+   * 默认使用主题渐变色（primary → primary-dark）
+   */
+  bgColor: { type: String, default: '' }
+})
+
+const { statusBarHeight } = useSystemInfo()
+
+// 导航栏样式
+const navbarStyle = computed(() => ({
+  paddingTop: `${statusBarHeight.value}px`,
+  background: props.bgColor || 'linear-gradient(135deg, var(--theme-primary, #8B4513) 0%, var(--theme-primary-dark, #6B3410) 100%)'
+}))
+</script>
+
+<style lang="scss">
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  &-content {
+    position: relative;
+    display: flex;
+      flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 44px;
+    padding: 0 30rpx;
+  }
+
+  &-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 34rpx;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  &-left,
+  &-right {
+    display: flex;
+      flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* 蒸汽模式 web 端 text→uni-text 不继承父级字号 */
+:global(.navbar-title > uni-text) {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+</style>

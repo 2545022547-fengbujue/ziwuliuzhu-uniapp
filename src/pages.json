@@ -1,0 +1,51 @@
+{
+  "darkmode": false,
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom",
+        "disableScroll": true,
+        "app-plus": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/setting/setting",
+      "style": {
+        "navigationStyle": "custom",
+        "disableScroll": true,
+        "backgroundColor": "#F8F4EF"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarBackgroundColor": "#8B4513",
+    "backgroundColor": "#F8F4EF",
+    "app-plus": {
+      "background": "#F8F4EF"
+    }
+  },
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#8B4513",
+    "borderStyle": "white",
+    "backgroundColor": "#fff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "取穴",
+        "iconPath": "static/tabbar/home-yellow.png",
+        "selectedIconPath": "static/tabbar/home-yellow-active.png"
+      },
+      {
+        "pagePath": "pages/setting/setting",
+        "text": "设置",
+        "iconPath": "static/tabbar/setting-yellow.png",
+        "selectedIconPath": "static/tabbar/setting-yellow-active.png"
+      }
+    ]
+  }
+}

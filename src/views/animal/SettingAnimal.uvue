@@ -1,0 +1,26 @@
+<template>
+  <!--
+    动物岛主题设置页（SettingAnimal）- 薄壳
+    公共布局见 _shared/SettingLayout.vue；本组件仅提供卡片标题图标插槽。
+    根 class 由 SettingLayout 按 store.activeUiStyle 自动推导（ui-animal）。
+    视觉差异由全局 ui-animal.scss 的 .ui-animal 命名空间覆盖实现。
+  -->
+  <SettingLayout>
+    <template #icon-solar><view class="card-icon-svg"><SettingIcon name="solar" /></view></template>
+    <template #icon-style><view class="card-icon-svg"><SettingIcon name="style" /></view></template>
+    <template #icon-najia><text class="card-icon">☯</text></template>
+    <template #icon-personal><view class="card-icon-svg"><SettingIcon name="personal" /></view></template>
+    <template #icon-methods><view class="picker-arrow"><SettingIcon name="methods" /></view></template>
+    <template #icon-about><view class="picker-arrow"><SettingIcon name="about" /></view></template>
+  </SettingLayout>
+</template>
+
+<script setup>
+import SettingIcon from '@/components/SettingIcon.uvue'
+import SettingLayout from '@/views/_shared/SettingLayout.uvue'
+
+// 蒸汽模式：允许全局主题 class 影响本组件（等价原 scoped 的全局覆盖行为）
+defineOptions({
+  styleIsolation: 'app'
+})
+</script>

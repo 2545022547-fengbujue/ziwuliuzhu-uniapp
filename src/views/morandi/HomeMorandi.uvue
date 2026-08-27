@@ -1,0 +1,18 @@
+<template>
+  <!--
+    莫兰迪主题首页（HomeMorandi）- 薄壳
+    公共布局见 _shared/HomeLayout.vue；本组件仅作为主题入口，
+    根 class 由 HomeLayout 按 store.activeUiStyle 自动推导（classic → theme-*，其它 → ui-*）。
+    视觉差异由全局 ui-morandi.scss 的 .ui-morandi 命名空间覆盖实现。
+  -->
+  <HomeLayout />
+</template>
+
+<script setup>
+import HomeLayout from '@/views/_shared/HomeLayout.uvue'
+
+// 蒸汽模式：允许全局主题 class 影响本组件（等价原 scoped 的全局覆盖行为）
+defineOptions({
+  styleIsolation: 'app'
+})
+</script>

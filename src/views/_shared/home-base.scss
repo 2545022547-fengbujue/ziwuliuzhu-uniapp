@@ -1,0 +1,478 @@
+@use '@/styles/variables.scss' as *;
+
+/* ============================================
+   首页共享基础样式（home-base）
+   
+   所有主题首页的经典布局与结构性样式，通过 CSS 变量（var(--theme-*)）自动适配各主题配色。
+   每个主题页面组件的 <style scoped> 块通过 @use 引入本文件，
+   再由全局 ui-*.scss 文件的 .ui-* 命名空间覆盖提供主题视觉差异。
+   
+   注意：本文件不包含任何主题特有的颜色硬编码，
+   所有颜色通过 var(--theme-*) CSS 变量引用，由各主题的根 class 定义。
+   ============================================ */
+
+.page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--theme-bg, #F8F4EF);
+}
+
+.nav-placeholder {
+  flex-shrink: 0;
+}
+
+/* 滚动容器：flex:1 + height:0 让 scroll-view 高度 = 父剩余空间（< 内容高度才能滚）。
+   web 端 SCROLL-VIEW 编译为自定义元素，靠 overflow-y:auto 原生滚动；
+   App 端 scroll-view 组件自带滚动能力。 */
+.page-scroll {
+  flex: 1;
+  height: 0;
+  /* #ifdef WEB */
+  overflow-y: auto;
+  /* #endif */
+  /* #ifndef WEB */
+  overflow: hidden;
+  /* #endif */
+}
+
+/* === 干支卡片 === */
+.ganzhi-card {
+  margin: $spacing-md;
+  padding: $spacing-lg;
+  background: var(--theme-surface, #FFFDF5);
+  border-radius: 32rpx;
+  box-shadow: 0 8rpx 32rpx rgba(139, 69, 19, 0.08);
+}
+
+.ganzhi-header {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.ganzhi-title {
+  font-size: 26rpx;
+  color: var(--theme-text-secondary, #666666);
+}
+
+.ganzhi-toggle {
+  display: flex;
+  flex-direction: row;
+  gap: 8rpx;
+  background: var(--theme-bg, #F8F4EF);
+  border-radius: 20rpx;
+  padding: 4rpx;
+  flex-shrink: 0;
+}
+
+.toggle-btn {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: 6rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 16rpx;
+  transition: all 0.25s ease;
+
+  &.active {
+    background: var(--theme-primary);
+    box-shadow: 0 8rpx 32rpx var(--theme-shadow);
+    .toggle-text { color: #fff; }
+  }
+}
+
+.toggle-icon {
+  font-size: $font-size-sm;
+}
+
+.toggle-text {
+  font-size: 24rpx;
+  color: var(--theme-text-secondary, #666666);
+}
+
+/* === 手动模式控件 === */
+.manual-controls {
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: var(--theme-surface-muted);
+  border-radius: 20rpx;
+}
+
+.control-row {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.control-label {
+  font-size: 28rpx;
+  color: var(--theme-text-secondary, #666666);
+}
+
+.picker-btn {
+  padding: 12rpx 28rpx;
+  background: var(--theme-surface);
+  border: 1rpx solid var(--theme-border);
+  border-radius: 16rpx;
+  font-size: $font-size-sm;
+  color: var(--theme-text, #2C2C2C);
+  min-width: 240rpx;
+  text-align: center;
+}
+
+.query-btn {
+  margin-top: $spacing-sm;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
+  border-radius: 20rpx;
+  text-align: center;
+  box-shadow: 0 8rpx 32rpx var(--theme-shadow);
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.query-btn-text {
+  color: #fff;
+  font-size: $font-size-sm;
+  font-weight: 600;
+}
+
+/* 手动模式子时日界说明（审查报告 2.2 文案澄清，主题中立基线） */
+.manual-hint {
+  margin-bottom: $spacing-sm;
+}
+
+.manual-hint-text {
+  font-size: 24rpx;
+  color: var(--theme-text-secondary, #666666);
+  line-height: 1.5;
+}
+
+/* === 当前日期时间 === */
+.current-datetime {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-md 0;
+  border-top: 1rpx solid var(--theme-border);
+}
+
+.datetime-text {
+  font-size: $font-size-xs;
+  color: var(--theme-text-hint, #999999);
+}
+
+.datetime-value {
+  font-size: $font-size-xs;
+  color: var(--theme-text-secondary, #666666);
+}
+
+/* === 干支标签显示 === */
+.ganzhi-display {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  padding-top: $spacing-md;
+}
+
+.ganzhi-tag-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 20rpx;
+  border-radius: 16rpx;
+  background: var(--theme-surface-muted);
+
+  &.highlight {
+    background: var(--theme-border);
+
+    .ganzhi-tag-text {
+      font-weight: 700;
+    }
+  }
+}
+
+.ganzhi-tag-text {
+  font-size: $font-size-sm;
+  color: var(--theme-primary);
+  font-weight: 600;
+  font-family: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
+}
+
+/* === 方法切换 === */
+.method-tabs {
+  display: flex;
+  flex-direction: row;
+  margin: 0 0 $spacing-md;
+  padding: 6rpx;
+  background: var(--theme-surface, #FFFDF5);
+  border-radius: 28rpx;
+  box-shadow: 0 6rpx 24rpx rgba(139, 69, 19, 0.06);
+  gap: 4rpx;
+  /* 防止 active 状态 transform: scale(1.02) 撑出容器 */
+  overflow: hidden;
+}
+
+.method-tab {
+  flex: 1;
+  min-width: 0;                  /* 允许 flex 子项被压缩到内容最小宽度以下 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+  padding: 16rpx 4rpx;            /* 紧凑：原 28rpx 0 在窄屏 4 个 tab 装不下 */
+  border-radius: 20rpx;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &.active {
+    background: var(--theme-primary);
+    box-shadow: 0 8rpx 32rpx var(--theme-shadow);
+    transform: scale(1.02);
+
+    .method-name {
+      color: #fff;
+      font-weight: 600;
+    }
+    .method-icon {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.method-icon {
+  font-size: $font-size-lg;
+  transition: transform 0.3s ease;
+}
+
+.method-name {
+  font-size: 24rpx;
+  color: var(--theme-text-secondary, #666666);
+  transition: all 0.25s ease;
+  white-space: nowrap;            /* 防止方法名换行导致 tab 高度跳动 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.method-indicator {
+  position: absolute;
+  bottom: 8rpx;
+  width: 32rpx;
+  height: 4rpx;
+  border-radius: 2rpx;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* === 结果过渡动画 === */
+.result-wrapper {
+  animation: fadeSlideIn 0.35s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === 反克法补充 === */
+.fanke-supplement {
+  margin: $spacing-md;
+  padding: 40rpx;
+  background: rgba($tcm-secondary, 0.04);
+  border: 2rpx dashed rgba($tcm-secondary, 0.3);
+  border-radius: 28rpx;
+  animation: fadeSlideIn 0.35s ease-out;
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+}
+
+.fanke-header {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: $spacing-md;
+}
+
+.fanke-icon {
+  font-size: 40rpx;
+  color: var(--theme-secondary, #5B8C3E);
+}
+
+.fanke-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--theme-secondary, #5B8C3E);
+}
+
+.fanke-desc {
+  font-size: 26rpx;
+  color: var(--theme-text-hint, #999999);
+  margin-left: 8rpx;
+}
+
+/* === 对比区域 === */
+.compare-section {
+  margin: $spacing-lg $spacing-md $spacing-md;
+}
+
+.compare-divider {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1rpx;
+  background: linear-gradient(to right, transparent, var(--theme-border), transparent);
+}
+
+.divider-text {
+  font-size: $font-size-xs;
+  color: var(--theme-text-hint, #999999);
+}
+
+.compare-grid {
+  display: flex;
+    flex-direction: row;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+/* === 查询确认弹窗 === */
+.confirm-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-popup {
+  width: 75%;
+  background: var(--theme-surface);
+  border-radius: 28rpx;
+  padding: 48rpx 40rpx;
+  box-shadow: 0 8rpx 30rpx var(--theme-shadow);
+}
+
+.confirm-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--theme-primary);
+  text-align: center;
+  margin-bottom: 36rpx;
+}
+
+.confirm-info {
+  display: flex;
+    flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--theme-border);
+}
+
+.confirm-label {
+  font-size: $font-size-sm;
+  color: var(--theme-text-hint);
+}
+
+.confirm-value {
+  padding: 8rpx 20rpx;
+  background: var(--theme-surface-muted);
+  border-radius: 12rpx;
+  font-size: $font-size-sm;
+  color: var(--theme-text);
+  font-weight: 500;
+}
+
+.confirm-btns {
+  display: flex;
+    flex-direction: row;
+  gap: 24rpx;
+  margin-top: 40rpx;
+}
+
+.confirm-cancel {
+  flex: 1;
+  padding: 24rpx 0;
+  background: var(--theme-surface-muted);
+  border-radius: 20rpx;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: var(--theme-text-secondary);
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.confirm-ok {
+  flex: 1;
+  padding: 24rpx 0;
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
+  border-radius: 20rpx;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: #fff;
+  font-weight: 600;
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.96);
+  }
+}

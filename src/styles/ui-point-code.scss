@@ -1,0 +1,75 @@
+/*
+ * 穴位编码关闭后的主题化排版。
+ *
+ * 约定：
+ * 1. ResultPanel 给列表按钮增加 point-btn-code-hidden，只调整按钮宽度、留白和中文名字号；
+ * 2. PointDetail 给详情大标题增加 point-name-code-hidden，只放大中文名，不移动 header-name-layer；
+ * 3. 每套主题单独设定字距和紧凑留白，但不得设置会超过三列单元格的固定最小宽度；
+ * 4. 开关重新打开后 class 自动移除，原编码布局无需额外复位代码。
+ */
+
+/* === 说明 ===
+ * 以下规则按主题分组，只调整「编码隐藏后」的排版参数；
+ * 每组与 ui-ink.scss 等主题文件的视觉语言保持一致，不单独发明新样式。
+ */
+.point-btn-code-hidden {
+  min-width: 0;
+  justify-content: center;
+  padding-left: 12rpx !important;
+  padding-right: 12rpx !important;
+}
+
+.theme-yellow {
+  .point-btn-code-hidden .point-name { font-size: 29rpx; letter-spacing: 2rpx; }
+  .point-name-code-hidden { font-size: 82rpx !important; }
+}
+
+.theme-black {
+  .point-btn-code-hidden { border-radius: 12rpx !important; }
+  .point-btn-code-hidden .point-name { font-size: 28rpx; letter-spacing: 1rpx; }
+  .point-name-code-hidden { font-size: 78rpx !important; }
+}
+
+.theme-green {
+  .point-btn-code-hidden .point-name { font-size: 29rpx; letter-spacing: 2rpx; }
+  .point-name-code-hidden { font-size: 82rpx !important; }
+}
+
+.theme-red {
+  .point-btn-code-hidden .point-name { font-size: 29rpx; letter-spacing: 2rpx; }
+  .point-name-code-hidden { font-size: 82rpx !important; }
+}
+
+.ui-modern {
+  .point-btn-code-hidden { padding: 14rpx 12rpx !important; }
+  .point-btn-code-hidden .point-name { font-size: 28rpx; letter-spacing: 1rpx; font-weight: 750 !important; }
+  .point-name-code-hidden { font-size: 80rpx !important; }
+}
+
+.ui-ink {
+  .point-btn-code-hidden { padding: 14rpx 10rpx !important; }
+  .point-btn-code-hidden .point-name { font-size: 30rpx; letter-spacing: 3rpx; }
+  .point-name-code-hidden { font-size: 86rpx !important; }
+}
+
+.ui-morandi {
+  .point-btn-code-hidden .point-name { font-size: 29rpx; letter-spacing: 2rpx; }
+  .point-name-code-hidden { font-size: 80rpx !important; }
+}
+
+.ui-watercolor {
+  .point-btn-code-hidden .point-name { font-size: 29rpx; letter-spacing: 3rpx; font-weight: 600 !important; }
+  .point-name-code-hidden { font-size: 82rpx !important; }
+}
+
+.ui-animal {
+  .point-btn-code-hidden { padding: 14rpx 10rpx !important; }
+  .point-btn-code-hidden .point-name { font-size: 29rpx; letter-spacing: 1rpx; }
+  .point-name-code-hidden { font-size: 82rpx !important; }
+}
+
+.ui-pixel {
+  .point-btn-code-hidden { padding: 12rpx 10rpx !important; }
+  .point-btn-code-hidden .point-name { font-size: 28rpx; letter-spacing: 2rpx; text-shadow: 2rpx 2rpx 0 #F7E7B7; }
+  .point-name-code-hidden { font-size: 78rpx !important; text-shadow: 4rpx 4rpx 0 #F7E7B7; }
+}

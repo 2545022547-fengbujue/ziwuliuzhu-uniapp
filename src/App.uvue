@@ -1,0 +1,67 @@
+<!--
+  App.uvue - 应用根组件（uni-app x 蒸汽模式）
+
+  迁移自原 uni-app 的 App.vue：
+  - 微信小程序端加载内嵌字体；
+  - Web/App 端应用主题到原生 tabBar；
+  - 全局错误兜底。
+-->
+<template></template>
+
+<script setup>
+import { useAppStore } from '@/stores/app.js'
+import { watch } from 'vue'
+import { onLaunch, onAppShow, onAppHide, onError, onUnhandledRejection } from '@dcloudio/uni-app'
+
+// #ifdef MP-WEIXIN
+import { loadMiniProgramFonts } from '@/utils/font-loader.js'
+// #endif
+
+onLaunch(() => {
+  // #ifdef MP-WEIXIN
+  loadMiniProgramFonts()
+  // #endif
+
+  // #ifdef WEB || APP-ANDROID || APP-IOS || APP-HARMONY
+  // Web / App 端：启动时应用主题 tabBar
+  const store = useAppStore()
+  store.applyThemeChrome()
+
+  // 监听 theme / uiStyle 变化，自动更新 tabBar（防抖合并连续切换）
+  let chromeTimer = null
+  watch(
+    () => [store.theme, store.uiStyle],
+    () => {
+      clearTimeout(chromeTimer)
+      chromeTimer = setTimeout(() => store.applyThemeChrome(), 50)
+    }
+  )
+  // #endif
+})
+
+onAppShow(() => {
+  // #ifdef WEB || APP-ANDROID || APP-IOS || APP-HARMONY
+  const store = useAppStore()
+  store.applyThemeChrome()
+  // #endif
+})
+
+onAppHide(() => {})
+
+/**
+ * 全局错误兜底（生产可用健壮性）：
+ * - 捕获未预期的运行时错误与未处理的 Promise 拒绝，统一落日志。
+ * - 只做「记录」，不做静默吞错。
+ */
+onError((err) => {
+  console.error('[App] 全局运行时错误:', err)
+})
+
+onUnhandledRejection((err) => {
+  console.error('[App] 未处理的 Promise 拒绝:', err)
+})
+</script>
+
+<style lang="scss">
+@use '@/styles/index.scss';
+</style>

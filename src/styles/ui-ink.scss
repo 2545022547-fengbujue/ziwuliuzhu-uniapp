@@ -1,0 +1,1211 @@
+/* ============================================
+   水墨意境（ui-ink）
+
+   设计语言：白宣纸 + 时段山水 + 墨色笔触 + 少量印色
+   - 页面、日期弹窗和时辰弹窗按设备当地时间切换同一组山水背景
+   - 卡片保持宣纸半透明感，以淡墨线和轻微纸面层次区分内容
+   - 标题使用真楷字体，选中态使用真实笔触素材，避免规则矩形色块
+   - 印色只用于关闭、提示等小面积点睛，不把大块红色冒充水墨
+
+   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
+   ============================================ */
+
+$ink-primary: #20272A;           // 浓墨
+$ink-seal: #9B3328;              // 朱砂印色（只作少量点睛）
+$ink-bg: #FCFCF9;                // 白宣纸底
+$ink-surface: #FFFFFF;           // 纸面
+$ink-muted: #EEF0ED;             // 淡灰纸色
+$ink-text: #2B2B2B;
+$ink-text-secondary: #4F5654;
+$ink-text-hint: #737A76;
+$ink-border: rgba(43, 43, 43, 0.16);
+// 水墨主展示字体：华文行楷优先（仅 H5/App 打包），项目汉字覆盖 99.3%；
+// 其后依次是 LXGW 真楷（落霞孤鹜体）、内置楷体、文渊宋体和系统楷体兜底。
+$ink-kaiti: 'HuawenXingkai', 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif;
+$ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
+
+.ui-ink {
+  /* === 主题变量重定义 === */
+  --theme-primary: #{$ink-primary};
+
+  /* 首页标题"子午流注取穴"放大（仅水墨主题生效） */
+  .home-navbar .navbar-title {
+    font-size: 42rpx !important;
+  }
+
+  /* 穴位详情弹窗内所有文字统一使用水墨主字体（华文行楷优先，自动跟随 $ink-kaiti 链首） */
+  .popup,
+  .popup * {
+    font-family: $ink-kaiti !important;
+  }
+
+  --theme-primary-dark: #1A1A1A;
+  --theme-secondary: #{$ink-seal};
+  --theme-bg: #{$ink-bg};
+  --theme-surface: #{$ink-surface};
+  --theme-surface-muted: #{$ink-muted};
+  --theme-text: #{$ink-text};
+  --theme-text-secondary: #{$ink-text-secondary};
+  --theme-text-hint: #{$ink-text-hint};
+  --theme-border: #{$ink-border};
+  --theme-shadow: rgba(43, 43, 43, 0.05);
+  --ink-scene: none;
+  --ink-scene-position: center center;
+  --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(255,255,252,0.08));
+  --ink-scene-filter: none;
+  /* #ifdef WEB || APP-ANDROID || APP-IOS || APP-HARMONY */
+  --ink-scene: url('@/assets/ink/ink-portrait-night.jpg');
+  /* #endif */
+
+  background: #FDFDFA !important;
+  color: $ink-text !important;
+  position: relative;
+  isolation: isolate;
+
+  // 水墨的核心不是黑色块，而是“墨落在纸上”的不规则边缘。
+  // 这些伪元素模拟横向笔触、干笔断续和淡墨颗粒；内容层保持清晰。
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  &::before {
+    inset: 0;
+    opacity: 1;
+    background-image: var(--ink-paper-wash), var(--ink-scene);
+    // 第二层山水必须 cover 整个页面。原来的 100% auto 只保证横向铺满，
+    // 横屏或较矮图片在设置页滚到底部时会提前结束，露出一整条纯色纸面。
+    background-size: 100% 100%, cover;
+    background-position: center, var(--ink-scene-position);
+    background-repeat: no-repeat;
+    filter: var(--ink-scene-filter);
+  }
+
+  /* #ifdef WEB || APP-ANDROID || APP-IOS || APP-HARMONY */
+  // 七时段背景仅用于 H5/App。所有图片都保持比例 cover 裁切，不做变形拉伸。
+  &.ink-bg-sunrise {
+    --ink-scene: url('@/assets/ink/ink-portrait-sunrise-morning.jpg');
+    --ink-scene-position: center center;
+    --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(255,255,252,0.08));
+    --ink-scene-filter: none;
+  }
+
+  &.ink-bg-morning {
+    --ink-scene: url('@/assets/ink/ink-portrait-sunrise-morning.jpg');
+    --ink-scene-position: center center;
+    --ink-paper-wash: linear-gradient(rgba(255,255,252,0.04), rgba(255,255,252,0.10));
+    --ink-scene-filter: saturate(0.82);
+  }
+
+  &.ink-bg-forenoon {
+    --ink-scene: url('@/assets/ink/ink-portrait-forenoon.jpg');
+    --ink-scene-position: center center;
+    --ink-paper-wash: linear-gradient(rgba(255,255,252,0.03), rgba(255,255,252,0.09));
+    --ink-scene-filter: none;
+  }
+
+  &.ink-bg-noon {
+    --ink-scene: url('@/assets/ink/ink-portrait-forenoon.jpg');
+    --ink-scene-position: center center;
+    --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(255,255,252,0.07));
+    --ink-scene-filter: brightness(1.03);
+  }
+
+  &.ink-bg-afternoon {
+    --ink-scene: url('@/assets/ink/ink-portrait-afternoon.jpg');
+    --ink-scene-position: center center;
+    --ink-paper-wash: linear-gradient(rgba(255,255,252,0.03), rgba(255,255,252,0.09));
+    --ink-scene-filter: none;
+  }
+
+  &.ink-bg-sunset {
+    --ink-scene: url('@/assets/ink/ink-portrait-sunset.jpg');
+    --ink-scene-position: center center;
+    --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(255,255,252,0.07));
+    --ink-scene-filter: saturate(0.88);
+  }
+
+  &.ink-bg-dusk {
+    --ink-scene: url('@/assets/ink/ink-portrait-dusk.jpg');
+    --ink-scene-position: center center;
+    --ink-paper-wash: linear-gradient(rgba(255,255,252,0.03), rgba(255,255,252,0.10));
+    --ink-scene-filter: saturate(0.84);
+  }
+
+  &.ink-bg-night {
+    --ink-scene: url('@/assets/ink/ink-portrait-night.jpg');
+    --ink-scene-position: center center;
+    --ink-paper-wash: linear-gradient(rgba(255,255,252,0.02), rgba(248,250,249,0.08));
+    --ink-scene-filter: none;
+  }
+
+  // 日期、时辰弹窗不再使用固定纸色：它们与页面共用同一套时段判断，
+  // 但独立设置背景图，避免弹窗脱离页面后看起来像另一套主题。
+  .date-picker-panel,
+  .time-picker-panel {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-night.jpg');
+  }
+
+  .date-picker-panel.ink-bg-sunrise,
+  .date-picker-panel.ink-bg-morning,
+  .time-picker-panel.ink-bg-sunrise,
+  .time-picker-panel.ink-bg-morning {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-sunrise-morning.jpg');
+  }
+
+  .date-picker-panel.ink-bg-forenoon,
+  .date-picker-panel.ink-bg-noon,
+  .time-picker-panel.ink-bg-forenoon,
+  .time-picker-panel.ink-bg-noon {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-forenoon.jpg');
+  }
+
+  .date-picker-panel.ink-bg-afternoon,
+  .time-picker-panel.ink-bg-afternoon {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-afternoon.jpg');
+  }
+
+  .date-picker-panel.ink-bg-sunset,
+  .time-picker-panel.ink-bg-sunset {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-sunset.jpg');
+  }
+
+  .date-picker-panel.ink-bg-dusk,
+  .time-picker-panel.ink-bg-dusk {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-dusk.jpg');
+  }
+
+  .date-picker-panel.ink-bg-night,
+  .time-picker-panel.ink-bg-night {
+    --ink-picker-scene: url('@/assets/ink/ink-picker-night.jpg');
+  }
+  /* #endif */
+
+  &::after {
+    display: none;
+  }
+
+  // 明确清除其他风格可能遗留的水彩层：切换风格时根节点不会重建，
+  // 因此水墨必须主动覆盖所有页面级色洗。
+  &.page,
+  .page-scroll,
+  .setting-content {
+    background: transparent !important;
+    background-image: none !important;
+  }
+
+  .page-scroll,
+  .setting-content,
+  .ganzhi-card,
+  .method-tabs,
+  .result-panel {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* === 导航栏：半透明宣纸 + 淡墨线 === */
+  .navbar {
+    background: rgba(253, 253, 250, 0.96) !important;
+    border-bottom: 1rpx solid rgba(43, 43, 43, 0.10) !important;
+    backdrop-filter: blur(16rpx) !important;
+  }
+
+  .navbar-title {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+    letter-spacing: 6rpx !important;
+  }
+
+  /* === 卡片通用：宣纸层次 + 柔和淡墨边界 === */
+  .ganzhi-card,
+  .method-tabs,
+  .result-panel,
+  .setting-card,
+  .method-card,
+  .desc-card,
+  .info-card,
+  .popup,
+  .confirm-popup,
+  .fullscreen-panel,
+  .date-picker-panel,
+  .time-picker-panel {
+    background:
+      radial-gradient(ellipse at 8% 4%, rgba(38, 45, 45, 0.028), transparent 42%),
+      rgba(255, 255, 252, 0.86) !important;
+    box-shadow: 0 10rpx 28rpx rgba(35, 40, 40, 0.07) !important;
+    border: 1rpx solid rgba(42, 49, 48, 0.13) !important;
+    border-radius: 10rpx 26rpx 13rpx 22rpx !important;
+    backdrop-filter: none !important;
+    overflow: hidden;
+  }
+
+  // 选择器单独叠加时段山水。原素材上方留白较多，因此这里放大并向下锚定，
+  // 让山水从面板中段开始出现；文字仍以深墨色显示，不牺牲可读性。
+  .date-picker-panel {
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 253, 0.82) 0%, rgba(255, 255, 253, 0.56) 38%, rgba(255, 255, 253, 0.24) 70%, rgba(255, 255, 253, 0.10) 100%),
+      var(--ink-picker-scene) !important;
+    background-color: #FFFFFF !important;
+    background-size: 100% 100%, 100% 100% !important;
+    background-position: center, center bottom !important;
+    background-repeat: no-repeat !important;
+  }
+
+  // 真正承载山水的图片层。CSS 背景仍作为降级方案；图片层确保 Android
+  // WebView、H5 和 uni-app 自定义组件都能稳定显示，而不是退化成纯白。
+  .ink-picker-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.62;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  // 时辰列表文字更密，适当降低山水浓度；日期网格留白较多，可保留更清楚的景物。
+  .time-picker-panel .ink-picker-bg {
+    opacity: 0.42;
+  }
+
+  .date-picker-panel > :not(.ink-picker-bg),
+  .time-picker-panel > :not(.ink-picker-bg) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .time-picker-panel {
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 253, 0.86) 0%, rgba(255, 255, 253, 0.64) 34%, rgba(255, 255, 253, 0.32) 70%, rgba(255, 255, 253, 0.14) 100%),
+      var(--ink-picker-scene) !important;
+    background-color: #FFFFFF !important;
+    background-size: 100% 100%, cover !important;
+    background-position: center, center bottom !important;
+    background-repeat: no-repeat !important;
+  }
+
+  /* === 干支卡片 === */
+  .ganzhi-title {
+    color: $ink-text-hint !important;
+    font-family: $ink-kaiti !important;
+    letter-spacing: 6rpx;
+  }
+
+  // 自动/手动切换：墨线框 + 选中填墨
+  .ganzhi-toggle {
+    background: transparent !important;
+    border: 1rpx solid $ink-border !important;
+    border-radius: 8rpx !important;
+    padding: 4rpx !important;
+  }
+
+  .toggle-btn {
+    border-radius: 3rpx 12rpx 5rpx 10rpx !important;
+
+    &.active {
+      background-color: rgba(28, 35, 36, 0.96) !important;
+      background-image: url('@/assets/ink/shuimo-brush-bg.webp') !important;
+      background-size: 100% 100% !important;
+      background-position: center !important;
+      border: none !important;
+      box-shadow: none !important;
+
+      .toggle-text {
+        color: $ink-surface !important;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .toggle-icon {
+    display: none !important;
+  }
+
+  .toggle-text {
+    color: $ink-text-secondary !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  .manual-controls {
+    background: $ink-muted !important;
+    border: none !important;
+    border-radius: 8rpx !important;
+    backdrop-filter: none !important;
+  }
+
+  .control-label {
+    color: $ink-text-secondary !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  .picker-btn {
+    background: $ink-surface !important;
+    border: 1rpx solid $ink-border !important;
+    border-radius: 6rpx !important;
+    backdrop-filter: none !important;
+
+    text {
+      color: $ink-text !important;
+      font-family: $ink-song !important;
+    }
+  }
+
+  // 查询按钮：墨块
+  .query-btn {
+    background-color: rgba(26, 33, 34, 0.97) !important;
+    background-image: url('@/assets/ink/shuimo-brush-bg.webp') !important;
+    background-size: 100% 100% !important;
+    background-position: center !important;
+    border: none !important;
+    border-radius: 8rpx !important;
+    box-shadow: none !important;
+  }
+
+  .query-btn-text {
+    font-family: $ink-kaiti !important;
+    letter-spacing: 8rpx;
+  }
+
+  .current-datetime {
+    border-top-color: $ink-border !important;
+  }
+
+  .datetime-text {
+    color: $ink-text-hint !important;
+  }
+
+  .datetime-value {
+    color: $ink-text-secondary !important;
+    font-family: $ink-song !important;
+  }
+
+  // 干支标签：无底墨字，日/时盖「印章」
+  .ganzhi-tag-item {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 6rpx !important;
+    padding: 12rpx 16rpx !important;
+
+    &.highlight {
+      background:
+        linear-gradient(96deg, transparent 0 3%, rgba(32, 39, 40, 0.96) 8% 92%, transparent 98%),
+        radial-gradient(ellipse at 50% 50%, rgba(32, 39, 40, 0.94), transparent 72%) !important;
+
+      .ganzhi-tag-text {
+        color: #FFF8EE !important;
+      }
+    }
+  }
+
+  .ganzhi-tag-text {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+    font-size: 34rpx !important;
+  }
+
+  /* === 方法切换栏：宣纸留白 + 选中墨笔 === */
+  .method-tabs {
+    // 保留一点背景气息，但隔开山水图中容易误读成控件的硬轮廓。
+    background: rgba(255, 255, 252, 0.82) !important;
+    border: none !important;
+    border-top: 1rpx solid $ink-border !important;
+    border-bottom: 1rpx solid $ink-border !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 12rpx !important;
+  }
+
+  .method-tab {
+    position: relative;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: visible;
+
+    &.active {
+      // 不再用实心矩形垫底；使用真实干笔裁出的透明墨迹。
+      background-color: transparent !important;
+      background-image: url('@/assets/ink/shuimo-method-brush.png') !important;
+      background-size: 148% auto !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      border: none !important;
+      box-shadow: none !important;
+      transform: none !important;
+
+      .method-name {
+        color: $ink-surface !important;
+        font-weight: 500;
+        font-family: $ink-kaiti !important;
+      }
+
+      .method-icon {
+        color: $ink-surface !important;
+        transform: none !important;
+      }
+    }
+
+    .method-icon,
+    .method-name {
+      position: relative;
+      z-index: 1;
+    }
+
+    &:not(.active) {
+      .method-name {
+        color: $ink-text-secondary !important;
+        font-family: $ink-kaiti !important;
+      }
+
+      .method-icon {
+        color: $ink-text-hint !important;
+      }
+    }
+  }
+
+  .method-indicator {
+    display: none !important;
+  }
+
+  /* === 结果面板 === */
+  .result-panel {
+    border: none !important;
+  }
+
+  .panel-header {
+    background:
+      linear-gradient(90deg, rgba(31, 38, 39, 0.06), transparent 34%),
+      rgba(255,255,252,0.84) !important;
+    border-bottom: 1rpx solid rgba(36, 43, 43, 0.14) !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: none !important;
+  }
+
+  .header-title {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+    letter-spacing: 4rpx;
+  }
+
+  .header-icon {
+    color: $ink-text-secondary !important;
+  }
+
+  .result-ganzhi-date,
+  .result-ganzhi-hour-label {
+    color: $ink-text-hint !important;
+  }
+
+  // 时辰标签：印章红
+  .result-ganzhi-hour-tag {
+    background:
+      linear-gradient(97deg, transparent 0 4%, rgba(31, 38, 39, 0.95) 10% 91%, transparent 97%),
+      radial-gradient(ellipse, rgba(31, 38, 39, 0.92), transparent 73%) !important;
+    border: none !important;
+    border-radius: 6rpx !important;
+  }
+
+  .result-ganzhi-hour-text {
+    color: #FFF8EE !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  // 闭穴提示：纸面 + 左侧朱线
+  .warning-box {
+    background:
+      linear-gradient(90deg, rgba(36, 43, 43, 0.065), transparent 84%),
+      rgba(255,255,252,0.70) !important;
+    border: none !important;
+    border-left: 5rpx solid $ink-primary !important;
+    border-radius: 6rpx !important;
+  }
+
+  .warning-text {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  .section-title {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+    letter-spacing: 4rpx;
+  }
+
+  .dot.primary,
+  .dot.secondary,
+  .title-dot {
+    background: $ink-primary !important;
+    border-radius: 2rpx !important;
+  }
+
+  .dot.fanke {
+    background: $ink-seal !important;
+    border-radius: 2rpx !important;
+  }
+
+  // 穴位按钮：墨线框 + 楷体墨字
+  .point-btn {
+    background: $ink-surface !important;
+    border: 1rpx solid $ink-border !important;
+    border-radius: 8rpx !important;
+    backdrop-filter: none !important;
+
+    &:active {
+      background: $ink-muted !important;
+    }
+  }
+
+  .point-name {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+    // 华文行楷基线偏高，结果面板穴名整体下移 2rpx 与同行编码/五行属性对齐（仅水墨主题生效）
+    transform: translateY(2rpx);
+  }
+
+  .point-code {
+    color: $ink-text-hint !important;
+  }
+
+  .tag-primary {
+    background: $ink-muted !important;
+    border: none !important;
+    border-radius: 6rpx !important;
+
+    text {
+      color: $ink-text !important;
+      font-family: $ink-kaiti !important;
+    }
+  }
+
+  .nazi-mode-switch {
+    background: transparent !important;
+    border: 1rpx solid $ink-border !important;
+    border-radius: 8rpx !important;
+    overflow: hidden;
+  }
+
+  .switch-option {
+    background: transparent !important;
+    color: $ink-text-secondary !important;
+
+    &.active {
+      background: $ink-primary !important;
+      color: $ink-surface !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .palace-box {
+    background: $ink-muted !important;
+    border: none !important;
+    border-radius: 8rpx !important;
+  }
+
+  .palace-icon {
+    color: $ink-seal !important;
+  }
+
+  .palace-text {
+    color: $ink-text-secondary !important;
+    font-family: $ink-song !important;
+  }
+
+  .palace-note {
+    color: $ink-text-hint !important;
+  }
+
+  .suggestion-box {
+    background: $ink-muted !important;
+    border: none !important;
+    border-left: 6rpx solid $ink-primary !important;
+    border-radius: 6rpx !important;
+  }
+
+  .suggestion-title {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  .principle-text {
+    color: $ink-text-secondary !important;
+    font-family: $ink-song !important;
+  }
+
+  .bumu-tip {
+    background: transparent !important;
+    border: none !important;
+  }
+
+  .bumu-tip-icon,
+  .bumu-tip-text {
+    color: $ink-text-hint !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  .empty-text {
+    color: $ink-text-hint !important;
+  }
+
+  /* === 反克法补充 === */
+  .fanke-supplement {
+    background: $ink-surface !important;
+    border: 2rpx dashed rgba(176, 58, 46, 0.35) !important;
+    border-radius: 12rpx !important;
+  }
+
+  .fanke-icon,
+  .fanke-title {
+    color: $ink-seal !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  .fanke-desc {
+    color: $ink-text-hint !important;
+  }
+
+  /* === 对比区域 === */
+  .divider-line {
+    background: $ink-border !important;
+  }
+
+  .divider-text {
+    color: $ink-text-hint !important;
+    font-family: $ink-kaiti !important;
+    letter-spacing: 8rpx;
+  }
+
+  /* === 确认弹窗 === */
+  .confirm-title {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  .confirm-info {
+    border-bottom-color: $ink-border !important;
+  }
+
+  .confirm-label {
+    color: $ink-text-hint !important;
+  }
+
+  .confirm-value {
+    background: $ink-muted !important;
+    border: none !important;
+    color: $ink-text !important;
+    font-family: $ink-song !important;
+  }
+
+  .confirm-cancel {
+    background: $ink-muted !important;
+    border: none !important;
+    border-radius: 8rpx !important;
+
+    text {
+      color: $ink-text-secondary !important;
+    }
+  }
+
+  .confirm-ok {
+    background: $ink-primary !important;
+    border: none !important;
+    border-radius: 8rpx !important;
+    box-shadow: none !important;
+  }
+
+  /* === 设置页 === */
+  .setting-row,
+  .info-row,
+  .popup-header,
+  .popup-footer,
+  .fullscreen-header,
+  .province-group,
+  .city-item,
+  .method-desc {
+    border-color: $ink-border !important;
+  }
+
+  .card-title {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+    letter-spacing: 4rpx;
+  }
+
+  .setting-label,
+  .theme-name {
+    color: $ink-text !important;
+  }
+
+  .setting-value,
+  .method-detail {
+    color: $ink-text-secondary !important;
+  }
+
+  .setting-hint,
+  .setting-tip,
+  .picker-arrow,
+  .theme-expand-arrow,
+  .theme-desc,
+  .app-version,
+  .disclaimer-text {
+    color: $ink-text-hint !important;
+  }
+
+  .theme-current,
+  .ui-style-option {
+    background:
+      linear-gradient(96deg, rgba(38,45,45,0.055), transparent 82%),
+      rgba(255,255,252,0.90) !important;
+    border-color: rgba(42,49,48,0.15) !important;
+    border-radius: 9rpx 20rpx 11rpx 18rpx !important;
+    box-shadow: 0 5rpx 13rpx rgba(30,36,36,0.045) !important;
+  }
+
+  .ui-style-name {
+    color: $ink-text !important;
+  }
+
+  .ui-style-desc {
+    color: $ink-text-hint !important;
+  }
+
+  .ui-style-option.active .ui-style-name {
+    color: $ink-primary !important;
+    font-weight: 700 !important;
+    font-size: 34rpx !important;
+    // 水墨意境主题下，外观风格中被选中的那一项名称也用行楷，与其余项区分
+    font-family: $ink-kaiti !important;
+  }
+
+  // 水墨意境主题下，选中项下方的说明小字也跟随行楷
+  .ui-style-option.active .ui-style-desc {
+    font-family: $ink-kaiti !important;
+  }
+
+  .ui-style-option.active {
+    border-color: rgba(32,39,40,0.38) !important;
+    background:
+      linear-gradient(95deg, transparent 0 2%, rgba(32,39,40,0.075) 8% 92%, transparent 98%),
+      rgba(255,255,252,0.94) !important;
+  }
+
+  .ui-style-check {
+    color: $ink-surface !important;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(32,39,40,0.98) 0 58%, transparent 73%) !important;
+    border-radius: 45% 55% 48% 52% !important;
+  }
+
+  switch {
+    transform: scale(0.92);
+    opacity: 1 !important;
+  }
+
+  .ink-switch {
+    width: 108rpx;
+    height: 58rpx;
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .ink-switch-track {
+    position: absolute;
+    left: 4rpx;
+    right: 4rpx;
+    top: 17rpx;
+    height: 25rpx;
+    opacity: 0.66;
+    background: url('@/assets/ink/shuimo-brush-bg.webp') center / 100% 100% no-repeat;
+    filter: grayscale(1);
+  }
+
+  .ink-switch-knob {
+    position: absolute;
+    top: 4rpx;
+    left: 4rpx;
+    width: 50rpx;
+    height: 50rpx;
+    border-radius: 45% 55% 48% 52%;
+    background:
+      url('@/assets/ink/shuimo-brush-core.webp') center / 100% 100% no-repeat,
+      #8A918D;
+    box-shadow: 0 3rpx 9rpx rgba(24,31,32,0.16);
+    transition: transform 180ms ease, background-color 180ms ease;
+  }
+
+  .ink-switch.active .ink-switch-track {
+    opacity: 0.88;
+    filter: sepia(0.22) hue-rotate(118deg) saturate(0.56);
+  }
+
+  .ink-switch.active .ink-switch-knob {
+    transform: translateX(50rpx) rotate(10deg);
+    background-color: #2F4A48;
+  }
+
+  .theme-option {
+    background: $ink-surface !important;
+    border-color: $ink-border !important;
+
+    &.active {
+      background: $ink-muted !important;
+      border-color: $ink-primary !important;
+    }
+  }
+
+  .city-picker-btn {
+    background: $ink-surface !important;
+    border-color: $ink-border !important;
+  }
+
+  .city-name-text {
+    color: $ink-primary !important;
+  }
+
+  .fullscreen-overlay {
+    background: $ink-bg !important;
+  }
+
+  .fullscreen-header {
+    background: $ink-surface !important;
+    border-bottom: 1rpx solid $ink-border !important;
+  }
+
+  .fullscreen-title {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+    letter-spacing: 6rpx;
+  }
+
+  .app-name {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+    letter-spacing: 8rpx;
+  }
+
+  .logo-icon {
+    color: $ink-seal !important;
+  }
+
+  .desc-text {
+    color: $ink-text-secondary !important;
+    font-family: $ink-song !important;
+  }
+
+  .disclaimer-card {
+    background: $ink-muted !important;
+    border-color: $ink-border !important;
+  }
+
+  .disclaimer-label {
+    color: $ink-text-hint !important;
+  }
+
+  /* === 穴位详情弹窗 === */
+  .popup-header {
+    background:
+      linear-gradient(90deg, rgba(31, 38, 39, 0.07), transparent 38%),
+      rgba(255,255,252,0.76) !important;
+    border-bottom: 1rpx solid $ink-border !important;
+  }
+
+  .popup-title {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  .header-icon-wrap {
+    background: $ink-muted !important;
+    border: 1rpx solid $ink-border !important;
+  }
+
+  .header-icon {
+    color: $ink-primary !important;
+  }
+
+  // 穴位大名保留楷体，墨色
+  :global(.popup.ui-ink .point-name),
+  :global(.popup.ui-ink .pn-char) {
+    color: $ink-text !important;
+    // 华文行楷基线偏高：字距收紧 2rpx、整体下移 2rpx 与结果面板穴名对齐（仅水墨主题生效）
+    letter-spacing: -2rpx !important;
+    transform: translateY(2rpx) !important;
+  }
+
+  /*
+   * 水墨详情关闭按钮：朱砂泼墨印记。
+   * 不直接依赖“✕”字形居中，因为不同系统字体的基线和字面框差异会让叉号偏右/偏下。
+   * 背景使用原创 close-brush.svg，按用户参考图重绘中心厚墨、外圈干笔与飞白层次；
+   * 同时隐藏原字形，用两个绝对定位的白色笔画绘制叉号，按钮仍保留完整触控尺寸与语义标签。
+   */
+  .popup .close-btn {
+    position: relative;
+    width: 78rpx;
+    height: 78rpx;
+    overflow: visible;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: url('@/static/themes/ink/close-brush.svg') center / contain no-repeat !important;
+    filter: drop-shadow(0 5rpx 4rpx rgba(86, 29, 25, .20));
+    box-shadow: none !important;
+  }
+
+  .popup .close-icon {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: #FFFFFF !important;
+    font-size: 36rpx !important;
+    line-height: 78rpx !important;
+    text-align: center;
+    z-index: 1;
+  }
+
+  /* #ifdef WEB */
+  .popup .close-icon {
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+  }
+
+  .popup .close-icon::before,
+  .popup .close-icon::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 37rpx;
+    height: 6rpx;
+    border-radius: 4rpx;
+    background: #FFFFFF;
+    box-shadow: 0 1rpx 1rpx rgba(91, 25, 21, .18);
+    transform-origin: center;
+  }
+
+  .popup .close-icon::before { transform: translate(-50%, -50%) rotate(45deg); }
+  .popup .close-icon::after { transform: translate(-50%, -50%) rotate(-45deg); }
+  /* #endif */
+
+  .popup .close-btn:active {
+    transform: scale(.92);
+    filter: saturate(1.08) brightness(.94);
+    box-shadow: none !important;
+  }
+
+  .popup {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 90% 24% at 4% 8%, rgba(31, 35, 39, 0.16), transparent 70%),
+      radial-gradient(ellipse 62% 18% at 96% 88%, rgba(31, 35, 39, 0.12), transparent 72%),
+      rgba(255,255,252,0.96) !important;
+    border-radius: 11rpx 28rpx 15rpx 24rpx !important;
+  }
+
+  .popup::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.18;
+    background:
+      radial-gradient(ellipse at 8% 18%, rgba(35,35,34,0.16), transparent 40%),
+      radial-gradient(ellipse at 92% 82%, rgba(35,35,34,0.12), transparent 42%);
+  }
+
+  .popup-header,
+  .popup-body {
+    position: relative;
+    z-index: 1;
+  }
+
+  .info-item,
+  .location-box,
+  .method-item {
+    background:
+      linear-gradient(94deg, rgba(38, 45, 45, 0.055), transparent 88%),
+      rgba(246,247,243,0.78) !important;
+    border: 1rpx solid rgba(42,49,48,0.10) !important;
+    backdrop-filter: none !important;
+  }
+
+  .info-label,
+  .method-label {
+    color: $ink-text-hint !important;
+  }
+
+  .info-value,
+  .method-value,
+  .location-text {
+    color: $ink-text !important;
+  }
+
+  .caution-box {
+    background:
+      linear-gradient(91deg, rgba(155,51,40,0.07), transparent 78%),
+      rgba(249,247,243,0.82) !important;
+    border: none !important;
+    border-left: 6rpx solid $ink-seal !important;
+  }
+
+  .caution-title,
+  .caution-icon {
+    color: $ink-seal !important;
+  }
+
+  .caution-text {
+    color: $ink-text-secondary !important;
+  }
+
+  .nazi-bumu-tip {
+    background: $ink-muted !important;
+    border: none !important;
+  }
+
+  .nazi-bumu-tip-text {
+    color: $ink-text-secondary !important;
+  }
+
+  /* === 日历/时辰面板（px 单位组件） === */
+  .date-picker-panel,
+  .time-picker-panel {
+    border-radius: 8px !important;
+  }
+
+  .year-nav,
+  .month-nav {
+    background: $ink-muted !important;
+    border: none !important;
+  }
+
+  .year-arrow,
+  .month-arrow {
+    color: $ink-text-secondary !important;
+  }
+
+  .year-text,
+  .month-text,
+  .picker-title-text {
+    color: $ink-text !important;
+    font-family: $ink-kaiti !important;
+  }
+
+  .week-item {
+    color: $ink-text-hint !important;
+  }
+
+  .day-item {
+    &.selected {
+      background-color: rgba(28,35,36,0.97) !important;
+      background-image: url('@/assets/ink/shuimo-brush-core.webp') !important;
+      background-size: 100% 100% !important;
+      background-position: center !important;
+      border-radius: 43% 57% 48% 52% !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .hour-item {
+    &.selected {
+      background-color: rgba(29,36,37,0.95) !important;
+      background-image: url('@/assets/ink/shuimo-brush-bg.webp') !important;
+      background-size: 100% 100% !important;
+      background-position: center !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .action-btn.confirm,
+  .btn-confirm {
+    background-color: rgba(27,34,35,0.96) !important;
+    background-image: url('@/assets/ink/shuimo-brush-bg.webp') !important;
+    background-size: 100% 100% !important;
+    background-position: center !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .action-btn.cancel,
+  .btn-cancel {
+    background: $ink-muted !important;
+    border: none !important;
+  }
+
+  /* === 城市选择弹窗 === */
+  .search-input {
+    background: $ink-muted !important;
+    border: none !important;
+    color: $ink-text !important;
+  }
+
+  .search-label,
+  .city-list-label {
+    color: $ink-text-hint !important;
+  }
+
+  .tip-box {
+    background: $ink-muted !important;
+    border: none !important;
+    border-left: 4px solid $ink-primary !important;
+  }
+
+  .tip-title {
+    color: $ink-primary !important;
+  }
+
+  .tip-desc {
+    color: $ink-text-secondary !important;
+  }
+
+  .province-header {
+    background: $ink-muted !important;
+
+    &:active {
+      background: $ink-border !important;
+    }
+  }
+
+  .province-name-text {
+    color: $ink-text !important;
+  }
+
+  .province-count,
+  .province-arrow {
+    color: $ink-text-hint !important;
+  }
+
+  .province-cities {
+    background: $ink-surface !important;
+    border: none !important;
+  }
+
+  .city-item {
+    &.selected {
+      background: $ink-muted !important;
+    }
+  }
+
+  .city-abbr {
+    background: $ink-muted !important;
+    color: $ink-text-secondary !important;
+  }
+
+  .city-item.selected .city-abbr {
+    background: $ink-primary !important;
+    color: $ink-surface !important;
+  }
+
+  .city-province,
+  .city-longitude,
+  .empty-tip {
+    color: $ink-text-hint !important;
+  }
+}

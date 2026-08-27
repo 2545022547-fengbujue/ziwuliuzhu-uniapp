@@ -1,0 +1,364 @@
+/* ============================================
+   子午流注取穴 - 全局样式
+
+   包含：
+   1. 楷体字体声明（@font-face，打包内置 kaiti-gb2312.ttf）
+   2. 页面基础重置（page 选择器、字体、颜色）
+   3. 通用组件样式（卡片、按钮、标签、分割线）
+   4. 中医专用样式（干支标签、五行标签、穴位按钮）
+   5. 过渡动画（fade、slide-up）
+
+   引入方式：App.vue 通过 @use '@/styles/index.scss' 引入
+   注意：本文件需显式 @use 'variables'，因为 additionalData 仅注入 .vue 文件
+   ============================================ */
+@use 'variables' as *;
+@use 'themes';
+// 新界面风格（ui-modern / ui-ink / ui-morandi / ui-watercolor / ui-animal / ui-pixel）：
+// 必须在 themes 之后引入，同特异性 !important 规则靠顺序取胜
+// 非经典主题仅 H5/App 使用，小程序端不编译（见工作区约定"除经典四色外不考虑小程序"）
+// #ifndef MP-WEIXIN
+@use 'modern';
+@use 'ui-ink';
+@use 'ui-morandi';
+@use 'ui-watercolor';
+@use 'ui-animal';
+@use 'ui-pixel';
+@use 'ui-point-code';
+// #endif
+
+/* 强制浅色（修复系统深色模式强行覆盖主题导致灰暗）：声明 color-scheme 后，
+   浏览器/WebView 不再对页面做强制深色反色。配合 index.html 的 meta color-scheme。
+   App 端不支持 :root 伪类，蒸汽模式用 page 选择器替代。 */
+page {
+  color-scheme: light;
+}
+
+/* === 楷体字体 === */
+/* App端（Android）：打包内置字体，解决系统无楷体问题 */
+/* 字体文件移至assets目录，微信小程序编译时自动排除 */
+/* #ifdef APP-ANDROID || APP-IOS || APP-HARMONY */
+@font-face {
+  font-family: 'KaitiGB2312';
+  src: url('@/assets/fonts/kaiti-gb2312.ttf') format('truetype');
+  font-display: swap;
+}
+/* #endif */
+/* 微信小程序：在 font-loader.js 中用 uni.loadFontFace + 生成的 base64 模块动态加载 */
+
+/* === 文渊宋体（英文/内部兼容名称仍为 WenYuan Serif） === */
+/* App端 + H5端：打包内置字体，用于弹窗正文"楷题宋文"排版 */
+/* 字体文件移至assets目录，微信小程序编译时自动排除 */
+/* #ifndef MP-WEIXIN */
+@font-face {
+  font-family: 'WenYuanSerifSC';
+  src: url('@/assets/fonts/wenjinmincho-subset-v6.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* 文渊宋体 Bold：穴位弹窗正文加粗（经络、穴位类别、五行） */
+@font-face {
+  font-family: 'WenYuanSerifSC-Bold';
+  src: url('@/assets/fonts/WenYuanSerifSC-Bold-subset-v2.ttf') format('truetype');
+  font-display: swap;
+}
+/* 水墨风专用：陆昊光 LXGW ZhenKai Slab GB，保留碑刻般的楷体骨架与墨块感 */
+@font-face {
+  font-family: 'LXGWZhenKaiSlabGB';
+  src: url('@/assets/fonts/LXGWZhenKaiSlabGB-subset.ttf') format('truetype');
+  font-display: swap;
+}
+/* 水墨风主展示字体（临时切换试用）：华文行楷（STXingkai，系统字体提取，仅 H5/App 打包） */
+/* 子集化自华文行楷.ttf，依据 chars_project_complete.txt 字符集，4.0MB → 625KB */
+/* 微信小程序不加载，自动回退已加载的 LXGW */
+@font-face {
+  font-family: 'HuawenXingkai';
+  src: url('@/assets/fonts/huawen-xingkai-subset.ttf') format('truetype');
+  font-display: swap;
+}
+/* #endif */
+/* 微信小程序：在 font-loader.js 中用 uni.loadFontFace + 生成的 base64 模块动态加载 */
+
+/* === 基础重置 === */
+page {
+  height: 100%;
+  overflow: hidden;
+  background-color: $tcm-bg;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  font-size: $font-size-base;
+  color: $tcm-text;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  word-break: break-all;
+}
+
+/* === H5端/App端全局隐藏滚动条 === */
+/* show-scrollbar 属性在H5端无效，必须用CSS隐藏 */
+/* 微信小程序不支持 ::-webkit-scrollbar 伪元素，用条件编译排除 */
+/* #ifdef WEB */
+::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent;
+}
+html, body {
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE 10+ */
+}
+/* #endif */
+
+/* #ifdef APP-ANDROID || APP-IOS || APP-HARMONY */
+::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent;
+}
+/* #endif */
+
+/* 统一 font-weight 在不同平台的表现 */
+text {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === 卡片 === */
+.card {
+  background-color: $tcm-bg-light;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+/* === 按钮 === */
+.btn-primary {
+  background: linear-gradient(135deg, $tcm-primary 0%, $tcm-primary-dark 100%);
+  color: #fff;
+  border: none;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+  
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.btn-outline {
+  background: transparent;
+  color: $tcm-primary;
+  border: 2rpx solid $tcm-primary;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:active {
+    background: rgba($tcm-primary, 0.05);
+  }
+}
+
+/* === 标签 === */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  
+  &-primary {
+    @extend .tag;
+    background: rgba($tcm-primary, 0.1);
+    color: $tcm-primary;
+  }
+  
+  &-secondary {
+    @extend .tag;
+    background: rgba($tcm-secondary, 0.1);
+    color: $tcm-secondary;
+  }
+}
+
+/* === 干支显示 === */
+.ganzhi-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64rpx;
+  height: 56rpx;
+  padding: 0 12rpx;
+  border-radius: $radius-sm;
+  background: rgba($tcm-primary, 0.08);
+  color: $tcm-primary;
+  font-size: $font-size-sm;
+  font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif;
+}
+
+/* === 五行标签 === */
+.wuxing-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+}
+
+/* === 穴位按钮 === */
+.point-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 24rpx;
+  border-radius: $radius-md;
+  background: rgba($tcm-primary, 0.08);
+  color: $tcm-primary;
+  font-size: $font-size-sm;
+  transition: all 0.2s;
+  
+  &:active {
+    transform: scale(0.97);
+    background: rgba($tcm-primary, 0.15);
+  }
+  
+  &__name {
+    font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif;
+    font-size: $font-size-base;
+  }
+  
+  &__code {
+    font-size: $font-size-xs;
+    opacity: 0.6;
+  }
+}
+
+/* === 分割线 === */
+.divider {
+  height: 1rpx;
+  background: rgba($tcm-primary, 0.1);
+}
+
+/* === 过渡动画 === */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-up-enter-from {
+  transform: translateY(30rpx);
+  opacity: 0;
+}
+.slide-up-leave-to {
+  transform: translateY(-30rpx);
+  opacity: 0;
+}
+
+/* === 蒸汽模式迁移：原组件 :deep() 覆盖（全局 class 命中子组件内部） === */
+.fanke-supplement .result-panel {
+  margin: 0;
+  border-radius: 24rpx;
+  box-shadow: 0 6rpx 24rpx rgba(91, 140, 62, 0.1);
+}
+
+.fanke-supplement .panel-header {
+  padding: 24rpx 32rpx;
+}
+
+.fanke-supplement .header-icon {
+  font-size: 34rpx;
+}
+
+.fanke-supplement .header-title {
+  font-size: 30rpx;
+}
+
+.fanke-supplement .panel-body {
+  padding: 28rpx;
+}
+
+.fanke-supplement .result-ganzhi-row {
+  margin-bottom: 20rpx;
+}
+
+.fanke-supplement .result-ganzhi-date {
+  font-size: 26rpx;
+}
+
+.fanke-supplement .result-ganzhi-hour-tag {
+  padding: 8rpx 20rpx;
+}
+
+.fanke-supplement .result-ganzhi-hour-text {
+  font-size: 28rpx;
+}
+
+.fanke-supplement .section-title {
+  font-size: 26rpx;
+  margin-bottom: 16rpx;
+}
+
+.fanke-supplement .point-btn {
+  min-height: 82rpx;
+  padding: 12rpx 10rpx;
+  border-radius: 24rpx;
+}
+
+.fanke-supplement .point-name {
+  font-size: 26rpx;
+}
+
+.fanke-supplement .point-code {
+  font-size: 18rpx;
+}
+
+.fanke-supplement .suggestion-title {
+  font-size: 28rpx;
+}
+
+.fanke-supplement .principle-text {
+  font-size: 26rpx;
+  line-height: 1.8;
+}
+
+.card-icon-svg {
+  width: 40rpx;
+  height: 40rpx;
+  flex-shrink: 0;
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.svg-icon {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card-compact .picker-arrow {
+  width: 36rpx;
+  height: 36rpx;
+  font-size: 0;
+}
+
+.solar-card .card-icon-svg {
+  width: 32rpx;
+  height: 32rpx;
+}
+

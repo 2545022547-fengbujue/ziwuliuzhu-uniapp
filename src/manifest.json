@@ -1,0 +1,60 @@
+{
+	"name": "子午流注取穴",
+	"appid": "__UNI__D99F77B",
+	"description": "中医子午流注取穴辅助工具 - 基于时间医学的智能化取穴系统",
+	"versionName": "2.1.1",
+	"versionCode": 361,
+	"transformPx": false,
+	"uni-app-x": {
+		"vapor": true,
+		"styleIsolationVersion": "2",
+		"vapor-render-target": "bytecode"
+	},
+	"vueVersion": "3",
+	"mp-weixin": {
+		"appid": "wx32e2d3fcf6cdb9d4",
+		"darkmode": false,
+		"setting": {
+			"urlCheck": true,
+			"es6": true,
+			"postcss": true,
+			"minified": true
+		},
+		"usingComponents": true,
+		"resizable": true,
+		"frameset": true,
+		"libVersion": "3.7.1",
+		"lazyCodeLoading": "requiredComponents",
+		"optimization": {
+			"subPackages": true
+		},
+		"permission": {},
+		"requiredPrivateInfos": []
+	},
+	"web": {
+		"title": "子午流注取穴",
+		"darkmode": false,
+		"devServer": {
+			"port": 5174
+		},
+		"router": {
+			"mode": "hash"
+		},
+		"security": {
+			"csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; object-src 'none'; frame-ancestors 'self';"
+		},
+		"optimization": {
+			"treeShaking": {
+				"enable": true
+			}
+		}
+	},
+	"uniStatistics": {
+		"enable": false
+	},
+	"locale": "zh-Hans",
+	"fallbackLocale": "zh-Hans",
+	"app-android": {
+		"distribute": {}
+	}
+}

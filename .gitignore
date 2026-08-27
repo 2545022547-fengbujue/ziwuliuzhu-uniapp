@@ -1,0 +1,20 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+unpackage/
+
+# HBuilderX 本地元数据
+.hbuilderx/
+
+# 日志
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 环境变量 / 密钥
+.env*
+!.env.example

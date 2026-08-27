@@ -1,0 +1,686 @@
+@use '@/styles/variables.scss' as *;
+
+/* ============================================
+   设置页共享基础样式（setting-base）
+   
+   所有主题设置页的经典布局与结构性样式，通过 CSS 变量自动适配各主题配色。
+   各主题页面组件的 <style scoped> 块通过 @use 引入本文件。
+   ============================================ */
+
+.page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--theme-bg, #F8F4EF);
+}
+
+.nav-placeholder {
+  flex-shrink: 0;
+}
+
+.page-scroll {
+  flex: 1;
+  height: 0;        /* 关键：配合flex:1让scroll-view正确计算剩余高度 */
+  overflow: hidden;
+}
+
+.setting-content {
+  padding: $spacing-md;
+}
+
+.setting-card {
+  background: var(--theme-surface, #FFFDF5);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.card-title {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-base;
+  font-weight: 600;
+  color: var(--theme-text, #2C2C2C);
+  margin-bottom: $spacing-lg;
+}
+
+.card-icon {
+  font-size: $font-size-lg;
+  line-height: 1;
+  width: 40rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+// 内联矢量图标容器（替换 emoji 符号）与 .svg-icon、.card-compact .picker-arrow
+// 已移至 SettingLayout.vue 的全局样式块：插槽内容由主题薄壳页编译，scoped 规则不命中。
+
+.card-title-collapsible {
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.card-title-left {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.card-desc {
+  display: block;
+  font-size: $font-size-xs;
+  color: var(--theme-text-hint, #999999);
+  line-height: 1.5;
+  margin-top: -20rpx;
+  margin-bottom: 28rpx;
+  padding-left: 58rpx;
+}
+
+// 真太阳时校正标题下方的说明小字
+.solar-desc {
+  display: block;
+  font-size: $font-size-xs;
+  color: var(--theme-text-hint, #999999);
+  line-height: 1.5;
+  margin-top: -16rpx;
+  margin-bottom: 14rpx;
+  padding-left: 58rpx;
+}
+
+// 真太阳时校正区域等比缩小（仅间距/图标/控件等比，字号保持原样），仅作用于本卡片内部
+.solar-card {
+  padding: 30rpx;
+
+  .card-title {
+    gap: 14rpx;
+    margin-bottom: 26rpx;
+  }
+
+  .card-icon-svg {
+    width: 32rpx;
+    height: 32rpx;
+  }
+
+  .solar-desc {
+    margin-top: -13rpx;
+    margin-bottom: 12rpx;
+    padding-left: 52rpx;
+  }
+
+  .setting-row {
+    padding: 20rpx 0 12rpx;
+  }
+
+  .city-picker-btn {
+    padding: 8rpx 20rpx;
+    gap: 6rpx;
+    border-radius: 14rpx;
+  }
+
+  // 行内控件与左侧文字垂直中线对齐，修正开关/图标偏上（跨端通用）
+  // switch 用 .native-switch 类选择器：兼容 H5 渲染的 uni-switch 与 MP 原生 switch（组件 wxss 禁标签选择器）
+  .native-switch,
+  .ink-switch,
+  .city-picker-btn,
+  .setting-value {
+    vertical-align: middle;
+  }
+
+  // 开关等比缩小（右侧对齐，缩放后位置不变）
+  .native-switch,
+  .ink-switch {
+    align-self: center;
+    vertical-align: middle;
+    transform: scale(0.82);
+    transform-origin: right center;
+  }
+
+  // H5 下原生 switch 内部包裹层基线对齐（native-switch 类同时命中 H5 uni-switch 与 MP 原生 switch）
+  .native-switch,
+  .uni-switch-wrapper {
+    vertical-align: middle;
+  }
+}
+
+// 折叠态：压缩成与「取穴方法说明」类似的紧凑单行入口（仅标题 + 展开箭头）
+.card-collapsed {
+  .card-title {
+    margin-bottom: 0;
+  }
+
+  .card-desc {
+    display: none;
+  }
+}
+
+// 取穴方法说明 / 关于：内部行清零上下内边距，与折叠态卡片等高的紧凑单行入口
+.card-compact {
+  .setting-row {
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .setting-label {
+    font-size: $font-size-base;
+  }
+}
+
+.setting-row {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid var(--theme-border);
+
+  &.no-border {
+    border-bottom: none;
+  }
+}
+
+.setting-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.setting-label {
+  font-size: $font-size-sm;
+  color: var(--theme-text, #2C2C2C);
+}
+
+.setting-hint {
+  font-size: $font-size-xs;
+  color: var(--theme-text-hint, #999999);
+}
+
+.setting-value {
+  font-size: $font-size-sm;
+  color: var(--theme-text-secondary, #666666);
+}
+
+.setting-tip {
+  padding: $spacing-sm 0 0;
+  font-size: $font-size-xs;
+  color: var(--theme-text-hint, #999999);
+  line-height: 1.6;
+
+  &.inline {
+    padding: 0;
+  }
+}
+
+.picker-display {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-size-sm;
+  color: var(--theme-text-secondary, #666666);
+}
+
+.city-picker-btn {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: 8rpx;
+  padding: 10rpx 24rpx;
+  background: var(--theme-surface);
+  border: 1rpx solid var(--theme-border);
+  border-radius: 16rpx;
+}
+
+.city-name-text {
+  font-size: $font-size-sm;
+  color: var(--theme-primary);
+  font-weight: 500;
+}
+
+.picker-arrow {
+  font-size: 18rpx;
+  color: var(--theme-text-hint, #999999);
+}
+
+.theme-current {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background: var(--theme-surface-muted);
+  border-radius: 18rpx;
+  border: 1rpx solid var(--theme-border);
+  margin-bottom: $spacing-sm;
+}
+
+.theme-current-left {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.theme-expand-arrow {
+  font-size: 20rpx;
+  color: var(--theme-text-hint, #999999);
+  transition: transform 0.25s ease;
+  padding: 8rpx;
+}
+
+.theme-expand-arrow.expanded {
+  transform: rotate(90deg);
+}
+
+.theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.theme-option {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: var(--theme-surface);
+  border: 1rpx solid var(--theme-border);
+  border-radius: 18rpx;
+
+  &.active {
+    border-color: var(--theme-primary);
+    background: var(--theme-surface-muted);
+  }
+}
+
+.theme-swatch {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.yellow {
+    background: linear-gradient(135deg, #8B4513 0%, #FFFDF5 100%);
+  }
+
+  &.black {
+    background: linear-gradient(135deg, #000000 0%, #0080FF 100%);
+  }
+
+  &.green {
+    background: linear-gradient(135deg, #2F7D73 0%, #F7FBF8 100%);
+  }
+
+  &.red {
+    background: linear-gradient(135deg, #B83A2E 0%, #FFF1E5 100%);
+  }
+
+  &.modern {
+    background: linear-gradient(145deg, #f7f9fc 8%, #c4cad3 92%);
+    box-shadow: inset 5rpx 5rpx 10rpx rgba(174, 181, 191, 0.55), inset -5rpx -5rpx 10rpx #ffffff;
+  }
+
+  &.ink {
+    background: radial-gradient(circle at 68% 30%, #f7f3ea 0 24%, #77736b 26% 43%, #242424 72%);
+  }
+
+  &.morandi {
+    background:
+      radial-gradient(circle at 28% 28%, #d8bfc0 0 24%, transparent 26%),
+      radial-gradient(circle at 72% 70%, #c4d0c8 0 24%, transparent 26%),
+      linear-gradient(135deg, #faf5ed, #dce5e7);
+    border: 2rpx solid rgba(169, 130, 130, 0.12);
+    box-shadow: 0 4rpx 12rpx rgba(142, 128, 116, 0.10);
+  }
+
+  &.classic {
+    background: conic-gradient(from 45deg, #F1D8C7 0 25%, #BFD8D0 0 50%, #C9D6E8 0 75%, #E5C5C0 0);
+    border: 4rpx solid rgba(255, 255, 255, 0.86);
+    box-shadow: 0 0 0 1rpx rgba(89, 78, 68, 0.10);
+  }
+
+  &.watercolor {
+    background:
+      radial-gradient(circle at 25% 24%, rgba(232, 168, 124, 0.95), transparent 42%),
+      radial-gradient(circle at 76% 72%, rgba(133, 205, 202, 0.95), transparent 46%),
+      #faf8f5;
+  }
+
+  &.animal {
+    background:
+      radial-gradient(circle at 28% 26%, #F7CD67 0 22%, transparent 24%),
+      radial-gradient(circle at 72% 72%, #82D5BB 0 24%, transparent 26%),
+      linear-gradient(135deg, #F7F3DF 0%, #19AFA2 100%);
+    box-shadow: inset 0 0 0 2rpx rgba(114, 93, 66, 0.10);
+  }
+
+  &.pixel {
+    border-radius: 0;
+    background:
+      linear-gradient(90deg, transparent 0 25%, #5B6EE1 25% 50%, transparent 50% 75%, #E76E55 75%) 0 0 / 16rpx 16rpx,
+      #F7E7B7;
+    box-shadow: 0 0 0 4rpx #3F3A4B, 6rpx 6rpx 0 #9A7B4F;
+    image-rendering: pixelated;
+  }
+}
+
+/* === 界面风格切换（经典 + 多套新界面） === */
+.ui-style-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
+}
+
+.classic-theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-left: 28rpx;
+  padding-left: 20rpx;
+  border-left: 2rpx solid var(--theme-border);
+}
+
+.classic-theme-option {
+  padding: 16rpx 24rpx;
+}
+
+.ui-style-option {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: var(--theme-surface-muted);
+  border: 1rpx solid var(--theme-border);
+  border-radius: 18rpx;
+  transition: all 0.2s ease;
+
+  &.active {
+    border-color: var(--theme-primary);
+    background: var(--theme-surface);
+
+    .ui-style-name {
+      color: var(--theme-primary);
+    }
+  }
+}
+
+.ui-style-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.ui-style-current {
+  cursor: pointer;
+  padding: 42rpx;
+
+  .ui-style-name {
+    font-size: $font-size-md;
+  }
+}
+
+.appearance-expand-icon {
+  flex-shrink: 0;
+  font-size: 34rpx;
+  line-height: 1;
+  color: var(--theme-primary);
+  transform: rotate(0deg);
+  transition: transform 0.22s ease;
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+// 折叠卡片展开图标（替换原 ⌄ 文本，flex 垂直居中的圆形箭头，展开时旋转 180° 指向上）
+.caret-expand {
+  flex-shrink: 0;
+  width: 40rpx;
+  height: 40rpx;
+  color: var(--theme-primary);
+  transform: rotate(0deg);
+  transition: transform 0.22s ease;
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+.ui-style-name {
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: var(--theme-text, #2C2C2C);
+}
+
+.ui-style-desc {
+  font-size: $font-size-xs;
+  color: var(--theme-text-hint, #999999);
+}
+
+.ui-style-check {
+  font-size: $font-size-md;
+  font-weight: 700;
+  color: var(--theme-primary);
+}
+
+.theme-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.theme-name {
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: var(--theme-text, #2C2C2C);
+}
+
+.theme-desc {
+  font-size: $font-size-xs;
+  color: var(--theme-text-hint, #999999);
+}
+
+/* === 方法说明 === */
+.method-desc {
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid var(--theme-border);
+
+  &:last-child { border-bottom: none; }
+}
+
+.method-header {
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-xs;
+}
+
+.method-icon {
+  font-size: $font-size-md;
+}
+
+.method-name {
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: var(--theme-text, #2C2C2C);
+}
+
+.method-detail {
+  font-size: $font-size-xs;
+  color: var(--theme-text-secondary, #666666);
+  line-height: 1.8;
+  padding-left: 40rpx;
+}
+
+/* === 全屏弹窗（方法说明 / 关于） === */
+.fullscreen-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 999;
+  background: var(--theme-bg, #F8F4EF);
+  animation: overlayFadeIn 0.2s ease-out;
+}
+
+.fullscreen-panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fullscreen-header {
+  position: relative;
+  display: flex;
+    flex-direction: row;
+  align-items: center;
+  padding: 12px 20px 12px;
+  border-bottom: 1px solid var(--theme-border);
+  flex-shrink: 0;
+}
+
+.fullscreen-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--theme-primary);
+  font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', 'STKaiti', serif;
+}
+
+.close-btn {
+  background: none !important;
+  border: none !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  /* #ifndef MP-WEIXIN */
+  margin-left: auto;  /* H5/App：推到右侧 */
+  /* #endif */
+}
+
+.close-icon {
+  font-size: 18px;
+  color: var(--theme-text-secondary);
+}
+
+.fullscreen-body {
+  flex: 1;
+  height: 0;        /* 关键：配合flex:1让scroll-view正确计算剩余高度 */
+  overflow: hidden;
+}
+
+/* 方法说明弹窗内容 */
+.method-card {
+  background: var(--theme-surface, #FFFDF5);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-lg;
+  margin: $spacing-md $spacing-lg 0;
+}
+
+.method-card:first-child {
+  margin-top: $spacing-lg;
+}
+
+.method-card:last-child {
+  margin-bottom: 0;
+}
+
+/* 关于弹窗内容 */
+.about-content-inner {
+  padding: $spacing-lg;
+}
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 0 36rpx;
+}
+
+.logo-icon {
+  font-size: 120rpx;
+  margin-bottom: $spacing-lg;
+}
+
+/* 关于弹窗 logo：books 书籍图标（H5 SVG / App PNG）容器，尺寸与 ☯ emoji 一致；
+   子组件 SettingIcon 根元素带本组件 data-v，scoped 规则可命中 */
+.logo-icon-books {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: $spacing-lg;
+  color: var(--theme-primary);
+}
+
+.app-name {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--theme-primary);
+  font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', serif;
+}
+
+.app-version {
+  font-size: $font-size-sm;
+  color: var(--theme-text-hint, #999999);
+  margin-top: $spacing-sm;
+}
+
+.desc-card {
+  background: var(--theme-surface, #FFFDF5);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-xl $spacing-lg;
+  margin-bottom: $spacing-lg;
+}
+
+.desc-text {
+  font-size: $font-size-sm;
+  color: var(--theme-text-secondary, #666666);
+  line-height: 2.2;
+  text-align: justify;
+}
+
+.disclaimer-card {
+  background: var(--theme-surface-muted);
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  border: 1rpx solid var(--theme-border);
+}
+
+.disclaimer-label {
+  font-size: $font-size-xs;
+  font-weight: 600;
+  color: var(--theme-text-hint, #999999);
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.disclaimer-text {
+  font-size: 22rpx;
+  color: var(--theme-text-hint, #999999);
+  line-height: 1.9;
+  text-align: justify;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

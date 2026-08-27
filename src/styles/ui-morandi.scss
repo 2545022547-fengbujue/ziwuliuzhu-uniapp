@@ -1,0 +1,914 @@
+/* ============================================
+   莫兰迪奶油（ui-morandi）
+
+   设计语言：低饱和莫兰迪色层 + 哑光奶油质感
+   - 不做单一灰粉换皮：同时使用粉笔米、尘粉、暖灰、褪色蓝、柔赭和鼠尾草绿
+   - 色彩采用相近明度、低对比的分层组合，让页面安静但不扁平
+   - 卡片模拟陶器和织物的哑光表面，阴影柔和扩散，不使用镜面高光
+   - 标题用文渊宋体增加克制的书卷感，正文保留清晰的系统无衬线字体
+
+   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
+   ============================================ */
+
+$mor-primary: #A98282;           // 尘粉灰玫瑰
+$mor-primary-dark: #7F6262;
+$mor-sage: #8E9F93;              // 鼠尾草灰绿
+$mor-caramel: #B99176;           // 柔赭陶土
+$mor-blue: #9CAAB2;              // 褪色雾蓝
+$mor-oat: #E9E0D3;               // 燕麦奶油
+$mor-mushroom: #DED4CA;          // 蘑菇暖灰
+$mor-blush: #E6D7D5;             // 蒙灰尘粉
+$mor-bg: #F2EDE7;                // 暖灰奶油底
+$mor-surface: #FBF8F2;           // 粉笔白陶器面
+$mor-muted: #E9E1D8;             // 浅蘑菇填充
+$mor-text: #494744;               // 深暖灰，避免使用纯黑
+$mor-text-secondary: #655F59;
+$mor-text-hint: #888078;
+$mor-border: rgba(101, 91, 82, 0.11);
+$mor-shadow: 0 12rpx 34rpx rgba(105, 92, 82, 0.11);
+$mor-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+$mor-serif: 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'STSong', 'Songti SC', 'SimSun', serif;
+
+.ui-morandi {
+  /* === 主题变量重定义 === */
+  --theme-primary: #{$mor-primary};
+  --theme-primary-dark: #{$mor-primary-dark};
+  --theme-secondary: #{$mor-sage};
+  --theme-bg: #{$mor-bg};
+  --theme-surface: #{$mor-surface};
+  --theme-surface-muted: #{$mor-muted};
+  --theme-text: #{$mor-text};
+  --theme-text-secondary: #{$mor-text-secondary};
+  --theme-text-hint: #{$mor-text-hint};
+  --theme-border: #{$mor-border};
+  --theme-shadow: rgba(120, 108, 92, 0.10);
+
+  background:
+    radial-gradient(ellipse at 6% 8%, rgba(169, 130, 130, 0.14) 0%, transparent 34%),
+    radial-gradient(ellipse at 96% 34%, rgba(142, 159, 147, 0.13) 0%, transparent 30%),
+    radial-gradient(ellipse at 18% 82%, rgba(156, 170, 178, 0.11) 0%, transparent 34%),
+    linear-gradient(180deg, #F8F4EF 0%, $mor-bg 58%, #EEE8E2 100%) !important;
+  color: $mor-text !important;
+  // 与水墨主题共用已内置的霞鹜臻楷；莫兰迪降低对比与字重后更像温润手账。
+  font-family: $mor-serif !important;
+
+  /* === 导航栏：奶油底 + 暖灰标题 === */
+  .navbar {
+    background: rgba(248, 244, 239, 0.92) !important;
+    border-bottom: none !important;
+    backdrop-filter: blur(18rpx) !important;
+  }
+
+  .navbar-title {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+    font-weight: 600;
+    letter-spacing: 6rpx !important;
+  }
+
+  /* === 卡片通用：奶油面 + 大圆角 + 弥散柔光（无边框） === */
+  .ganzhi-card,
+  .method-tabs,
+  .result-panel,
+  .setting-card,
+  .method-card,
+  .desc-card,
+  .info-card,
+  .popup,
+  .confirm-popup,
+  .fullscreen-panel,
+  .date-picker-panel,
+  .time-picker-panel {
+    background: linear-gradient(145deg, rgba(253, 250, 245, 0.97), rgba(248, 244, 237, 0.95)) !important;
+    box-shadow: $mor-shadow !important;
+    border: 1rpx solid $mor-border !important;
+    border-radius: 32rpx !important;
+    backdrop-filter: none !important;
+  }
+
+  /* === 干支卡片 === */
+  .ganzhi-title {
+    color: $mor-text-hint !important;
+    font-family: $mor-serif !important;
+    letter-spacing: 5rpx;
+  }
+
+  // 自动/手动切换：驼色轨道 + 奶油滑块
+  .ganzhi-toggle {
+    background: $mor-muted !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+    padding: 6rpx !important;
+  }
+
+  .toggle-btn {
+    border-radius: 999rpx !important;
+
+    &.active {
+      background: $mor-surface !important;
+      border: none !important;
+      box-shadow: 0 4rpx 12rpx rgba(120, 108, 92, 0.18) !important;
+
+      .toggle-text {
+        color: $mor-primary !important;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .toggle-icon {
+    display: none !important;
+  }
+
+  .toggle-text {
+    color: $mor-text-secondary !important;
+  }
+
+  .manual-controls {
+    background: $mor-muted !important;
+    border: none !important;
+    border-radius: 20rpx !important;
+    backdrop-filter: none !important;
+  }
+
+  .control-label {
+    color: $mor-text-secondary !important;
+  }
+
+  .picker-btn {
+    background: $mor-surface !important;
+    border: none !important;
+    border-radius: 14rpx !important;
+    box-shadow: 0 2rpx 8rpx rgba(120, 108, 92, 0.10) !important;
+    backdrop-filter: none !important;
+
+    text {
+      color: $mor-text !important;
+    }
+  }
+
+  // 查询按钮：灰玫瑰胶囊
+  .query-btn {
+    background: $mor-primary !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+    box-shadow: 0 6rpx 18rpx rgba(169, 130, 130, 0.30) !important;
+  }
+
+  .current-datetime {
+    border-top-color: $mor-border !important;
+  }
+
+  .datetime-text {
+    color: $mor-text-hint !important;
+  }
+
+  .datetime-value {
+    color: $mor-text-secondary !important;
+  }
+
+  // 干支标签使用相近明度的燕麦、雾蓝、陶土和尘粉，安静但不单调。
+  .ganzhi-display {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16rpx;
+  }
+
+  .ganzhi-tag-item {
+    flex: 1 1 45%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 24rpx 0 !important;
+    background: $mor-oat !important;
+    border: none !important;
+    border-radius: 20rpx !important;
+
+    &:nth-child(2) {
+      background: #DEE4E2 !important;
+    }
+
+    &:nth-child(3).highlight {
+      background: #C6A189 !important;
+
+      .ganzhi-tag-text {
+        color: #FFF9F2 !important;
+      }
+    }
+
+    &:nth-child(4).highlight {
+      background: #AF8D8D !important;
+
+      .ganzhi-tag-text {
+        color: #FFF9F2 !important;
+      }
+    }
+  }
+
+  .ganzhi-tag-text {
+    color: $mor-text-secondary !important;
+    font-family: $mor-serif !important;
+    font-weight: 600;
+    font-size: 30rpx !important;
+  }
+
+  /* === 方法切换栏：驼色轨道 + 奶油圆胖滑块 === */
+  .method-tabs {
+    background: linear-gradient(90deg, $mor-oat, #E6DEDA, #DFE4E1) !important;
+    border: 1rpx solid rgba(101, 91, 82, 0.07) !important;
+    border-radius: 999rpx !important;
+    box-shadow: none !important;
+    padding: 10rpx !important;
+  }
+
+  .method-tab {
+    border-radius: 999rpx !important;
+
+    &.active {
+      background: $mor-surface !important;
+      border: 1rpx solid rgba(169, 130, 130, 0.18) !important;
+      box-shadow: 0 6rpx 18rpx rgba(112, 96, 88, 0.15) !important;
+      transform: none !important;
+
+      .method-name {
+        color: $mor-primary !important;
+        font-weight: 600;
+      }
+
+      .method-icon {
+        color: $mor-caramel !important;
+        transform: none !important;
+      }
+    }
+
+    &:not(.active) {
+      .method-name {
+        color: $mor-text-secondary !important;
+      }
+
+      .method-icon {
+        color: $mor-text-hint !important;
+      }
+    }
+  }
+
+  .method-indicator {
+    display: none !important;
+  }
+
+  /* === 结果面板 === */
+  .panel-header {
+    background: linear-gradient(90deg, rgba(230, 215, 213, 0.58), rgba(251, 248, 242, 0.88) 42%, rgba(222, 228, 226, 0.44)) !important;
+    border-bottom: 1rpx solid $mor-border !important;
+  }
+
+  .header-title {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+    letter-spacing: 3rpx;
+  }
+
+  .header-icon {
+    color: $mor-caramel !important;
+  }
+
+  .result-ganzhi-date,
+  .result-ganzhi-hour-label {
+    color: $mor-text-hint !important;
+  }
+
+  .result-ganzhi-hour-tag {
+    background: #B9947B !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+  }
+
+  .result-ganzhi-hour-text {
+    color: #FFF9F2 !important;
+  }
+
+  .warning-box {
+    background: rgba(169, 130, 130, 0.13) !important;
+    border: none !important;
+    border-radius: 16rpx !important;
+  }
+
+  .warning-text {
+    color: $mor-primary-dark !important;
+  }
+
+  .section-title {
+    color: $mor-text-secondary !important;
+    font-family: $mor-serif !important;
+  }
+
+  .dot.primary,
+  .dot.secondary,
+  .title-dot {
+    background: $mor-sage !important;
+  }
+
+  .dot.fanke {
+    background: $mor-caramel !important;
+  }
+
+  // 穴位按钮：浅驼圆胖药片
+  .point-btn {
+    background: linear-gradient(145deg, #F2EAE2, #E7DDDA) !important;
+    border: 1rpx solid rgba(169, 130, 130, 0.10) !important;
+    border-radius: 999rpx !important;
+    backdrop-filter: none !important;
+    align-items: center !important;
+
+    // 无衬线编码相对衬线大字 name 视觉偏上，下移微调使其等线
+    .point-code {
+      position: relative !important;
+      top: 2rpx !important;
+      line-height: 1 !important;
+    }
+
+    &:active {
+      background: rgba(169, 130, 130, 0.22) !important;
+    }
+  }
+
+  .point-name {
+    color: $mor-primary !important;
+    font-family: $mor-serif !important;
+  }
+
+  .point-code {
+    color: $mor-text-hint !important;
+  }
+
+  .tag-primary {
+    background: rgba(142, 159, 147, 0.20) !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+
+    text {
+      color: #6B7F69 !important;
+    }
+  }
+
+  .nazi-mode-switch {
+    background: $mor-muted !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+    overflow: hidden;
+  }
+
+  .switch-option {
+    background: transparent !important;
+    color: $mor-text-secondary !important;
+    border-radius: 999rpx !important;
+
+    &.active {
+      background: $mor-surface !important;
+      color: $mor-primary !important;
+      box-shadow: 0 2rpx 8rpx rgba(120, 108, 92, 0.15) !important;
+    }
+  }
+
+  .palace-box {
+    background: #E3E7E5 !important;
+    border: none !important;
+    border-radius: 16rpx !important;
+  }
+
+  .palace-icon {
+    color: $mor-caramel !important;
+  }
+
+  .palace-text {
+    color: $mor-text-secondary !important;
+  }
+
+  .palace-note {
+    color: $mor-text-hint !important;
+  }
+
+  .suggestion-box {
+    background: rgba(142, 159, 147, 0.18) !important;
+    border: none !important;
+    border-radius: 16rpx !important;
+  }
+
+  .suggestion-title {
+    color: #6B7F69 !important;
+  }
+
+  .principle-text {
+    color: $mor-text-secondary !important;
+  }
+
+  .bumu-tip {
+    background: $mor-muted !important;
+    border: none !important;
+  }
+
+  .bumu-tip-icon,
+  .bumu-tip-text {
+    color: $mor-text-hint !important;
+  }
+
+  .empty-text {
+    color: $mor-text-hint !important;
+  }
+
+  /* === 反克法补充 === */
+  .fanke-supplement {
+    background: $mor-surface !important;
+    border: 2rpx dashed rgba(200, 155, 123, 0.45) !important;
+    border-radius: 28rpx !important;
+  }
+
+  .fanke-icon,
+  .fanke-title {
+    color: $mor-caramel !important;
+  }
+
+  .fanke-desc {
+    color: $mor-text-hint !important;
+  }
+
+  /* === 对比区域 === */
+  .divider-line {
+    background: $mor-border !important;
+  }
+
+  .divider-text {
+    color: $mor-text-hint !important;
+    font-family: $mor-serif !important;
+    letter-spacing: 4rpx;
+  }
+
+  /* === 确认弹窗 === */
+  .confirm-title {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+  }
+
+  .confirm-info {
+    border-bottom-color: $mor-border !important;
+  }
+
+  .confirm-label {
+    color: $mor-text-hint !important;
+  }
+
+  .confirm-value {
+    background: $mor-muted !important;
+    border: none !important;
+    color: $mor-text !important;
+  }
+
+  .confirm-cancel {
+    background: $mor-muted !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+
+    text {
+      color: $mor-text-secondary !important;
+    }
+  }
+
+  .confirm-ok {
+    background: $mor-primary !important;
+    border: none !important;
+    border-radius: 999rpx !important;
+    box-shadow: 0 6rpx 18rpx rgba(169, 130, 130, 0.30) !important;
+  }
+
+  /* === 设置页 === */
+  .setting-row,
+  .info-row,
+  .popup-header,
+  .popup-footer,
+  .fullscreen-header,
+  .province-group,
+  .city-item,
+  .method-desc {
+    border-color: $mor-border !important;
+  }
+
+  .card-title {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+    letter-spacing: 2rpx;
+  }
+
+  .setting-label,
+  .theme-name {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+  }
+
+  .setting-value,
+  .method-detail {
+    color: $mor-text-secondary !important;
+  }
+
+  .setting-hint,
+  .setting-tip,
+  .picker-arrow,
+  .theme-expand-arrow,
+  .theme-desc,
+  .app-version,
+  .disclaimer-text {
+    color: $mor-text-hint !important;
+  }
+
+  .theme-current,
+  .ui-style-option {
+    background: linear-gradient(145deg, $mor-oat, #E5DEDA) !important;
+    border: 1rpx solid rgba(101, 91, 82, 0.08) !important;
+  }
+
+  .ui-style-name {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+  }
+
+  .ui-style-desc {
+    color: $mor-text-secondary !important;
+  }
+
+  .ui-style-option.active {
+    background: $mor-surface !important;
+    box-shadow: 0 4rpx 14rpx rgba(120, 108, 92, 0.18) !important;
+
+    .ui-style-name {
+      color: $mor-primary !important;
+    }
+  }
+
+  .theme-option {
+    background: $mor-surface !important;
+    border: none !important;
+
+    &.active {
+      background: rgba(169, 130, 130, 0.14) !important;
+      border: 1rpx solid rgba(169, 130, 130, 0.34) !important;
+    }
+  }
+
+  .city-picker-btn {
+    background: linear-gradient(145deg, #FCF9F4, #EFE7DE) !important;
+    border: 1rpx solid rgba(101, 91, 82, 0.08) !important;
+    box-shadow: 0 2rpx 8rpx rgba(120, 108, 92, 0.10) !important;
+  }
+
+  .city-name-text {
+    color: $mor-primary !important;
+  }
+
+  .fullscreen-overlay {
+    background: $mor-bg !important;
+  }
+
+  .fullscreen-header {
+    background: $mor-surface !important;
+    border-bottom: none !important;
+  }
+
+  .fullscreen-title {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+  }
+
+  .app-name {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+  }
+
+  .logo-icon {
+    color: $mor-caramel !important;
+  }
+
+  .desc-text {
+    color: $mor-text-secondary !important;
+  }
+
+  .disclaimer-card {
+    background: $mor-muted !important;
+    border: none !important;
+  }
+
+  .disclaimer-label {
+    color: $mor-text-hint !important;
+  }
+
+  /* === 穴位详情弹窗 === */
+  .popup-header {
+    background: $mor-surface !important;
+    border-bottom: 1rpx solid $mor-border !important;
+  }
+
+  .popup-title {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+  }
+
+  .header-icon-wrap {
+    background: rgba(200, 155, 123, 0.20) !important;
+    border: none !important;
+  }
+
+  .header-icon {
+    color: $mor-caramel !important;
+  }
+
+  :global(.popup.ui-morandi .point-name),
+  :global(.popup.ui-morandi .pn-char) {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+  }
+
+  .close-icon {
+    color: $mor-text-secondary !important;
+  }
+
+  .info-item,
+  .location-box,
+  .method-item {
+    background: linear-gradient(145deg, #F2EBE3, #E5DEDA) !important;
+    border: 1rpx solid rgba(101, 91, 82, 0.08) !important;
+    backdrop-filter: none !important;
+  }
+
+  .info-label,
+  .method-label {
+    color: $mor-text-hint !important;
+  }
+
+  .info-value,
+  .method-value,
+  .location-text {
+    color: $mor-text !important;
+  }
+
+  .caution-box {
+    background: #F5E9D6 !important;
+    border: none !important;
+  }
+
+  .caution-title,
+  .caution-icon {
+    color: #9C7A3C !important;
+  }
+
+  .caution-text {
+    color: #7A6230 !important;
+  }
+
+  .nazi-bumu-tip {
+    background: $mor-muted !important;
+    border: none !important;
+  }
+
+  .nazi-bumu-tip-text {
+    color: $mor-text-secondary !important;
+  }
+
+  /* === 日历/时辰面板（px 单位组件） === */
+  .date-picker-panel,
+  .time-picker-panel {
+    border-radius: 18px !important;
+  }
+
+  .year-nav,
+  .month-nav {
+    background: $mor-muted !important;
+    border: none !important;
+  }
+
+  .year-arrow,
+  .month-arrow {
+    color: $mor-primary !important;
+  }
+
+  .year-text,
+  .month-text,
+  .picker-title-text {
+    color: $mor-text !important;
+    font-family: $mor-serif !important;
+  }
+
+  .week-item {
+    color: $mor-text-hint !important;
+  }
+
+  .day-item {
+    &.selected {
+      background: $mor-primary !important;
+      box-shadow: 0 4rpx 12rpx rgba(169, 130, 130, 0.30) !important;
+    }
+  }
+
+  .hour-item {
+    &.selected {
+      background: $mor-primary !important;
+      border: none !important;
+      box-shadow: 0 4rpx 12rpx rgba(169, 130, 130, 0.30) !important;
+    }
+  }
+
+  .action-btn.confirm,
+  .btn-confirm {
+    background: $mor-primary !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .action-btn.cancel,
+  .btn-cancel {
+    background: $mor-muted !important;
+    border: none !important;
+  }
+
+  /* === 城市选择弹窗 === */
+  .search-input {
+    background: $mor-muted !important;
+    border: none !important;
+    color: $mor-text !important;
+  }
+
+  .search-label,
+  .city-list-label {
+    color: $mor-text-hint !important;
+  }
+
+  .tip-box {
+    background: rgba(142, 159, 147, 0.18) !important;
+    border: none !important;
+  }
+
+  .tip-title {
+    color: #6B7F69 !important;
+  }
+
+  .tip-desc {
+    color: $mor-text-secondary !important;
+  }
+
+  .province-header {
+    background: linear-gradient(90deg, $mor-oat, #E4DEDA) !important;
+
+    &:active {
+      background: $mor-border !important;
+    }
+  }
+
+  .province-name-text {
+    color: $mor-text !important;
+  }
+
+  .province-count,
+  .province-arrow {
+    color: $mor-text-hint !important;
+  }
+
+  .province-cities {
+    background: #F8F4EE !important;
+    border: none !important;
+  }
+
+  .city-item {
+    &.selected {
+      background: rgba(169, 130, 130, 0.14) !important;
+    }
+  }
+
+  .city-abbr {
+    background: $mor-muted !important;
+    color: $mor-text-secondary !important;
+  }
+
+  .city-item.selected .city-abbr {
+    background: $mor-primary !important;
+    color: #FFF9F2 !important;
+  }
+
+  .city-province,
+  .city-longitude,
+  .empty-tip {
+    color: $mor-text-hint !important;
+  }
+}
+
+/* 弹窗自身同时带 theme-* 与 ui-morandi，必须直接覆盖旧主题的高优先级规则。 */
+.date-picker-panel.ui-morandi,
+.time-picker-panel.ui-morandi,
+.popup.ui-morandi {
+  background: linear-gradient(145deg, #FCF9F4, #F4EEE7) !important;
+  color: $mor-text !important;
+  border: 1px solid rgba(169, 130, 130, 0.14) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.popup.ui-morandi {
+  .province-group {
+    margin-bottom: 8px !important;
+    border: 1px solid rgba(169, 130, 130, 0.12) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+  }
+
+  .province-header {
+    border-radius: 13px !important;
+  }
+
+  .province-cities {
+    display: flex;
+      flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: #FBF8F3 !important;
+  }
+
+  .city-item-indented {
+    flex: 1 1 45%;
+    padding: 12px !important;
+    min-width: 0;
+    border-right: 1px solid rgba(169, 130, 130, 0.10) !important;
+  }
+
+  .city-item-indented:nth-child(2n) {
+    border-right: none !important;
+  }
+
+  .city-item-indented .city-longitude {
+    display: none;
+  }
+
+  .city-abbr {
+    border-radius: 7px !important;
+  }
+}
+
+.date-picker-panel.ui-morandi,
+.time-picker-panel.ui-morandi {
+  .day-text,
+  .hour-text {
+    color: $mor-text !important;
+  }
+
+  .day-item.selected {
+    background: transparent !important;
+    box-shadow: none !important;
+
+    .day-text {
+      background: $mor-primary !important;
+      color: #FFF9F2 !important;
+      border: 1px solid rgba(127, 98, 98, 0.18) !important;
+      border-radius: 50% !important;
+      box-shadow: 0 5px 14px rgba(127, 98, 98, 0.18) !important;
+    }
+  }
+
+  .hour-item.selected {
+    background: rgba(169, 130, 130, 0.18) !important;
+    border: 1px solid rgba(169, 130, 130, 0.30) !important;
+    box-shadow: none !important;
+
+    .hour-text {
+      color: $mor-primary-dark !important;
+    }
+  }
+}
+
+.ui-morandi switch .uni-switch-input,
+.ui-morandi .uni-switch-input {
+  background-color: #E8DDD7 !important;
+  border-color: rgba(169, 130, 130, 0.26) !important;
+}
+
+.ui-morandi switch .uni-switch-input::before,
+.ui-morandi .uni-switch-input::before {
+  background-color: #E8DDD7 !important;
+}
+
+.ui-morandi switch .uni-switch-input::after,
+.ui-morandi .uni-switch-input::after {
+  background-color: $mor-surface !important;
+  box-shadow: 0 2px 8px rgba(105, 92, 82, 0.18) !important;
+}
+
+.ui-morandi switch .uni-switch-input.uni-switch-input-checked::after,
+.ui-morandi .uni-switch-input.uni-switch-input-checked::after {
+  background-color: $mor-primary !important;
+}
+
+/* 设置卡片使用轻微不同的底色倾向，体现莫兰迪“层叠而非整页同色”的原则。 */
+.ui-morandi .setting-content > .setting-card:nth-child(1) {
+  background: linear-gradient(145deg, rgba(251, 248, 242, 0.98), rgba(229, 233, 229, 0.92)) !important;
+}
+
+.ui-morandi .setting-content > .setting-card:nth-child(2) {
+  background: linear-gradient(145deg, rgba(251, 248, 242, 0.98), rgba(232, 217, 215, 0.72)) !important;
+}
+
+.ui-morandi .setting-content > .setting-card:nth-child(3) {
+  background: linear-gradient(145deg, rgba(251, 248, 242, 0.98), rgba(233, 224, 211, 0.78)) !important;
+}

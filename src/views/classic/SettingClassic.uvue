@@ -1,0 +1,52 @@
+<template>
+  <!--
+    经典主题设置页（SettingClassic）- 薄壳
+    公共布局见 _shared/SettingLayout.vue；本组件仅提供卡片标题图标插槽。
+    对应经典四色：古典宣纸 / 暗夜幽光 / 青瓷天青 / 朱砂丹霞（根类由 SettingLayout 按 activeTheme 推导）。
+
+    注意：本组件是唯一需要兼容微信小程序的主题页面，
+    图标一律使用文本/emoji（小程序原生不支持内联 SVG）。
+  -->
+  <SettingLayout>
+    <!-- 真太阳时/个性化图标与其它主题一致（H5/App 用 SettingIcon 矢量图标，MP 用 emoji 兜底） -->
+    <template #icon-solar>
+      <!-- #ifdef WEB || APP-ANDROID || APP-IOS || APP-HARMONY -->
+      <view class="card-icon-svg"><SettingIcon name="solar" /></view>
+      <!-- #endif -->
+      <!-- #ifndef WEB || APP-ANDROID || APP-IOS || APP-HARMONY -->
+      <text class="card-icon">📍</text>
+      <!-- #endif -->
+    </template>
+    <template #icon-style><text class="card-icon">🎨</text></template>
+    <template #icon-najia><text class="card-icon">☯</text></template>
+    <template #icon-personal>
+      <!-- #ifdef WEB || APP-ANDROID || APP-IOS || APP-HARMONY -->
+      <view class="card-icon-svg"><SettingIcon name="personal" /></view>
+      <!-- #endif -->
+      <!-- #ifndef WEB || APP-ANDROID || APP-IOS || APP-HARMONY -->
+      <text class="card-icon">⚙️</text>
+      <!-- #endif -->
+    </template>
+    <template #icon-methods><text class="classic-arrow">▶</text></template>
+    <template #icon-about><text class="classic-arrow">▶</text></template>
+  </SettingLayout>
+</template>
+
+<script setup>
+import SettingIcon from '@/components/SettingIcon.uvue'
+import SettingLayout from '@/views/_shared/SettingLayout.uvue'
+
+// 蒸汽模式：允许全局主题 class 影响本组件（等价原 scoped 的全局覆盖行为）
+defineOptions({
+  styleIsolation: 'app'
+})
+</script>
+
+<style lang="scss">
+/* classic 版文本箭头：替代其它主题的 caret 内联 SVG（小程序兼容）。
+   var(--theme-text-hint, #999) 跟随四色变量；小程序端 black/green/red 无变量时回退 #999。 */
+.classic-arrow {
+  font-size: 18rpx;
+  color: var(--theme-text-hint, #999);
+}
+</style>
