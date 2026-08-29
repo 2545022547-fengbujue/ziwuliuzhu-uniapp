@@ -80,7 +80,7 @@
  * - 格式：[{ label: '子时（23:00-01:00）', value: 0 }, ...]
  */
 import { ref, computed } from 'vue'
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 import { HOUR_OPTIONS } from '@/utils/date.js'
 // #ifdef WEB || APP-ANDROID || APP-IOS || APP-HARMONY
 import { getInkPickerBackground } from '@/utils/ink-backgrounds.js'
@@ -174,7 +174,12 @@ function confirm() {
 .time-picker-panel {
   width: 80%;
   max-width: 320px;
+  /* #ifndef APP */
   max-height: 70vh;
+  /* #endif */
+  /* #ifdef APP */
+  max-height: 560px;
+  /* #endif */
   background: var(--theme-surface);
   border-radius: 24px;
   padding: 20px;
@@ -210,10 +215,12 @@ function confirm() {
   cursor: pointer;
   transition: background 0.2s;
 
-  /* hover 效果 */
+  /* hover 效果（仅 Web） */
+  /* #ifndef APP */
   &:hover {
     background: var(--theme-surface-muted);
   }
+  /* #endif */
 
   /* 选中时辰：渐变背景 + 白色文本 */
   &.selected {
@@ -299,8 +306,8 @@ function confirm() {
     }
   }
 
-  /* hover 效果：电蓝色半透明 */
-  /* #ifndef MP-WEIXIN */
+  /* hover 效果：电蓝色半透明（仅 Web） */
+  /* #ifdef WEB */
   .hour-item:hover {
     background: rgba(0, 128, 255, 0.15);
   }

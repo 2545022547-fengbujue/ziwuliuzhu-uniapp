@@ -9,7 +9,7 @@
 <template></template>
 
 <script setup>
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 import { watch } from 'vue'
 import { onLaunch, onAppShow, onAppHide, onError, onUnhandledRejection } from '@dcloudio/uni-app'
 

@@ -26,7 +26,7 @@
 
 <script setup>
 import { provide, reactive, defineAsyncComponent } from 'vue'
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 import { useHomePage } from '@/composables/useHomePage.js'
 // classic 常驻（唯一需兼容微信小程序的主题；小程序端仅保留此组件）
 import HomeClassic from '@/views/classic/HomeClassic.uvue'

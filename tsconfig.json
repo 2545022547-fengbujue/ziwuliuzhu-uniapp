@@ -8,12 +8,17 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "vue": ["D:/HBuilderX/plugins/uniapp-uts-v1/node_modules/@dcloudio/uni-uts-v1/lib/uts/types/uni-x/@vue/vue/dist/vue.d.ts"],
+      "@vue/runtime-core": ["D:/HBuilderX/plugins/uniapp-uts-v1/node_modules/@dcloudio/uni-uts-v1/lib/uts/types/uni-x/@vue/runtime-core/dist/runtime-core.d.ts"],
+      "@vue/reactivity": ["D:/HBuilderX/plugins/uniapp-uts-v1/node_modules/@dcloudio/uni-uts-v1/lib/uts/types/uni-x/@vue/reactivity/dist/reactivity.d.ts"],
+      "@vue/runtime-vapor-dom2": ["D:/HBuilderX/plugins/uniapp-uts-v1/node_modules/@dcloudio/uni-uts-v1/lib/uts/types/uni-x/@vue/runtime-vapor-dom2/dist/runtime-vapor-dom2.d.ts"]
     },
     "allowJs": true,
     "skipLibCheck": true,
     "noEmit": true,
     "lib": ["esnext", "dom"],
+    "typeRoots": ["./node_modules/@types", "./node_modules"],
     "types": ["@dcloudio/types"]
   },
   "include": [

@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 import { getWuxingStyle, getWuxingColor } from '@/utils/wuxing.js'
 
 // 蒸汽模式：允许全局主题 class 影响本组件（等价原 scoped 的全局覆盖行为）

@@ -12,7 +12,12 @@
    ============================================ */
 
 .page {
+  /* #ifndef APP */
   height: 100vh;
+  /* #endif */
+  /* #ifdef APP */
+  height: 100%;
+  /* #endif */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -135,9 +140,11 @@
   box-shadow: 0 8rpx 32rpx var(--theme-shadow);
   transition: transform 0.15s ease;
 
+  /* #ifndef APP */
   &:active {
     transform: scale(0.97);
   }
+  /* #endif */
 }
 
 .query-btn-text {
@@ -187,7 +194,12 @@
 }
 
 .ganzhi-tag-item {
+  /* #ifndef APP */
   display: inline-flex;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   align-items: center;
   justify-content: center;
   padding: 8rpx 20rpx;
@@ -263,7 +275,9 @@
   white-space: nowrap;            /* 防止方法名换行导致 tab 高度跳动 */
   overflow: hidden;
   text-overflow: ellipsis;
+  /* #ifndef APP */
   max-width: 100%;
+  /* #endif */
 }
 
 .method-indicator {
@@ -280,16 +294,18 @@
   animation: fadeSlideIn 0.35s ease-out;
 }
 
+/* #ifndef APP */
 @keyframes fadeSlideIn {
-  from {
+  0% {
     opacity: 0;
     transform: translateY(20rpx);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
 }
+/* #endif */
 
 /* === 反克法补充 === */
 .fanke-supplement {
@@ -408,7 +424,12 @@
 }
 
 .confirm-title {
+  /* #ifndef APP */
   display: block;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   font-size: 36rpx;
   font-weight: 700;
   color: var(--theme-primary);
@@ -456,9 +477,11 @@
   color: var(--theme-text-secondary);
   transition: transform 0.15s ease;
 
+  /* #ifndef APP */
   &:active {
     transform: scale(0.96);
   }
+  /* #endif */
 }
 
 .confirm-ok {
@@ -472,7 +495,9 @@
   font-weight: 600;
   transition: transform 0.15s ease;
 
+  /* #ifndef APP */
   &:active {
     transform: scale(0.96);
   }
+  /* #endif */
 }

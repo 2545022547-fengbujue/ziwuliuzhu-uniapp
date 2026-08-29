@@ -144,7 +144,7 @@
  * 穴位点击：调用 store.selectPoint(point) 打开穴位详情弹窗
  */
 import { computed } from 'vue'
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 import { METHOD_NAMES } from '@/data/constants.js'
 import PointGrid from '@/components/PointGrid.uvue'
 
@@ -309,7 +309,12 @@ const methodIcon = computed(() => {
 }
 
 .result-ganzhi-hour-tag {
+  /* #ifndef APP */
   display: inline-flex;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   align-items: center;
   justify-content: center;
   padding: 6rpx 16rpx;
@@ -383,7 +388,12 @@ const methodIcon = computed(() => {
 }
 
 .tag-primary {
+  /* #ifndef APP */
   display: inline-flex;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   padding: 6rpx 16rpx;
   background: var(--theme-surface-muted);
   border-radius: $radius-sm;

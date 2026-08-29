@@ -12,21 +12,21 @@
 
     注意：微信小程序不支持 <component :is>，故使用 v-if/v-else-if 链。
   -->
-  <SettingClassic v-if="store.activeUiStyle === 'classic'" />
+  <SettingClassic v-if="isClassic" />
   <!-- #ifndef MP-WEIXIN -->
-  <SettingModern v-else-if="store.activeUiStyle === 'modern'" />
-  <SettingInk v-else-if="store.activeUiStyle === 'ink'" />
-  <SettingMorandi v-else-if="store.activeUiStyle === 'morandi'" />
-  <SettingWatercolor v-else-if="store.activeUiStyle === 'watercolor'" />
-  <SettingAnimal v-else-if="store.activeUiStyle === 'animal'" />
-  <SettingPixel v-else-if="store.activeUiStyle === 'pixel'" />
+  <SettingModern v-else-if="isModern" />
+  <SettingInk v-else-if="isInk" />
+  <SettingMorandi v-else-if="isMorandi" />
+  <SettingWatercolor v-else-if="isWatercolor" />
+  <SettingAnimal v-else-if="isAnimal" />
+  <SettingPixel v-else-if="isPixel" />
   <!-- #endif -->
   <SettingClassic v-else />
 </template>
 
-<script setup>
-import { provide, reactive, defineAsyncComponent } from 'vue'
-import { useAppStore } from '@/stores/app.js'
+<script setup lang="uts">
+import { useAppStore } from '@/stores/app.ts'
+import type { AppStore } from '@/stores/app.ts'
 import { useSettingPage } from '@/composables/useSettingPage.js'
 import { mark } from '@/utils/perf.js'
 // classic 常驻（唯一需兼容微信小程序的主题；小程序端仅保留此组件）
@@ -105,7 +105,28 @@ const prefetchThemeChunks = () => {
 prefetchThemeChunks()
 // #endif
 
-const store = useAppStore()
+const store: AppStore = useAppStore()
+
+// 每主题一个 boolean ref，由 watch 根据 store.activeUiStyle 同步（响应式，tabBar 切回不丢状态）。
+// 直接把 store.activeUiStyle 放进模板做 `==` 比较，vapor 模板无法推断类型
+// （computed 经 `import from 'vue'` 解析为 any，见 index.uvue 同款结论）。
+// 改用框架自动导入的 ref(false) 布尔 ref，v-if 绑定可稳定推断（与 index.uvue 同模式，已验证可编译）。
+const isClassic = ref(false)
+const isModern = ref(false)
+const isInk = ref(false)
+const isMorandi = ref(false)
+const isWatercolor = ref(false)
+const isAnimal = ref(false)
+const isPixel = ref(false)
+watch(() => store.activeUiStyle, (v) => {
+  isClassic.value = v == 'classic'
+  isModern.value = v == 'modern'
+  isInk.value = v == 'ink'
+  isMorandi.value = v == 'morandi'
+  isWatercolor.value = v == 'watercolor'
+  isAnimal.value = v == 'animal'
+  isPixel.value = v == 'pixel'
+}, { immediate: true })
 
 // 页面级业务逻辑（含 onShow/onHide/onBackPress/定时器/主题过渡动画）
 const setting = useSettingPage()

@@ -1,7 +1,7 @@
 import { ref, computed, inject, onMounted, onUnmounted } from 'vue'
 // onShow/onHide/onBackPress 是 uni-app 页面生命周期，用于暂停/恢复定时器、拦截返回键
 import { onPageShow, onPageHide, onBackPress } from '@dcloudio/uni-app'
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import { APP_CONFIG } from '@/config/index.js'
 import { formatDate, getHourIndexFromDate, HOUR_OPTIONS, SHICHEN_START_HOURS } from '@/utils/date.js'

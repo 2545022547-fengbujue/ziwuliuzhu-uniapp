@@ -227,6 +227,7 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
       }
     }
 
+    /* #ifndef APP */
     &:not(.active) {
       .method-name {
         color: $modern-text-secondary !important;
@@ -236,6 +237,7 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
         color: $modern-text-hint !important;
       }
     }
+    /* #endif */
   }
 
   .method-indicator {
@@ -303,9 +305,11 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
     border-radius: 14rpx !important;
     backdrop-filter: none !important;
 
+    /* #ifndef APP */
     &:active {
       background: $modern-primary-soft !important;
     }
+    /* #endif */
   }
 
   .point-name {

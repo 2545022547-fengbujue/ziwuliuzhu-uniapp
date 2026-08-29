@@ -88,9 +88,11 @@ const navbarStyle = computed(() => ({
   }
 }
 
-/* 蒸汽模式 web 端 text→uni-text 不继承父级字号 */
+/* 蒸汽模式 web 端 text→uni-text 不继承父级字号（仅 Web 生成的 uni-text 需要此 hack） */
+/* #ifdef WEB */
 :global(.navbar-title > uni-text) {
   font-size: 34rpx;
   font-weight: 600;
 }
+/* #endif */
 </style>

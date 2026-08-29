@@ -724,44 +724,58 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
 .ui-animal .uni-switch-input.uni-switch-input-checked::after { background-color: $animal-yellow !important; }
 
 /* === 动画关键帧：迎宾、入场、按压、氛围动效 === */
+/* #ifndef APP */
 @keyframes animal-hero-arrive {
   from { opacity: 0; transform: translateY(26rpx) scale(.84); }
   72% { opacity: 1; transform: translateY(-4rpx) scale(1.03); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+/* #endif */
 
+/* #ifndef APP */
 @keyframes animal-card-rise {
   from { opacity: 0; transform: translateY(18rpx); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* #endif */
 
+/* #ifndef APP */
 @keyframes animal-icon-bounce {
   0% { transform: translateY(0) rotate(-5deg) scale(1.05); }
   48% { transform: translateY(-9rpx) rotate(3deg) scale(1.12); }
   76% { transform: translateY(2rpx) rotate(-7deg) scale(1.02); }
   100% { transform: translateY(0) rotate(-5deg) scale(1.05); }
 }
+/* #endif */
 
+/* #ifndef APP */
 @keyframes animal-tab-label-in {
   from { opacity: .45; transform: translateY(5rpx); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* #endif */
 
+/* #ifndef APP */
 @keyframes animal-option-arrive {
   from { opacity: 0; transform: translateY(10rpx) scale(.985); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+/* #endif */
 
+/* #ifndef APP */
 @keyframes animal-leaf-wiggle {
   0%, 74%, 100% { transform: rotate(0deg) scaleX(1); }
   82% { transform: rotate(-4deg) scaleX(.94); }
   91% { transform: rotate(4deg) scaleX(1.04); }
 }
+/* #endif */
 
+/* #ifndef APP */
 @keyframes animal-modal-zoom-in {
   from { opacity: 0; transform: scale(.94) translateY(12rpx); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+/* #endif */
 
 /* 系统开启减弱动态时，关闭全部入场与装饰动画 */
 @media (prefers-reduced-motion: reduce) {

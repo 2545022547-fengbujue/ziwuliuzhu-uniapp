@@ -36,6 +36,70 @@ import { APP_CONFIG } from '@/config/index.js'
 import { CITIES } from '@/data/city-coordinates.js'
 import { THEME_OPTIONS, THEME_CHROME, UI_STYLE_OPTIONS, UI_STYLE_PRIMARY, UI_STYLE_CHROME } from '@/config/themes.js'
 
+// 类型声明：蒸汽模式（vapor）要求 store 属性类型明确，否则模板中
+// 任何 store 属性比较都会触发 uts "The type could not be inferred"。
+interface AppearanceOption {
+  id: string
+  name: string
+  desc: string
+  swatch: string
+  active: boolean
+}
+
+export interface AppStore {
+  currentHour: number
+  selectedDate: Date
+  selectedHour: number
+  isManualMode: boolean
+  activeMethod: string
+  results: Record<string, any>
+  showDetail: boolean
+  selectedPoint: any
+  naziMode: string
+  theme: string
+  uiStyle: string
+  activeUiStyle: string
+  uiStyles: any
+  appearanceOptions: AppearanceOption[]
+  activeTheme: string
+  themePrimaryColor: string
+  themeSwitchColor: string
+  themes: any
+  useTrueSolarTime: boolean
+  longitude: number
+  selectedCity: string
+  fankeDisplayMode: string
+  showFanke: boolean
+  useHeRiHuYong: boolean
+  showPointCode: boolean
+  showGanZhi: boolean
+  showWuXing: boolean
+  schemaVersion: number
+  currentResults: any
+  currentGanZhi: any
+  effectiveCurrentTime: Date
+  inkBackgroundPeriod: string
+  updateCurrentTime: (forceUpdate?: boolean) => void
+  refreshVisualClock: () => void
+  switchToAutoMode: () => void
+  switchToManualMode: (date: Date, hour: number) => void
+  updateLongitude: (newLongitude: number, city?: string) => void
+  toggleTrueSolarTime: (enabled: boolean) => void
+  toggleFanke: (value: boolean) => void
+  setActiveMethod: (method: string) => void
+  setNaziMode: (mode: string) => void
+  toggleHeRiHuYong: (enabled: boolean) => void
+  togglePointCode: (enabled: boolean) => void
+  toggleGanZhi: (enabled: boolean) => void
+  toggleWuXing: (enabled: boolean) => void
+  setTheme: (nextTheme: string) => void
+  setUiStyle: (styleId: string) => void
+  setAppearance: (optionId: string) => void
+  applyThemeChrome: () => void
+  selectPoint: (point: any) => void
+  closeDetail: () => void
+}
+
 function isKnownUiStyle(styleId) {
   return styleId === 'classic' || UI_STYLE_OPTIONS.some(s => s.id === styleId)
 }
@@ -598,7 +662,7 @@ export const useAppStore = defineStore('app', () => {
     applyThemeChrome,
     selectPoint,
     closeDetail
-  }
+  } as unknown as AppStore
 }, {
   persist: {
     enabled: true,
@@ -624,4 +688,4 @@ export const useAppStore = defineStore('app', () => {
       }
     ]
   }
-})
+}) as unknown as (() => AppStore)

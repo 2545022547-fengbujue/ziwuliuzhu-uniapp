@@ -8,7 +8,12 @@
    ============================================ */
 
 .page {
+  /* #ifndef APP */
   height: 100vh;
+  /* #endif */
+  /* #ifdef APP */
+  height: 100%;
+  /* #endif */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -72,7 +77,12 @@
 }
 
 .card-desc {
+  /* #ifndef APP */
   display: block;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   font-size: $font-size-xs;
   color: var(--theme-text-hint, #999999);
   line-height: 1.5;
@@ -83,7 +93,12 @@
 
 // 真太阳时校正标题下方的说明小字
 .solar-desc {
+  /* #ifndef APP */
   display: block;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   font-size: $font-size-xs;
   color: var(--theme-text-hint, #999999);
   line-height: 1.5;
@@ -326,36 +341,61 @@
   }
 
   &.ink {
+    /* #ifndef APP */
     background: radial-gradient(circle at 68% 30%, #f7f3ea 0 24%, #77736b 26% 43%, #242424 72%);
+    /* #endif */
+    /* #ifdef APP */
+    background: linear-gradient(135deg, #f7f3ea 0%, #77736b 45%, #242424 100%);
+    /* #endif */
   }
 
   &.morandi {
+    /* #ifndef APP */
     background:
       radial-gradient(circle at 28% 28%, #d8bfc0 0 24%, transparent 26%),
       radial-gradient(circle at 72% 70%, #c4d0c8 0 24%, transparent 26%),
       linear-gradient(135deg, #faf5ed, #dce5e7);
+    /* #endif */
+    /* #ifdef APP */
+    background: linear-gradient(135deg, #d8bfc0 0%, #c4d0c8 50%, #faf5ed 100%);
+    /* #endif */
     border: 2rpx solid rgba(169, 130, 130, 0.12);
     box-shadow: 0 4rpx 12rpx rgba(142, 128, 116, 0.10);
   }
 
   &.classic {
+    /* #ifndef APP */
     background: conic-gradient(from 45deg, #F1D8C7 0 25%, #BFD8D0 0 50%, #C9D6E8 0 75%, #E5C5C0 0);
+    /* #endif */
+    /* #ifdef APP */
+    background: linear-gradient(135deg, #F1D8C7 0%, #BFD8D0 35%, #C9D6E8 70%, #E5C5C0 100%);
+    /* #endif */
     border: 4rpx solid rgba(255, 255, 255, 0.86);
     box-shadow: 0 0 0 1rpx rgba(89, 78, 68, 0.10);
   }
 
   &.watercolor {
+    /* #ifndef APP */
     background:
       radial-gradient(circle at 25% 24%, rgba(232, 168, 124, 0.95), transparent 42%),
       radial-gradient(circle at 76% 72%, rgba(133, 205, 202, 0.95), transparent 46%),
       #faf8f5;
+    /* #endif */
+    /* #ifdef APP */
+    background: linear-gradient(135deg, rgba(232, 168, 124, 0.95) 0%, rgba(133, 205, 202, 0.95) 55%, #faf8f5 100%);
+    /* #endif */
   }
 
   &.animal {
+    /* #ifndef APP */
     background:
       radial-gradient(circle at 28% 26%, #F7CD67 0 22%, transparent 24%),
       radial-gradient(circle at 72% 72%, #82D5BB 0 24%, transparent 26%),
       linear-gradient(135deg, #F7F3DF 0%, #19AFA2 100%);
+    /* #endif */
+    /* #ifdef APP */
+    background: linear-gradient(135deg, #F7CD67 0%, #82D5BB 50%, #19AFA2 100%);
+    /* #endif */
     box-shadow: inset 0 0 0 2rpx rgba(114, 93, 66, 0.10);
   }
 
@@ -495,7 +535,9 @@
   padding: $spacing-md 0;
   border-bottom: 1rpx solid var(--theme-border);
 
+  /* #ifndef APP */
   &:last-child { border-bottom: none; }
+  /* #endif */
 }
 
 .method-header {
@@ -567,7 +609,12 @@
   height: auto !important;
   border-radius: 0 !important;
   padding: 0;
+  /* #ifndef APP */
   display: inline-flex;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -596,6 +643,7 @@
   margin: $spacing-md $spacing-lg 0;
 }
 
+/* #ifndef APP */
 .method-card:first-child {
   margin-top: $spacing-lg;
 }
@@ -603,6 +651,7 @@
 .method-card:last-child {
   margin-bottom: 0;
 }
+/* #endif */
 
 /* 关于弹窗内容 */
 .about-content-inner {
@@ -655,7 +704,9 @@
   font-size: $font-size-sm;
   color: var(--theme-text-secondary, #666666);
   line-height: 2.2;
+  /* #ifndef APP */
   text-align: justify;
+  /* #endif */
 }
 
 .disclaimer-card {
@@ -670,17 +721,23 @@
   font-weight: 600;
   color: var(--theme-text-hint, #999999);
   margin-bottom: $spacing-sm;
+  /* #ifndef APP */
   display: block;
+  /* #endif */
 }
 
 .disclaimer-text {
   font-size: 22rpx;
   color: var(--theme-text-hint, #999999);
   line-height: 1.9;
+  /* #ifndef APP */
   text-align: justify;
+  /* #endif */
 }
 
+/* #ifndef APP */
 @keyframes overlayFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
+/* #endif */

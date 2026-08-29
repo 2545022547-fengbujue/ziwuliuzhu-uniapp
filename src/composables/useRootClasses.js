@@ -20,7 +20,7 @@
  * ============================================================
  */
 import { computed } from 'vue'
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 
 export function useRootClasses() {
   const store = useAppStore()

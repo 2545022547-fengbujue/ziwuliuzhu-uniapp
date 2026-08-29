@@ -347,10 +347,12 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
 .ui-pixel .uni-switch-input.uni-switch-input-checked::after { background: $px-gold !important; }
 
 /* 设置页光标闪烁：steps(2, end) 让透明度二值跳变，保持像素感而非平滑过渡 */
+/* #ifndef APP */
 @keyframes pixel-cursor {
   0%, 45% { opacity: 1; transform: translateX(0); }
   50%, 100% { opacity: .25; transform: translateX(4rpx); }
 }
+/* #endif */
 
 /* 系统开启减弱动态时，关闭光标闪烁 */
 @media (prefers-reduced-motion: reduce) {

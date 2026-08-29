@@ -10,4 +10,4 @@
 
 - 蒸汽模式仅支持组合式 API，渲染性能超过原生
 - 业务逻辑沿用原 uni-app 版本（`.js`），页面组件为 `.uvue`
-- 原项目：`D:\WorkBuddyWorkspaces\ziwuliuzhu-uniapp`
+- 原项目：同工作区下的 `ziwuliuzhu-uniapp`（GitHub: ziwuliuzhu-uniapp）

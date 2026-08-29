@@ -1,2 +1,6 @@
 /* === uni-app 全局样式变量 === */
-/* 这里的变量会自动注入所有 Vue 文件 */
+/* 这里的变量会自动注入所有 Vue 文件（含云端打包预编译管线）。
+   原项目变量集中在 styles/variables.scss，由 vite additionalData 注入；
+   蒸汽模式的发行预编译管线不读取 vite additionalData，导致 $tcm-red 等
+   变量 Undefined variable。改为在 uni.scss 里 @use 引入，覆盖所有编译路径。 */
+@use "@/styles/variables.scss" as *;

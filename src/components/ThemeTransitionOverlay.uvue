@@ -10,7 +10,7 @@
       <image class="animal-transition-friends" :src="animalFriendsImg" mode="widthFix" />
       <view class="animal-transition-copy">
         <text class="animal-transition-title">欢迎来到动物岛</text>
-        <view class="animal-loading-dots"><text class="dot"></text><text class="dot"></text><text class="dot"></text></view>
+        <view class="animal-loading-dots"><text class="dot"></text><text class="dot dot2"></text><text class="dot dot3"></text></view>
       </view>
     </view>
 
@@ -115,7 +115,12 @@ defineOptions({
   position: absolute;
   bottom: 0;
   border-radius: 50%;
+  /* #ifndef APP */
   background: inherit;
+  /* #endif */
+  /* #ifdef APP */
+  background: rgba(255,252,237,.92);
+  /* #endif */
 }
 .animal-transition-cloud::before { left: 22rpx; width: 64rpx; height: 64rpx; }
 .animal-transition-cloud::after { right: 18rpx; width: 52rpx; height: 52rpx; }
@@ -182,19 +187,29 @@ defineOptions({
   background: #19AFA2;
   animation: animal-dot .72s ease-in-out infinite alternate;
 }
-.animal-loading-dots .dot:nth-child(2) { animation-delay: .16s; background: #F7CD67; }
-.animal-loading-dots .dot:nth-child(3) { animation-delay: .32s; background: #82D5BB; }
+.dot2 { animation-delay: .16s; background: #F7CD67; }
+.dot3 { animation-delay: .32s; background: #82D5BB; }
 
 /* Shuimo UI 的呼吸式加载标记，叠加墨迹扩散与落笔。 */
 .ink-transition-stage {
+  /* #ifndef APP */
   background:
     radial-gradient(circle at 50% 44%, rgba(255,255,252,.97), rgba(247,244,235,.96) 48%, rgba(224,222,211,.98) 100%);
+  /* #endif */
+  /* #ifdef APP */
+  background: #F7F4EB;
+  /* #endif */
 }
 .ink-bloom {
   position: absolute;
   border-radius: 50%;
   filter: blur(10rpx);
+  /* #ifndef APP */
   background: radial-gradient(circle, rgba(21,25,25,.48) 0%, rgba(42,48,47,.20) 42%, transparent 70%);
+  /* #endif */
+  /* #ifdef APP */
+  background: rgba(30,32,31,0.32);
+  /* #endif */
   animation: ink-bloom-spread 1.35s ease-out both;
 }
 .bloom-one { width: 620rpx; height: 620rpx; left: -180rpx; top: -160rpx; }
@@ -273,17 +288,39 @@ defineOptions({
   animation-delay: .14s;
 }
 
-@keyframes animal-sun-arrive { from { opacity: 0; transform: scale(.45); } to { opacity: 1; transform: scale(1); } }
-@keyframes animal-cloud-drift { from { margin-left: -10rpx; } to { margin-left: 12rpx; } }
-@keyframes animal-island-rise { from { opacity: 0; transform: translate(-50%,-30%) scale(.72); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
-@keyframes animal-friends-arrive { from { opacity: 0; transform: translate(-50%,-30%) scale(.72); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
-@keyframes animal-wave { from { transform: translateX(-12rpx); } to { transform: translateX(12rpx); } }
-@keyframes animal-dot { from { transform: translateY(0) scale(.8); opacity: .55; } to { transform: translateY(-12rpx) scale(1); opacity: 1; } }
-@keyframes ink-bloom-spread { from { opacity: 0; transform: scale(.25); } to { opacity: 1; transform: scale(1); } }
+/* #ifndef APP */
+@keyframes animal-sun-arrive { 0% { opacity: 0; transform: scale(.45); } 100% { opacity: 1; transform: scale(1); } }
+/* #endif */
+/* #ifndef APP */
+@keyframes animal-cloud-drift { 0% { margin-left: -10rpx; } 100% { margin-left: 12rpx; } }
+/* #endif */
+/* #ifndef APP */
+@keyframes animal-island-rise { 0% { opacity: 0; transform: translate(-50%,-30%) scale(.72); } 100% { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
+/* #endif */
+/* #ifndef APP */
+@keyframes animal-friends-arrive { 0% { opacity: 0; transform: translate(-50%,-30%) scale(.72); } 100% { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
+/* #endif */
+/* #ifndef APP */
+@keyframes animal-wave { 0% { transform: translateX(-12rpx); } 100% { transform: translateX(12rpx); } }
+/* #endif */
+/* #ifndef APP */
+@keyframes animal-dot { 0% { transform: translateY(0) scale(.8); opacity: .55; } 100% { transform: translateY(-12rpx) scale(1); opacity: 1; } }
+/* #endif */
+/* #ifndef APP */
+@keyframes ink-bloom-spread { 0% { opacity: 0; transform: scale(.25); } 100% { opacity: 1; transform: scale(1); } }
+/* #endif */
+/* #ifndef APP */
 @keyframes ink-heart-beat { 0% { transform: scale(1); } 40% { transform: scale(.9); } 100% { transform: scale(1); } }
-@keyframes ink-ring-turn { to { transform: rotate(360deg); } }
-@keyframes ink-brush-write { to { transform: translate(-50%, 122rpx) scaleX(1); } }
-@keyframes ink-mountain-rise { from { opacity: 0; transform: scaleY(.45); } to { opacity: .28; transform: scaleY(1); } }
+/* #endif */
+/* #ifndef APP */
+@keyframes ink-ring-turn { 100% { transform: rotate(360deg); } }
+/* #endif */
+/* #ifndef APP */
+@keyframes ink-brush-write { 100% { transform: translate(-50%, 122rpx) scaleX(1); } }
+/* #endif */
+/* #ifndef APP */
+@keyframes ink-mountain-rise { 0% { opacity: 0; transform: scaleY(.45); } 100% { opacity: .28; transform: scaleY(1); } }
+/* #endif */
 
 /* 仅 H5：prefers-reduced-motion 是浏览器无障碍媒体特性，小程序 WXSS 不支持
    通配符选择器 *（官方编译器报 unexpected token *），且该特性在小程序端不生效 */

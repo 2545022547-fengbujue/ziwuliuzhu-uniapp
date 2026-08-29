@@ -1,4 +1,13 @@
+// lunar-javascript 是 CommonJS 包（module.exports 对象字面量），蒸汽模式的
+// uts2js/rollup 没有 commonjs 互操作，静态 import（具名/default）都会报
+// "not exported"。App 端改用 require（uts2js 阶段不做静态分析，最终打包由
+// vite 的 commonjs 插件转换）；Web/小程序/vitest 走标准 ESM import。
+// #ifdef APP-ANDROID || APP-IOS || APP-HARMONY
+const { Lunar } = require('lunar-javascript')
+// #endif
+// #ifndef APP-ANDROID || APP-IOS || APP-HARMONY
 import { Lunar } from 'lunar-javascript'
+// #endif
 import {
   HEAVENLY_STEMS,
   EARTHLY_BRANCHES,

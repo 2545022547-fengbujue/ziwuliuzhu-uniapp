@@ -10,7 +10,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 import { clearUniStorage } from '../../tests/setup.js'
 
 // 包装 5 个算法服务为可计数 fn（内部仍调用真实实现，结果不变）：

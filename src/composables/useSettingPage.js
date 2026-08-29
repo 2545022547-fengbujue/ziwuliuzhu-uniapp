@@ -1,6 +1,6 @@
 import { ref, computed, inject, onUnmounted } from 'vue'
 import { onPageShow, onPageHide, onBackPress } from '@dcloudio/uni-app'
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 import { useSystemInfo } from '@/composables/useSystemInfo.js'
 import { mark } from '@/utils/perf.js'
 import { METHOD_DESCS } from '@/data/constants.js'

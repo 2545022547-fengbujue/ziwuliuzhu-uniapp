@@ -155,7 +155,7 @@
  *   - 单位统一使用 rpx（2026-05-25 从 px 迁移，确保全App单位一致）
  */
 import { computed, ref } from 'vue'
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 import { getWuxingColor } from '@/utils/wuxing.js'
 
 // 蒸汽模式：允许全局主题 class 影响本组件（等价原 scoped 的全局覆盖行为）
@@ -401,9 +401,11 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   flex-shrink: 0;
   transition: transform 0.15s ease;
 
+  /* #ifndef APP */
   &:active {
     transform: scale(0.92);
   }
+  /* #endif */
 }
 
 .close-icon {
@@ -555,17 +557,21 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 /* 经络框默认加长，方便显示较长经络名 */
+/* #ifndef APP */
 .info-item:first-child {
   flex: 1.15;
 }
+/* #endif */
 
 /* 经络6字且有五行时，经络框进一步变宽，五行框变窄 */
+/* #ifndef APP */
 .info-grid-meridian-long .info-item:first-child {
   flex: 1.3;
 }
 .info-grid-meridian-long .info-item:last-child {
   flex: 0.7;
 }
+/* #endif */
 
 .info-item {
   flex: 1;
@@ -580,7 +586,9 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 .info-label {
+  /* #ifndef APP */
   display: block;
+  /* #endif */
   font-size: 24rpx;
   color: var(--theme-text-hint);
   margin-bottom: 8rpx;
@@ -657,7 +665,9 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 .method-label {
+  /* #ifndef APP */
   display: block;
+  /* #endif */
   font-size: 24rpx;
   color: var(--theme-text-hint);
   margin-bottom: 12rpx;
@@ -665,12 +675,16 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 }
 
 .method-value {
+  /* #ifndef APP */
   display: block;
+  /* #endif */
   font-size: 28rpx;
   color: var(--theme-text-secondary);
   line-height: 1.7;
   word-break: break-all;
-  text-align: justify;
+  /* #ifndef APP */
+text-align: justify;
+/* #endif */
   font-family: $font-songti;
 }
 
@@ -708,7 +722,9 @@ $font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
   color: rgba($tcm-red, 0.8);
   line-height: 1.7;
   word-break: break-all;
-  text-align: justify;
+  /* #ifndef APP */
+text-align: justify;
+/* #endif */
   font-family: $font-songti;
 }
 

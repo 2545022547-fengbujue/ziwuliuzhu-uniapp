@@ -135,7 +135,7 @@
  */
 import { ref, computed, nextTick, onUnmounted } from 'vue'
 import { CITIES, searchCities, PROVINCE_ORDER } from '@/data/city-coordinates.js'
-import { useAppStore } from '@/stores/app.js'
+import { useAppStore } from '@/stores/app.ts'
 
 // 蒸汽模式：允许全局主题 class 影响本组件（等价原 scoped 的全局覆盖行为）
 defineOptions({
@@ -331,7 +331,12 @@ defineExpose({ open, close, isOpen })
 
 .popup {
   width: 88%;
+  /* #ifndef APP */
   max-height: 85vh;
+  /* #endif */
+  /* #ifdef APP */
+  max-height: 680px;
+  /* #endif */
   background: var(--theme-surface);
   border-radius: 24px;
   display: flex;
@@ -363,7 +368,12 @@ defineExpose({ open, close, isOpen })
   height: auto !important;
   border-radius: 0 !important;
   padding: 0;
+  /* #ifndef APP */
   display: inline-flex;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -380,7 +390,12 @@ defineExpose({ open, close, isOpen })
 }
 
 .search-label {
+  /* #ifndef APP */
   display: block;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   font-size: 14px;
   font-weight: 500;
   color: var(--theme-text);
@@ -420,7 +435,12 @@ defineExpose({ open, close, isOpen })
 .popup-body {
   flex: 1;
   padding: 0 16px 16px;
+  /* #ifndef APP */
   max-height: 50vh;
+  /* #endif */
+  /* #ifdef APP */
+  max-height: 400px;
+  /* #endif */
   width: 100%;
   box-sizing: border-box;
 }
@@ -435,14 +455,6 @@ defineExpose({ open, close, isOpen })
 }
 /* #endif */
 
-/* #ifdef APP-ANDROID || APP-IOS || APP-HARMONY */
-.popup-body ::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-  color: transparent;
-}
-/* #endif */
 
 .tip-box {
   padding: 14px;
@@ -452,7 +464,9 @@ defineExpose({ open, close, isOpen })
   border-radius: 12px;
   box-sizing: border-box;
   width: 100%;
+  /* #ifndef APP */
   max-width: 100%;
+  /* #endif */
   overflow: hidden;
 }
 
@@ -461,7 +475,9 @@ defineExpose({ open, close, isOpen })
   flex-direction: column;
   gap: 2px;
   width: 100%;
+  /* #ifndef APP */
   max-width: 100%;
+  /* #endif */
 }
 
 .tip-title-row {
@@ -492,9 +508,11 @@ defineExpose({ open, close, isOpen })
   border-bottom: 1px solid var(--theme-border);
 }
 
+/* #ifndef APP */
 .province-group:last-child {
   border-bottom: none;
 }
+/* #endif */
 
 .province-header {
   padding: 14px 16px;
@@ -505,9 +523,11 @@ defineExpose({ open, close, isOpen })
   border-radius: 8px;
 }
 
+/* #ifndef APP */
 .province-header:active {
   background: var(--theme-surface-muted);
 }
+/* #endif */
 
 .province-left {
   display: flex;
@@ -550,13 +570,17 @@ defineExpose({ open, close, isOpen })
   border-bottom: 1px solid var(--theme-border);
 }
 
+/* #ifndef APP */
 .city-item:last-child {
   border-bottom: none;
 }
+/* #endif */
 
+/* #ifndef APP */
 .city-item:active {
   background: var(--theme-surface-muted);
 }
+/* #endif */
 
 .city-item.selected {
   background: var(--theme-border);
@@ -579,7 +603,12 @@ defineExpose({ open, close, isOpen })
   color: var(--theme-text-hint);
   width: 30px;
   height: 24px;
+  /* #ifndef APP */
   display: inline-flex;
+  /* #endif */
+  /* #ifdef APP */
+  display: flex;
+  /* #endif */
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -625,9 +654,11 @@ defineExpose({ open, close, isOpen })
   background: var(--theme-surface-muted);
 }
 
+/* #ifndef APP */
 .btn-cancel:active {
   opacity: 0.7;
 }
+/* #endif */
 
 .btn-confirm {
   padding: 10px 24px;
@@ -639,9 +670,11 @@ defineExpose({ open, close, isOpen })
   opacity: 0.5;
 }
 
+/* #ifndef APP */
 .btn-confirm:active {
   opacity: 0.85;
 }
+/* #endif */
 
 .btn-text {
   font-size: 15px;
