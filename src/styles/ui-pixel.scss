@@ -9,7 +9,7 @@
    - 不依赖 Web 专用组件库，仅用 uni-app 基础组件，确保 App/H5 WebView 表现一致
    - 像素字体优先使用 Fusion Pixel / Ark Pixel / Zpix，缺失时回退等宽字体
 
-   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
+   级联规则同 ui-modern.scss：!important 压 scoped，@use 顺序压 themes.scss
    ============================================ */
 
 // 像素调色板：深墨、牛皮纸、沙金、掌机蓝、珊瑚红等，均为 Pixelium 有限色板成员
@@ -233,11 +233,12 @@ $px-font: 'Fusion Pixel Zh_hans', 'Ark Pixel', 'Zpix', 'Courier New', 'PingFang 
   /* === 穴位按钮：金色底 + 硬边 + 像素化渲染 === */
   // image-rendering: pixelated 让位图边缘保持锯齿而非模糊，贴合像素主题。
   .point-btn {
+    /* 主题令牌（渐进式迁移）：见 PointGrid.vue 令牌表说明 */
+    --point-btn-bg: #{$px-gold};
+    --point-btn-border: 4rpx solid #{$px-ink};
+    --point-btn-radius: 0;
+    --point-btn-shadow: 0 6rpx 0 #{$px-shadow};
     color: $px-ink !important;
-    background: $px-gold !important;
-    border: 4rpx solid $px-ink !important;
-    border-radius: 0 !important;
-    box-shadow: 0 6rpx 0 $px-shadow !important;
     image-rendering: pixelated;
     transition: none !important;
   }

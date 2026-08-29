@@ -12,7 +12,7 @@
    注：规范中 [TEMPLATES]/[CHECKLIST] 两段（border-black/font-black/硬阴影）
    与 Token 字典及 FORBIDDEN 自相矛盾（疑从其他风格误复制），按水彩本体规则执行。
 
-   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
+   级联规则同 ui-modern.scss：!important 压 scoped，@use 顺序压 themes.scss
    ============================================ */
 
 $wc-primary: #4A6FA5;            // 水彩蓝（规范主色）
@@ -417,14 +417,12 @@ $wc-sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Mic
 
   // 穴位按钮：纸面细蓝边药片
   .point-btn {
-    background: rgba(255, 255, 255, 0.60) !important;
-    border: 1rpx solid $wc-border !important;
-    border-radius: 24rpx !important;
-    backdrop-filter: none !important;
-
-    &:active {
-      background: rgba(74, 111, 165, 0.12) !important;
-    }
+    /* 主题令牌（渐进式迁移）：见 PointGrid.vue 令牌表说明 */
+    --point-btn-bg: rgba(255, 255, 255, 0.60);
+    --point-btn-border: 1rpx solid #{$wc-border};
+    --point-btn-radius: 24rpx;
+    --point-btn-backdrop: none;
+    --point-btn-active-bg: rgba(74, 111, 165, 0.12);
   }
 
   .point-name {

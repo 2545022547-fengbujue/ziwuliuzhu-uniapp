@@ -21,10 +21,7 @@
   <view class="time-picker-overlay" @tap="close">
     <view
       class="time-picker-panel"
-      :class="[
-        store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`,
-        store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : ''
-      ]"
+      :class="rootClasses"
       @tap.stop
     >
       <!-- 与日期面板共用时段背景；真实 image 层在 Android WebView 中更可靠。 -->
@@ -81,12 +78,15 @@
  */
 import { ref, computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
+import { useRootClasses } from '@/composables/useRootClasses.js'
 import { HOUR_OPTIONS } from '@/utils/date.js'
 // #ifdef H5 || APP-PLUS
 import { getInkPickerBackground } from '@/utils/ink-backgrounds.js'
 // #endif
 
 const store = useAppStore()
+// 面板根 class 与布局同源推导（ink-bg 后缀是 --ink-picker-scene 变量载体）
+const rootClasses = useRootClasses()
 // 水墨背景仅 H5/App 使用；MP 端不 import 背景模块，避免把 6 张背景图打进小程序包。
 const inkPickerBackground = computed(() => {
   // #ifdef H5 || APP-PLUS

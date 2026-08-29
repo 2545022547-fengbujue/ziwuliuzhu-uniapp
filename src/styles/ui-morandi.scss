@@ -7,7 +7,7 @@
    - 卡片模拟陶器和织物的哑光表面，阴影柔和扩散，不使用镜面高光
    - 标题用文渊宋体增加克制的书卷感，正文保留清晰的系统无衬线字体
 
-   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
+   级联规则同 ui-modern.scss：!important 压 scoped，@use 顺序压 themes.scss
    ============================================ */
 
 $mor-primary: #A98282;           // 尘粉灰玫瑰
@@ -312,21 +312,19 @@ $mor-serif: 'LXGWZhenKaiSlabGB', 'KaitiGB2312', 'WenYuanSerifSC', 'STSong', 'Son
 
   // 穴位按钮：浅驼圆胖药片
   .point-btn {
-    background: linear-gradient(145deg, #F2EAE2, #E7DDDA) !important;
-    border: 1rpx solid rgba(169, 130, 130, 0.10) !important;
-    border-radius: 999rpx !important;
-    backdrop-filter: none !important;
+    /* 主题令牌（渐进式迁移）：见 PointGrid.vue 令牌表说明 */
+    --point-btn-bg: linear-gradient(145deg, #F2EAE2, #E7DDDA);
+    --point-btn-border: 1rpx solid rgba(169, 130, 130, 0.10);
+    --point-btn-radius: 999rpx;
+    --point-btn-backdrop: none;
+    --point-btn-active-bg: rgba(169, 130, 130, 0.22);
     align-items: center !important;
 
-    // 无衬线编码相对衬线大字 name 视觉偏上，下移微调使其等线
+    // 无衬线编码相对衬线大字 name 视觉偏上，下移微调使其等线（超出令牌范围的结构微调）
     .point-code {
       position: relative !important;
       top: 2rpx !important;
       line-height: 1 !important;
-    }
-
-    &:active {
-      background: rgba(169, 130, 130, 0.22) !important;
     }
   }
 

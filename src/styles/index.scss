@@ -17,7 +17,7 @@
 // 必须在 themes 之后引入，同特异性 !important 规则靠顺序取胜
 // 非经典主题仅 H5/App 使用，小程序端不编译（见工作区约定"除经典四色外不考虑小程序"）
 // #ifndef MP-WEIXIN
-@use 'modern';
+@use 'ui-modern';
 @use 'ui-ink';
 @use 'ui-morandi';
 @use 'ui-watercolor';

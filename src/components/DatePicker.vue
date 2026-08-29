@@ -23,10 +23,7 @@
   <view class="date-picker-overlay" @tap="close">
     <view
       class="date-picker-panel"
-      :class="[
-        store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`,
-        store.activeUiStyle === 'ink' ? `ink-bg-${store.inkBackgroundPeriod}` : ''
-      ]"
+      :class="rootClasses"
       @tap.stop
     >
       <!-- 使用真实 image 层，避免部分 App WebView 对多重 CSS 背景图渲染不稳定。 -->
@@ -117,6 +114,7 @@
  */
 import { ref, computed } from 'vue'
 import { useAppStore } from '@/stores/app.js'
+import { useRootClasses } from '@/composables/useRootClasses.js'
 // #ifdef H5 || APP-PLUS
 import { getInkPickerBackground } from '@/utils/ink-backgrounds.js'
 // #endif
@@ -130,6 +128,8 @@ const MIN_YEAR = 1900
 const MAX_YEAR = 2100
 
 const store = useAppStore()
+// 面板根 class 与布局同源推导（ink-bg 后缀是 --ink-picker-scene 变量载体，见 useRootClasses JSDoc）
+const rootClasses = useRootClasses()
 // 水墨背景仅 H5/App 使用；MP 端不 import 背景模块，避免把 6 张背景图打进小程序包。
 const inkPickerBackground = computed(() => {
   // #ifdef H5 || APP-PLUS

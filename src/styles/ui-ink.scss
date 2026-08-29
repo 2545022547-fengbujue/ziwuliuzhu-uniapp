@@ -7,7 +7,7 @@
    - 标题使用真楷字体，选中态使用真实笔触素材，避免规则矩形色块
    - 印色只用于关闭、提示等小面积点睛，不把大块红色冒充水墨
 
-   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
+   级联规则同 ui-modern.scss：!important 压 scoped，@use 顺序压 themes.scss
    ============================================ */
 
 $ink-primary: #20272A;           // 浓墨
@@ -550,14 +550,12 @@ $ink-song: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
 
   // 穴位按钮：墨线框 + 楷体墨字
   .point-btn {
-    background: $ink-surface !important;
-    border: 1rpx solid $ink-border !important;
-    border-radius: 8rpx !important;
-    backdrop-filter: none !important;
-
-    &:active {
-      background: $ink-muted !important;
-    }
+    /* 主题令牌（渐进式迁移）：见 PointGrid.vue 令牌表说明 */
+    --point-btn-bg: #{$ink-surface};
+    --point-btn-border: 1rpx solid #{$ink-border};
+    --point-btn-radius: 8rpx;
+    --point-btn-backdrop: none;
+    --point-btn-active-bg: #{$ink-muted};
   }
 
   .point-name {

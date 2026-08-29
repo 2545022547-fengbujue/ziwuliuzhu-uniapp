@@ -67,13 +67,28 @@ const store = useAppStore()
   padding: 12rpx 10rpx;
   box-sizing: border-box;
   overflow: hidden;
-  border-radius: 20rpx;
-  background: var(--theme-surface-muted);
+
+  /* ============================================
+     主题令牌（渐进式迁移）
+     经典四色：不声明下表变量，走回退值（--theme-* 派生）；
+     ui-* 主题：只声明变量，不再整块覆盖结构属性（无需 !important，
+     自定义属性没有特异性竞争——scoped 基线只消费、不声明同名变量）。
+     迁移配方：background→--point-btn-bg；border→--point-btn-border；
+     border-radius→--point-btn-radius；box-shadow→--point-btn-shadow；
+     backdrop-filter→--point-btn-backdrop；:active 背景→--point-btn-active-bg。
+     ============================================ */
+  background: var(--point-btn-bg, var(--theme-surface-muted));
+  border: var(--point-btn-border, none);
+  border-radius: var(--point-btn-radius, 20rpx);
+  box-shadow: var(--point-btn-shadow, none);
+  backdrop-filter: var(--point-btn-backdrop, none);
   transition: all 0.25s ease;
 
   &:active {
     transform: scale(0.96);
     opacity: 0.85;
+    /* 未声明 active 令牌的主题：按下保持常态背景（与令牌化前行为一致） */
+    background: var(--point-btn-active-bg, var(--point-btn-bg, var(--theme-surface-muted)));
   }
 }
 
