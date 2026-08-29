@@ -41,7 +41,11 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: '@use "@/styles/variables.scss" as *;'
+        additionalData: '@use "@/styles/variables.scss" as *;',
+        // 静默 legacy-js-api 弃用警告：uni 的 vite 管线用旧版 JS API 调 Dart Sass，
+        // Sass 2.0 才会移除该 API；等 uni 官方切到现代编译器 API 后可删掉本行。
+        // 需要 sass >= 1.79（项目内 sass 已是 1.100.0）。
+        silenceDeprecations: ['legacy-js-api']
       }
     }
   }
