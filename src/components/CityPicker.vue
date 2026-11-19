@@ -423,6 +423,9 @@ defineExpose({ open, close, isOpen })
 
 /* 隐藏 scroll-view 滚动条（仅H5/App端，微信小程序不支持） */
 /* #ifdef H5 */
+.popup-body {
+  scrollbar-width: none;
+}
 .popup-body ::-webkit-scrollbar {
   display: none;
   width: 0;
@@ -432,6 +435,9 @@ defineExpose({ open, close, isOpen })
 /* #endif */
 
 /* #ifdef APP-PLUS */
+.popup-body {
+  scrollbar-width: none;
+}
 .popup-body ::-webkit-scrollbar {
   display: none;
   width: 0;

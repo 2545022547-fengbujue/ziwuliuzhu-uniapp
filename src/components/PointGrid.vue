@@ -82,7 +82,9 @@ const store = useAppStore()
   border-radius: var(--point-btn-radius, 20rpx);
   box-shadow: var(--point-btn-shadow, none);
   backdrop-filter: var(--point-btn-backdrop, none);
-  transition: all 0.25s ease;
+  transition: background 0.25s ease, border 0.25s ease, border-radius 0.25s ease,
+    box-shadow 0.25s ease, backdrop-filter 0.25s ease, transform 0.25s ease,
+    opacity 0.25s ease;
 
   &:active {
     transform: scale(0.96);

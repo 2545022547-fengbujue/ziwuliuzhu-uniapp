@@ -234,8 +234,8 @@ text {
   color: $tcm-primary;
   font-size: $font-size-sm;
   font-weight: 500;
-  transition: all 0.2s;
-  
+  transition: background-color 0.2s, transform 0.2s;
+
   &:active {
     transform: scale(0.97);
     background: rgba($tcm-primary, 0.15);
@@ -271,7 +271,7 @@ text {
 
 .slide-up-enter-active,
 .slide-up-leave-active {
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .slide-up-enter-from {
   transform: translateY(30rpx);
