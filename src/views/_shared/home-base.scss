@@ -64,7 +64,7 @@
   gap: 6rpx;
   padding: 12rpx 24rpx;
   border-radius: 16rpx;
-  transition: all 0.25s ease;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
 
   &.active {
     background: var(--theme-primary);
@@ -215,7 +215,7 @@
   padding: $spacing-md 0;
   border-radius: 20rpx;
   position: relative;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 
   &.active {
     background: var(--theme-primary);
@@ -240,7 +240,7 @@
 .method-name {
   font-size: 24rpx;
   color: var(--theme-text-secondary, #666666);
-  transition: all 0.25s ease;
+  transition: color 0.25s ease;
 }
 
 .method-indicator {

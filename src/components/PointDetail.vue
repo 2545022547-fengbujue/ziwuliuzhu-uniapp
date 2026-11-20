@@ -4,12 +4,10 @@
   <view class="overlay" @tap="handleClose">
     <view
       class="popup"
-      :class="[store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`, `watercolor-wash-${watercolorWash}`]"
+      :class="[...rootClasses, `watercolor-wash-${watercolorWash}`]"
       @tap.stop
     >
-      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-primary"></view>
-      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-wash-layer watercolor-wash-secondary"></view>
-      <view v-if="store.activeUiStyle === 'watercolor'" class="watercolor-paper-texture"></view>
+      <DetailThemeDecor variant="overlay" />
 
       <template v-if="point">
         <!-- 头部 -->
@@ -102,19 +100,7 @@
             </view>
           </view>
 
-          <!-- 动物岛主题底部场景：角色固定在详情卡右下角，草地与海浪补足原来的空白。 -->
-          <view v-if="store.activeUiStyle === 'animal'" class="animal-detail-scene" aria-hidden="true">
-            <view class="animal-scene-cloud cloud-one"></view>
-            <view class="animal-scene-cloud cloud-two"></view>
-            <view class="animal-scene-sun"></view>
-            <view class="animal-scene-tree tree-left"><view class="tree-crown"></view><view class="tree-crown tree-crown-b"></view><text class="tree-trunk"></text></view>
-            <view class="animal-scene-tree tree-mid"><view class="tree-crown"></view><view class="tree-crown tree-crown-b"></view><text class="tree-trunk"></text></view>
-            <view class="animal-scene-wave wave-back"></view>
-            <view class="animal-scene-wave wave-front"></view>
-            <view class="animal-scene-grass"></view>
-          </view>
-
-          <view v-else style="height: 80rpx;"></view>
+          <DetailThemeDecor variant="body-tail" />
         </scroll-view>
       </template>
 
@@ -155,20 +141,23 @@
  */
 import { computed, ref } from 'vue'
 import { useAppStore } from '@/stores/app.js'
+import { useRootClasses } from '@/composables/useRootClasses.js'
 import { getWuxingColor } from '@/utils/wuxing.js'
+import { nameGapStyle } from '@/utils/point-name-glyphs.js'
+import DetailThemeDecor from '@/components/DetailThemeDecor.vue'
 
 const store = useAppStore()
+// 弹窗根 class 与布局同源推导；弹窗无 ink-bg 变量消费规则，显式关闭
+const rootClasses = useRootClasses({ inkBackground: false })
 const point = computed(() => store.selectedPoint)
 
 // 弹窗穴名按字拆分，便于"陵→泉"这一对单独收紧字距，其余字对保持原字距
 const nameChars = computed(() => Array.from(point.value?.name || ''))
 
-// 仅在水墨主题、且上一字为"陵"且当前字为"泉"时额外负 margin 收拢该字对；其它情况不加
+// 穴位名逐字间距：按主题字形规则表派发（当前仅 ink「陵泉」收紧），规则见
+// utils/point-name-glyphs.js —— 共享组件不感知具体主题的字形癖好。
 function pnGapStyle(i, ch) {
-  if (store.activeUiStyle === 'ink' && i > 0 && nameChars.value[i - 1] === '陵' && ch === '泉') {
-    return 'margin-left:-10rpx'
-  }
-  return ''
+  return nameGapStyle(store.activeUiStyle, nameChars.value[i - 1], ch)
 }
 const watercolorWashes = ['mist', 'peach', 'ocean', 'rose', 'golden', 'shore']
 
@@ -252,440 +241,7 @@ function handleClose() {
 </script>
 
 <style lang="scss" scoped>
-/* ============================================
-   PointDetail - 穴位详情弹窗样式
-
-   布局说明：
-   - overlay：fixed 全屏遮罩
-   - popup：居中弹窗容器，flex column
-   - popup-header：顶部固定区域（名称+代码+关闭按钮）
-   - popup-body：可滚动内容区（基本信息、定位、操作方法等）
-
-   重要：所有卡片容器必须加 box-sizing: border-box; width: 100%; overflow: hidden
-         否则在 uni-app H5 模式下会出现右边截断的问题
-
-   单位：全部使用 rpx（2026-05-25 从 px 迁移，确保与全App一致）
-   ============================================ */
-
-/* 宋体字体族：正文区域使用，与标题楷体形成"楷题宋文"传统排版 */
-$font-songti: 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
-
-/* === 遮罩层 === */
-.overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 1100;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.popup {
-  width: 92%;
-  max-height: 85vh;
-  background: var(--theme-surface);
-  border-radius: 48rpx;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 16rpx 60rpx rgba(0, 0, 0, 0.18);
-  overflow: hidden;
-}
-
-.empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 120rpx 40rpx;
-}
-
-.empty-text {
-  font-size: 28rpx;
-  color: var(--theme-text-hint, #999999);
-}
-
-.popup-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 48rpx 40rpx;
-  border-bottom: 2rpx solid var(--theme-border);
-  flex-shrink: 0;
-  position: relative;
-  min-height: 144rpx;
-}
-
-.header-icon-wrap {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 50%;
-  background: var(--theme-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  z-index: 2;
-}
-
-.header-icon {
-  font-size: 40rpx;
-}
-
-.header-name-layer {
-  position: absolute;
-  left: 152rpx;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: baseline;
-  gap: 12rpx;
-  z-index: 1;
-}
-
-.point-name {
-  font-size: 76rpx;
-  font-weight: 700;
-  color: var(--theme-text);
-  font-family: 'KaitiGB2312', 'WenYuanSerifSC', 'KaiTi', '楷体', 'STKaiti', serif;
-  line-height: 1.2;
-  // 字距改按字拆分的精准方案：仅"陵→泉"一对额外收拢（见 pnGapStyle），其余字对保持原字距；
-  // 华文行楷基线偏高所需的 letter-spacing/translateY 微调仅水墨主题需要，已移至 ui-ink.scss 的 .popup .point-name
-}
-
-.point-code {
-  font-size: 20rpx;
-  color: var(--theme-text-hint);
-  font-family: monospace;
-  letter-spacing: 1rpx;
-  transform: translateY(8rpx);
-}
-
-.close-btn {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 50%;
-  background: var(--theme-surface-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: transform 0.15s ease;
-
-  &:active {
-    transform: scale(0.92);
-  }
-}
-
-.close-icon {
-  font-size: 36rpx;
-  color: var(--theme-text-secondary);
-}
-
-.popup-body {
-  flex: 1;
-  padding: 0;
-  max-height: 65vh;
-  width: 100%;
-  box-sizing: border-box;
-  overflow-y: auto;
-}
-
-.popup-body-content {
-  width: 100%;
-  padding: 40rpx;
-  box-sizing: border-box;
-}
-
-/* === 动物主题：详情底部岛屿场景与右下角随机守护动物 === */
-.animal-detail-scene {
-  position: relative;
-  height: 300rpx;
-  width: 100%;
-  margin: 16rpx 0 0;
-  overflow: hidden;
-}
-
-.animal-scene-sun {
-  position: absolute;
-  top: 30rpx;
-  right: 80rpx;
-  width: 74rpx;
-  height: 74rpx;
-  border-radius: 50%;
-}
-
-.animal-scene-cloud {
-  position: absolute;
-  z-index: 1;
-  width: 92rpx;
-  height: 28rpx;
-  border-radius: 999rpx;
-}
-.animal-scene-cloud::before,
-.animal-scene-cloud::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  border-radius: 50%;
-  background: inherit;
-}
-.animal-scene-cloud::before { left: 16rpx; width: 42rpx; height: 42rpx; }
-.animal-scene-cloud::after { right: 12rpx; width: 32rpx; height: 32rpx; }
-.cloud-one { top: 42rpx; left: 52rpx; }
-.cloud-two { top: 100rpx; left: 230rpx; transform: scale(.72); opacity: .72; }
-
-.animal-scene-tree {
-  position: absolute;
-  z-index: 3;
-  bottom: 64rpx;
-  width: 98rpx;
-  height: 134rpx;
-}
-.animal-scene-tree .tree-crown {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 86rpx;
-  height: 72rpx;
-  border-radius: 50%;
-  transform: translateX(-50%);
-}
-.animal-scene-tree .tree-crown-b { top: 38rpx; width: 98rpx; }
-.animal-scene-tree .tree-trunk {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 18rpx;
-  height: 58rpx;
-  transform: translateX(-50%);
-}
-.tree-left { left: 26rpx; transform: scale(.88); }
-.tree-mid { left: 142rpx; bottom: 56rpx; transform: scale(.62); }
-
-.animal-scene-wave {
-  position: absolute;
-  left: -5%;
-  width: 110%;
-  border-radius: 50% 50% 0 0;
-}
-.wave-back { z-index: 2; bottom: 34rpx; height: 112rpx; }
-.wave-front { z-index: 4; bottom: -28rpx; height: 94rpx; }
-.animal-scene-grass {
-  position: absolute;
-  left: -4%;
-  bottom: 38rpx;
-  z-index: 5;
-  width: 108%;
-  height: 70rpx;
-  border-radius: 52% 48% 20% 18%;
-}
-
-/* === 信息区块 === */
-.info-section {
-  margin-bottom: 40rpx;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  margin-bottom: 24rpx;
-  font-size: 30rpx;
-  font-weight: 600;
-  color: var(--theme-text-secondary);
-  font-family: $font-songti;
-}
-
-.title-dot {
-  width: 8rpx;
-  height: 32rpx;
-  border-radius: 4rpx;
-  background: var(--theme-secondary);
-}
-
-.info-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20rpx;
-}
-
-.info-grid-center {
-  justify-content: center;
-}
-
-.info-grid-center .info-item {
-  max-width: 48%;
-}
-
-/* 经络框默认加长，方便显示较长经络名 */
-.info-item:first-child {
-  flex: 1.15;
-}
-
-/* 经络6字且有五行时，经络框进一步变宽，五行框变窄 */
-.info-grid-meridian-long .info-item:first-child {
-  flex: 1.3;
-}
-.info-grid-meridian-long .info-item:last-child {
-  flex: 0.7;
-}
-
-.info-item {
-  flex: 1;
-  min-width: 160rpx;
-  padding: 24rpx;
-  background: var(--theme-surface-muted);
-  border-radius: 24rpx;
-  box-sizing: border-box;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.info-label {
-  display: block;
-  font-size: 24rpx;
-  color: var(--theme-text-hint);
-  margin-bottom: 8rpx;
-  font-family: $font-songti;
-}
-
-.info-value {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  font-size: 32rpx;
-  font-weight: 700;
-  color: var(--theme-text);
-  word-break: keep-all;
-  font-family: 'WenYuanSerifSC-Bold', 'WenYuanSerifSC', 'SimSun', 'STSong', 'Songti SC', serif;
-}
-
-.info-value-center {
-  text-align: center;
-}
-
-// 所属经络 / 穴位类别的值字号放大
-.info-value-lg {
-  font-size: 40rpx;
-}
-
-.wuxing-value {
-  font-size: 32rpx;
-  font-weight: 700;
-}
-
-/* 类别文字较长时，五行属性字号放大 */
-.wuxing-value-large {
-  font-size: 36rpx;
-}
-
-/* === 定位 === */
-.location-box {
-  padding: 28rpx;
-  background: var(--theme-surface-muted);
-  border: 2rpx solid var(--theme-border);
-  border-radius: 24rpx;
-  box-sizing: border-box;
-  width: 100%;
-  overflow: hidden;
-}
-
-.location-text {
-  font-size: 30rpx;
-  color: var(--theme-text-secondary);
-  line-height: 2;
-  letter-spacing: 1rpx;
-  word-break: normal;
-  overflow-wrap: break-word;
-}
-
-/* === 操作方法 === */
-.method-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20rpx;
-}
-
-.method-item {
-  padding: 28rpx;
-  background: var(--theme-surface-muted);
-  border: 2rpx solid var(--theme-border);
-  border-radius: 24rpx;
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.method-label {
-  display: block;
-  font-size: 24rpx;
-  color: var(--theme-text-hint);
-  margin-bottom: 12rpx;
-  font-family: $font-songti;
-}
-
-.method-value {
-  display: block;
-  font-size: 28rpx;
-  color: var(--theme-text-secondary);
-  line-height: 1.7;
-  word-break: break-all;
-  text-align: justify;
-  font-family: $font-songti;
-}
-
-/* === 注意事项 === */
-.caution-box {
-  padding: 28rpx;
-  background: rgba($tcm-red, 0.04);
-  border: 2rpx solid rgba($tcm-red, 0.15);
-  border-radius: 24rpx;
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.caution-header {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
-}
-
-.caution-icon {
-  font-size: 28rpx;
-}
-
-.caution-title {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: $tcm-red;
-  font-family: $font-songti;
-}
-
-.caution-text {
-  font-size: 26rpx;
-  color: rgba($tcm-red, 0.8);
-  line-height: 1.7;
-  word-break: break-all;
-  text-align: justify;
-  font-family: $font-songti;
-}
-
-/* === 纳子法补母泻子说明 === */
-.nazi-bumu-tip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16rpx;
-  padding: 20rpx;
-  background: var(--theme-surface-muted);
-  border-radius: 28rpx;
-  margin-top: $spacing-md;
-}
-
-.nazi-bumu-tip-text {
-  font-size: 24rpx;
-  color: var(--theme-text-hint, #999999);
-}
+/* 样式主体见同目录 point-detail-base.scss（与 views/_shared/home-base.scss 同模式，
+   经典基线；主题覆盖位于全局 ui-*.scss / themes.scss 命名空间）。 */
+@use './point-detail-base.scss' as *;
 </style>

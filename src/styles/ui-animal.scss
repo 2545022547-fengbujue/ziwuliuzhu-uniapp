@@ -8,7 +8,7 @@
    - 双狸角色与岛屿纸纹来自 Animal Island UI（MIT），许可见 THIRD_PARTY_NOTICES.md
    - 交互参考 Animal Island Button：悬浮轻抬、按下回落，形成柔和木牌手感
 
-   级联规则同 modern.scss：!important 压 scoped，@use 顺序压 themes.scss
+   级联规则同 ui-modern.scss：!important 压 scoped，@use 顺序压 themes.scss
    ============================================ */
 
 // 动物岛调色板：青绿主色系 + 暖黄木牌 + 奶油纸面，全部取自 Animal Island 的自然系配色
@@ -502,10 +502,12 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
 
   /* === 穴位按钮：奶油药片 + 青绿细边 + 按压回落 === */
   .point-btn {
-    background: $animal-paper !important;
-    border: 2rpx solid rgba(25,175,162,0.22) !important;
-    border-radius: 999rpx !important;
-    box-shadow: 0 5rpx 0 rgba(25,175,162,0.10) !important;
+    /* 主题令牌（渐进式迁移）：见 PointGrid.vue 令牌表说明 */
+    --point-btn-bg: #{$animal-paper};
+    --point-btn-border: 2rpx solid rgba(25, 175, 162, 0.22);
+    --point-btn-radius: 999rpx;
+    --point-btn-shadow: 0 5rpx 0 rgba(25, 175, 162, 0.10);
+    --point-btn-active-bg: #DDF3E8;
     transition: transform .22s cubic-bezier(.4,0,.2,1), box-shadow .22s ease, background-color .22s ease !important;
   }
 
@@ -517,7 +519,7 @@ $animal-font: 'Arial Rounded MT Bold', 'PingFang SC', 'Microsoft YaHei', sans-se
   /* #endif */
 
   .point-btn:active {
-    background: #DDF3E8 !important;
+    /* 背景由 --point-btn-active-bg 令牌承载（见上）；此处只做位移/阴影的结构按压反馈 */
     transform: translateY(3rpx) !important;
     box-shadow: 0 2rpx 0 rgba(25,175,162,0.12) !important;
   }

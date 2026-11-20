@@ -391,7 +391,7 @@
   background: var(--theme-surface-muted);
   border: 1rpx solid var(--theme-border);
   border-radius: 18rpx;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 
   &.active {
     border-color: var(--theme-primary);

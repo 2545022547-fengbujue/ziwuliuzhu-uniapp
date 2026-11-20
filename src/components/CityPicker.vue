@@ -2,7 +2,7 @@
   <view v-if="show" class="overlay" @tap="handleOverlayTap">
     <view
       class="popup"
-      :class="store.activeUiStyle === 'classic' ? `theme-${store.activeTheme}` : `ui-${store.activeUiStyle}`"
+      :class="rootClasses"
       @tap="handlePopupTap"
     >
       <!-- 头部 -->
@@ -136,8 +136,11 @@
 import { ref, computed, nextTick, onUnmounted } from 'vue'
 import { CITIES, searchCities, PROVINCE_ORDER } from '@/data/city-coordinates.js'
 import { useAppStore } from '@/stores/app.js'
+import { useRootClasses } from '@/composables/useRootClasses.js'
 
 const store = useAppStore()
+// 弹窗根 class 与布局同源推导；弹窗无 ink-bg 变量消费规则，显式关闭
+const rootClasses = useRootClasses({ inkBackground: false })
 const show = ref(false)
 const selectedCity = ref('')
 const searchText = ref('')
@@ -420,6 +423,9 @@ defineExpose({ open, close, isOpen })
 
 /* 隐藏 scroll-view 滚动条（仅H5/App端，微信小程序不支持） */
 /* #ifdef H5 */
+.popup-body {
+  scrollbar-width: none;
+}
 .popup-body ::-webkit-scrollbar {
   display: none;
   width: 0;
@@ -429,6 +435,9 @@ defineExpose({ open, close, isOpen })
 /* #endif */
 
 /* #ifdef APP-PLUS */
+.popup-body {
+  scrollbar-width: none;
+}
 .popup-body ::-webkit-scrollbar {
   display: none;
   width: 0;

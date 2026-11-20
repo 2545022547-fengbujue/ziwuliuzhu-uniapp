@@ -297,14 +297,12 @@ $modern-font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 
 
   // 穴位按钮：浅灰扁平药片
   .point-btn {
-    background: $modern-muted !important;
-    border: none !important;
-    border-radius: 14rpx !important;
-    backdrop-filter: none !important;
-
-    &:active {
-      background: $modern-primary-soft !important;
-    }
+    /* 主题令牌（渐进式迁移）：见 PointGrid.vue 令牌表说明 */
+    --point-btn-bg: #{$modern-muted};
+    --point-btn-border: none;
+    --point-btn-radius: 14rpx;
+    --point-btn-backdrop: none;
+    --point-btn-active-bg: #{$modern-primary-soft};
   }
 
   .point-name {
