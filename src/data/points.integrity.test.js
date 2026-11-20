@@ -25,9 +25,9 @@ const PREFIXES = ['LU', 'LI', 'ST', 'SP', 'HT', 'SI', 'BL', 'KI', 'PC', 'TE', 'G
 const PREFIX_RE = new RegExp(`^(?:${PREFIXES.join('|')})\\d+$`)
 
 describe('穴位主数据（acupuncture-points-gb2021.json）', () => {
-  it('总数与 metadata 一致且等于 359（GB/T 2021 国家标准化穴位）', () => {
+  it('总数与 metadata 一致且等于 361（GB/T 2021 补全 SP16/BL30 后）', () => {
     expect(data.metadata.totalPoints).toBe(pts.length)
-    expect(pts.length).toBe(359)
+    expect(pts.length).toBe(361)
   })
 
   it('每条记录必填字段非空且 id === code', () => {
